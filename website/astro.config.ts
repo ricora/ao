@@ -17,9 +17,9 @@ export default defineConfig({
         },
       ],
       social: {
-        github: "https://github.com/shuiro-dev/shuiro",
+        github: "https://github.com/ricora/ao",
       },
-      title: "Shuiro Language",
+      title: "Ao Language",
     }),
     react(),
     tailwind({ applyBaseStyles: false }),

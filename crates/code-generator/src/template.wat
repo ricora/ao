@@ -55,7 +55,7 @@
   )
 
 
-  ;; std module - Shuiro Standard Library v0
+  ;; std module - Ao Standard Library v0
   (core module $Std
     (import "env" "memory" (memory $memory 0))
 
@@ -266,16 +266,16 @@
   (core module $Main
     (import "env" "memory" (memory $memory 0))
 
-    (import "shuiro:std@0.0.0" "print_int"
+    (import "ao:std@0.0.0" "print_int"
       (func $print_int (param i32) (result i32))
     )
-    (import "shuiro:std@0.0.0" "print_char"
+    (import "ao:std@0.0.0" "print_char"
       (func $print_char (param i32) (result i32))
     )
   )
   (core instance $core|main (instantiate $Main
     (with "env" (instance $core|env))
-    (with "shuiro:std@0.0.0" (instance $core|std))
+    (with "ao:std@0.0.0" (instance $core|std))
   ))
 
 
