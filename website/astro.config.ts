@@ -6,6 +6,7 @@ import tsconfigPaths from "vite-tsconfig-paths"
 
 // https://astro.build/config
 export default defineConfig({
+  base: "/ao",
   integrations: [
     starlight({
       customCss: ["./src/tailwind.css"],
@@ -23,6 +24,7 @@ export default defineConfig({
     react(),
     tailwind({ applyBaseStyles: false }),
   ],
+  site: "https://ricora.github.io",
   vite: {
     optimizeDeps: {
       exclude: ["@bytecodealliance/jco/component", "@rollup/browser"],
