@@ -25,7 +25,7 @@ jobs:
       - run: exit 1
 
   rust-format:
-    name: Format
+    name: Format (Rust)
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
@@ -41,7 +41,7 @@ jobs:
         run: cargo make format
 
   rust-lint:
-    name: Lint
+    name: Lint (Rust)
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
@@ -57,7 +57,7 @@ jobs:
         run: cargo make lint
 
   rust-build:
-    name: Build
+    name: Build (Rust)
     runs-on: ${{ matrix.runner }}
     strategy:
       fail-fast: false
@@ -90,7 +90,7 @@ jobs:
           CARGO_BUILD_TARGET: ${{ matrix.target }}
 
   rust-test:
-    name: Test
+    name: Test (Rust)
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
@@ -106,7 +106,7 @@ jobs:
         run: cargo make test
 
   rust-machete:
-    name: Machete
+    name: Machete (Rust)
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
@@ -122,7 +122,7 @@ jobs:
         run: cargo make machete
 
   npm-format:
-    name: Format
+    name: Format (npm)
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
@@ -134,7 +134,7 @@ jobs:
         run: pnpm run --filter "*" format
 
   npm-lint:
-    name: Lint
+    name: Lint (npm)
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
@@ -146,7 +146,7 @@ jobs:
         run: pnpm run --filter "*" lint
 
   npm-build:
-    name: Build
+    name: Build (npm)
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
