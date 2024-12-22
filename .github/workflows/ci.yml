@@ -16,6 +16,9 @@ jobs:
       - rust-build
       - rust-test
       - rust-machete
+      - npm-format
+      - npm-lint
+      - npm-build
     permissions: {}
     if: failure()
     steps:
