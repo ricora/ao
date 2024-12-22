@@ -74,6 +74,12 @@ importers:
       '@eslint/js':
         specifier: 9.17.0
         version: 9.17.0
+      '@types/eslint-config-prettier':
+        specifier: 6.11.3
+        version: 6.11.3
+      '@types/eslint-plugin-jsx-a11y':
+        specifier: 6.10.0
+        version: 6.10.0
       eslint:
         specifier: 9.17.0
         version: 9.17.0(jiti@2.4.2)
@@ -1807,6 +1813,15 @@ packages:
 
   '@types/debug@4.1.12':
     resolution: {integrity: sha512-vIChWdVG3LG1SMxEvI/AK+FWJthlrqlTu7fbrlywTkkaONwk/UAGaULXRlf8vkzFBLVm0zkMdCquhL5aOjhXPQ==}
+
+  '@types/eslint-config-prettier@6.11.3':
+    resolution: {integrity: sha512-3wXCiM8croUnhg9LdtZUJQwNcQYGWxxdOWDjPe1ykCqJFPVpzAKfs/2dgSoCtAvdPeaponcWPI7mPcGGp9dkKQ==}
+
+  '@types/eslint-plugin-jsx-a11y@6.10.0':
+    resolution: {integrity: sha512-TGKmk2gO6DrvTVADNOGQMqn3SzqcFcJILFnXNllQA34us9uClS3/AsL/cERPz6jS9ePI3bx+1q8/d2GZsxPVYw==}
+
+  '@types/eslint@9.6.1':
+    resolution: {integrity: sha512-FXx2pKgId/WyYo2jXw63kk7/+TY7u7AziEJxJAnSFzHlqTAS3Ync6SvgYAN/k4/PQpnnVuzoMuVnByKK2qp0ag==}
 
   '@types/estree-jsx@1.0.5':
     resolution: {integrity: sha512-52CcUVNFyfb1A2ALocQw/Dd1BQFNmSdkuC3BkZ6iqhdMfQz7JWOFRuJFloOzjk+6WijU56m9oKXFAXc7o3Towg==}
@@ -6810,6 +6825,17 @@ snapshots:
   '@types/debug@4.1.12':
     dependencies:
       '@types/ms': 0.7.34
+
+  '@types/eslint-config-prettier@6.11.3': {}
+
+  '@types/eslint-plugin-jsx-a11y@6.10.0':
+    dependencies:
+      '@types/eslint': 9.6.1
+
+  '@types/eslint@9.6.1':
+    dependencies:
+      '@types/estree': 1.0.6
+      '@types/json-schema': 7.0.15
 
   '@types/estree-jsx@1.0.5':
     dependencies:

@@ -4,11 +4,11 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "dev": "bun run build:wasm && bun run astro dev",
+    "dev": "pnpm run build:wasm && pnpm run astro dev",
     "start": "astro dev",
-    "build": "bun run build:wasm && bun run build:astro",
+    "build": "pnpm run build:wasm && pnpm run build:astro",
     "build:astro": "astro build",
-    "build:wasm": "cargo component build --release --package tools && cp ../target/wasm32-wasip1/release/tools.wasm generated/tools/tools.wasm && bun run jco transpile generated/tools/tools.wasm -o generated/tools",
+    "build:wasm": "cargo component build --release --package tools && cp ../target/wasm32-wasip1/release/tools.wasm generated/tools/tools.wasm && pnpm jco transpile generated/tools/tools.wasm -o generated/tools",
     "preview": "astro preview",
     "astro": "astro",
     "lint": "eslint --cache --cache-location ./node_modules/.cache/eslint .",
@@ -40,6 +40,8 @@
   },
   "devDependencies": {
     "@eslint/js": "9.17.0",
+    "@types/eslint-config-prettier": "6.11.3",
+    "@types/eslint-plugin-jsx-a11y": "6.10.0",
     "eslint": "9.17.0",
     "eslint-config-flat-gitignore": "0.3.0",
     "eslint-config-prettier": "9.1.0",
