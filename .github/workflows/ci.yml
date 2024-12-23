@@ -1,0 +1,168 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  status-check:
+    name: Status Check
+    runs-on: ubuntu-24.04
+    needs:
+      - rust-format
+      - rust-lint
+      - rust-build
+      - rust-test
+      - rust-machete
+      - npm-format
+      - npm-lint
+      - npm-build
+    permissions: {}
+    if: always()
+    steps:
+      - run: exit 1
+        if: contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') || contains(needs.*.result, 'skipped')
+
+  rust-format:
+    name: Format (Rust)
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+      - name: Install Rust toolchain
+        run: rustup toolchain install stable --profile minimal
+      - name: Cache dependencies
+        uses: Swatinem/rust-cache@82a92a6e8fbeee089604da2575dc567ae9ddeaab # v2.7.5
+      - name: Install cargo-binstall
+        uses: cargo-bins/cargo-binstall@9bc0ba964d12bf4c034d65ce732726a2b1a8d9df # v1.10.17
+      - name: Install cargo-make
+        run: cargo binstall cargo-make --force
+      - name: Check formatting
+        run: cargo make format
+
+  rust-lint:
+    name: Lint (Rust)
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+      - name: Install Rust toolchain
+        run: rustup toolchain install stable --profile minimal
+      - name: Cache dependencies
+        uses: Swatinem/rust-cache@82a92a6e8fbeee089604da2575dc567ae9ddeaab # v2.7.5
+      - name: Install cargo-binstall
+        uses: cargo-bins/cargo-binstall@9bc0ba964d12bf4c034d65ce732726a2b1a8d9df # v1.10.17
+      - name: Install cargo-make
+        run: cargo binstall cargo-make --force
+      - name: Check linting
+        run: cargo make lint
+
+  rust-build:
+    name: Build (Rust)
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: linux-x86_64
+            runner: ubuntu-24.04
+            target: x86_64-unknown-linux-gnu
+          - name: wasm32-unknown-unknown
+            runner: ubuntu-24.04
+            target: wasm32-unknown-unknown
+          - name: wasm32-wasip2
+            runner: ubuntu-24.04
+            target: wasm32-wasip2
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+      - name: Install Rust toolchain
+        run: rustup toolchain install stable --profile minimal
+      - name: Cache dependencies
+        uses: Swatinem/rust-cache@82a92a6e8fbeee089604da2575dc567ae9ddeaab # v2.7.5
+      - name: Install cargo-binstall
+        uses: cargo-bins/cargo-binstall@9bc0ba964d12bf4c034d65ce732726a2b1a8d9df # v1.10.17
+      - name: Install cargo-make
+        run: cargo binstall cargo-make --force
+      - name: Install target
+        run: rustup target add ${{ matrix.target }}
+      - name: Build
+        run: cargo make build
+        env:
+          CARGO_BUILD_TARGET: ${{ matrix.target }}
+
+  rust-test:
+    name: Test (Rust)
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+      - name: Install Rust toolchain
+        run: rustup toolchain install stable --profile minimal
+      - name: Cache dependencies
+        uses: Swatinem/rust-cache@82a92a6e8fbeee089604da2575dc567ae9ddeaab # v2.7.5
+      - name: Install cargo-binstall
+        uses: cargo-bins/cargo-binstall@9bc0ba964d12bf4c034d65ce732726a2b1a8d9df # v1.10.17
+      - name: Install cargo-make
+        run: cargo binstall cargo-make --force
+      - name: Test
+        run: cargo make test
+
+  rust-machete:
+    name: Machete (Rust)
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+      - name: Install Rust toolchain
+        run: rustup toolchain install stable --profile minimal
+      - name: Cache dependencies
+        uses: Swatinem/rust-cache@82a92a6e8fbeee089604da2575dc567ae9ddeaab # v2.7.5
+      - name: Install cargo-binstall
+        uses: cargo-bins/cargo-binstall@9bc0ba964d12bf4c034d65ce732726a2b1a8d9df # v1.10.17
+      - name: Install cargo-make
+        run: cargo binstall cargo-make --force
+      - name: Run machete
+        run: cargo make machete
+
+  npm-format:
+    name: Format (npm)
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+      - name: Install tools
+        uses: jdx/mise-action@5bb8f8c1911837cf42064e6490e7634fc842ee7e # v2.1.8
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Check formatting
+        run: pnpm run --filter "*" format
+
+  npm-lint:
+    name: Lint (npm)
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+      - name: Install tools
+        uses: jdx/mise-action@5bb8f8c1911837cf42064e6490e7634fc842ee7e # v2.1.8
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Check linting
+        run: pnpm run --filter "*" lint
+
+  npm-build:
+    name: Build (npm)
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+      - name: Install tools
+        uses: jdx/mise-action@5bb8f8c1911837cf42064e6490e7634fc842ee7e # v2.1.8
+      - name: Cache dependencies
+        uses: Swatinem/rust-cache@82a92a6e8fbeee089604da2575dc567ae9ddeaab # v2.7.5
+      - name: Install Rust toolchain
+        run: rustup toolchain install stable
+      - name: Install cargo-binstall
+        uses: cargo-bins/cargo-binstall@9bc0ba964d12bf4c034d65ce732726a2b1a8d9df # v1.10.17
+      - name: Install cargo-component
+        run: cargo binstall cargo-component --force
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Check build
+        run: pnpm run --filter "*" build

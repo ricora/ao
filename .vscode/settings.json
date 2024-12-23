@@ -1,0 +1,16 @@
+{
+  "tailwindCSS.experimental.classRegex": [
+    ["([\"'`][^\"'`]*.*?[\"'`])", "[\"'`]([^\"'`]*).*?[\"'`]"]
+  ],
+  "rust-analyzer.check.overrideCommand": [
+    "cargo",
+    "component",
+    "check",
+    "--workspace",
+    "--all-targets",
+    "--message-format=json"
+  ],
+  "evenBetterToml.schema.associations": {
+    "Makefile.toml": "https://json.schemastore.org/cargo-make.json"
+  }
+}
