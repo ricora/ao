@@ -38,7 +38,7 @@ jobs:
       - name: Install cargo-component
         run: cargo binstall cargo-component
       - name: Install dependencies
-        run: bun install --frozen-lockfile
+        run: pnpm install --frozen-lockfile
       - name: Build
         run: pnpm run --filter website build
       - name: Upload artifact
