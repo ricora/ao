@@ -76,6 +76,7 @@ crate_name = "cargo-machete"
 binary = "machete"
 test_arg = ["--help"]
 install_command = "binstall"
+force = true
 
 
 [tasks.setup-llvm-cov.install_crate]
@@ -83,3 +84,4 @@ crate_name = "cargo-llvm-cov"
 binary = "llvm-cov"
 test_arg = ["--version"]
 install_command = "binstall"
+force = true

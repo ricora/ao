@@ -37,7 +37,7 @@ jobs:
       - name: Install cargo-binstall
         uses: cargo-bins/cargo-binstall@9bc0ba964d12bf4c034d65ce732726a2b1a8d9df # v1.10.17
       - name: Install cargo-make
-        run: cargo binstall cargo-make
+        run: cargo binstall cargo-make --force
       - name: Check formatting
         run: cargo make format
 
@@ -53,7 +53,7 @@ jobs:
       - name: Install cargo-binstall
         uses: cargo-bins/cargo-binstall@9bc0ba964d12bf4c034d65ce732726a2b1a8d9df # v1.10.17
       - name: Install cargo-make
-        run: cargo binstall cargo-make
+        run: cargo binstall cargo-make --force
       - name: Check linting
         run: cargo make lint
 
@@ -82,7 +82,7 @@ jobs:
       - name: Install cargo-binstall
         uses: cargo-bins/cargo-binstall@9bc0ba964d12bf4c034d65ce732726a2b1a8d9df # v1.10.17
       - name: Install cargo-make
-        run: cargo binstall cargo-make
+        run: cargo binstall cargo-make --force
       - name: Install target
         run: rustup target add ${{ matrix.target }}
       - name: Build
@@ -102,7 +102,7 @@ jobs:
       - name: Install cargo-binstall
         uses: cargo-bins/cargo-binstall@9bc0ba964d12bf4c034d65ce732726a2b1a8d9df # v1.10.17
       - name: Install cargo-make
-        run: cargo binstall cargo-make
+        run: cargo binstall cargo-make --force
       - name: Test
         run: cargo make test
 
@@ -118,7 +118,7 @@ jobs:
       - name: Install cargo-binstall
         uses: cargo-bins/cargo-binstall@9bc0ba964d12bf4c034d65ce732726a2b1a8d9df # v1.10.17
       - name: Install cargo-make
-        run: cargo binstall cargo-make
+        run: cargo binstall cargo-make --force
       - name: Run machete
         run: cargo make machete
 
@@ -158,9 +158,9 @@ jobs:
       - name: Install Rust toolchain
         run: rustup toolchain install stable
       - name: Install cargo-binstall
-        run: curl -L --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/cargo-bins/cargo-binstall/main/install-from-binstall-release.sh | bash
+        uses: cargo-bins/cargo-binstall@9bc0ba964d12bf4c034d65ce732726a2b1a8d9df # v1.10.17
       - name: Install cargo-component
-        run: cargo binstall cargo-component
+        run: cargo binstall cargo-component --force
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
       - name: Check build
