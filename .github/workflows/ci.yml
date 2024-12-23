@@ -9,6 +9,7 @@ on:
 
 jobs:
   status-check:
+    name: Status Check
     runs-on: ubuntu-24.04
     needs:
       - rust-format
