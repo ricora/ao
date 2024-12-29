@@ -30,7 +30,7 @@ jobs:
       - name: Install tools
         uses: jdx/mise-action@249c01ba271e19fa76eede7f766161cc95ace489 # v2.1.10
       - name: Cache dependencies
-        uses: Swatinem/rust-cache@720f7e45ccee46c12a7b1d7bed2ab733be9be5a1 # v2.7.6
+        uses: Swatinem/rust-cache@f0deed1e0edfc6a9be95417288c0e1099b1eeec3 # v2.7.7
       - name: Install Rust toolchain
         run: rustup toolchain install stable
       - name: Install cargo-binstall
