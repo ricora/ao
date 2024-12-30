@@ -129,7 +129,7 @@ jobs:
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
       - name: Install tools
-        uses: jdx/mise-action@249c01ba271e19fa76eede7f766161cc95ace489 # v2.1.10
+        uses: jdx/mise-action@5083fe46898c414b2475087cc79da59e7da859e8 # v2.1.11
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
       - name: Check formatting
@@ -141,7 +141,7 @@ jobs:
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
       - name: Install tools
-        uses: jdx/mise-action@249c01ba271e19fa76eede7f766161cc95ace489 # v2.1.10
+        uses: jdx/mise-action@5083fe46898c414b2475087cc79da59e7da859e8 # v2.1.11
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
       - name: Check linting
@@ -153,7 +153,7 @@ jobs:
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
       - name: Install tools
-        uses: jdx/mise-action@249c01ba271e19fa76eede7f766161cc95ace489 # v2.1.10
+        uses: jdx/mise-action@5083fe46898c414b2475087cc79da59e7da859e8 # v2.1.11
       - name: Cache dependencies
         uses: Swatinem/rust-cache@f0deed1e0edfc6a9be95417288c0e1099b1eeec3 # v2.7.7
       - name: Install Rust toolchain
