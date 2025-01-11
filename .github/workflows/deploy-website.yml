@@ -34,7 +34,7 @@ jobs:
       - name: Install Rust toolchain
         run: rustup toolchain install stable
       - name: Install cargo-binstall
-        uses: cargo-bins/cargo-binstall@1f43e1af11cf5eb18fb1f2660e0d6dcddd24b6ea # v1.10.19
+        uses: cargo-bins/cargo-binstall@7bcb061e8888b85b43b5addc082de33986263fe9 # v1.10.20
       - name: Install cargo-component
         run: cargo binstall cargo-component --force
       - name: Install dependencies
