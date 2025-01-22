@@ -45,7 +45,7 @@ importers:
         version: 11.18.2(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       justd-icons:
         specifier: ^1.10.8
-        version: 1.10.21(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+        version: 1.10.24(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       react:
         specifier: ^19.0.0
         version: 19.0.0
@@ -2968,8 +2968,8 @@ packages:
     resolution: {integrity: sha512-ZZow9HBI5O6EPgSJLUb8n2NKgmVWTwCvHGwFuJlMjvLFqlGG6pjirPhtdsseaLZjSibD8eegzmYpUZwoIlj2cQ==}
     engines: {node: '>=4.0'}
 
-  justd-icons@1.10.21:
-    resolution: {integrity: sha512-OTCl6ArwQ6W0Thyf6wgQ7B4G4N+s58FD09zqO5zqa/iNBmF3LMDcGDTY1s7TBM6ndeLTTYXs/keWneQGXIWz0g==}
+  justd-icons@1.10.24:
+    resolution: {integrity: sha512-4UGz7ltvzNuTVne/YSadfYN89ZXePc8CGE7IECjVDFJI/gjrzkiN4TzMeoYgr7TG7Dj+++kuYYGFYZRwKfBCNg==}
     peerDependencies:
       react: ^19.0.0
       react-dom: ^19.0.0
@@ -8177,7 +8177,7 @@ snapshots:
       object.assign: 4.1.7
       object.values: 1.2.1
 
-  justd-icons@1.10.21(react-dom@19.0.0(react@19.0.0))(react@19.0.0):
+  justd-icons@1.10.24(react-dom@19.0.0(react@19.0.0))(react@19.0.0):
     dependencies:
       '@babel/runtime': 7.26.0
       react: 19.0.0
