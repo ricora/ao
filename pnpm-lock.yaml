@@ -23,8 +23,8 @@ importers:
         specifier: ^5.1.4
         version: 5.1.5(astro@5.1.8(jiti@1.21.7)(rollup@4.31.0)(terser@5.37.0)(typescript@5.7.3)(yaml@2.7.0))(tailwindcss@3.4.17)
       '@bytecodealliance/jco':
-        specifier: 1.8.1
-        version: 1.8.1
+        specifier: 1.9.1
+        version: 1.9.1
       '@bytecodealliance/preview2-shim':
         specifier: ^0.17.1
         version: 0.17.1
@@ -278,11 +278,11 @@ packages:
     resolution: {integrity: sha512-L6mZmwFDK6Cjh1nRCLXpa6no13ZIioJDz7mdkzHv399pThrTa/k0nUlNaenOeh2kWu/iaOQYElEpKPUswUa9Vg==}
     engines: {node: '>=6.9.0'}
 
-  '@bytecodealliance/componentize-js@0.14.0':
-    resolution: {integrity: sha512-Y53lxcHEQz5k4PwqBY3+q6Y+TmFSu5mWhd+2dyURE7mk0GDaFYKRDoATCoXxD8Dvq/HgNPrDSE2X7AJIjPMtYQ==}
+  '@bytecodealliance/componentize-js@0.15.1':
+    resolution: {integrity: sha512-bTQT+uwWNeyFXRiV6cp+5ERUKC2g6lyiMoeMys2/yg8IcWPwq+3btV1Pj/q0ueAwyiIsuQ//c+peMHPrNTmHOg==}
 
-  '@bytecodealliance/jco@1.8.1':
-    resolution: {integrity: sha512-mYjE7lrSWEzFD6lAVA4skm9/6DvorFjuO5DHoxzwWlJ2hKyO/d9t0Wx1V0nT5L1s7+98ZtVSB1emYLNMebpMdA==}
+  '@bytecodealliance/jco@1.9.1':
+    resolution: {integrity: sha512-Xmd1iw2OrWhlLOPZraFTBuE1AGfMSQVqKzswmq3k1vQ5B0EJe8O1CFG/UJeRXwbq1fxHHS9DTtlfAZiTeOdLWQ==}
     hasBin: true
 
   '@bytecodealliance/preview2-shim@0.17.1':
@@ -4740,16 +4740,16 @@ snapshots:
       '@babel/helper-string-parser': 7.25.9
       '@babel/helper-validator-identifier': 7.25.9
 
-  '@bytecodealliance/componentize-js@0.14.0':
+  '@bytecodealliance/componentize-js@0.15.1':
     dependencies:
-      '@bytecodealliance/jco': 1.8.1
+      '@bytecodealliance/jco': 1.9.1
       '@bytecodealliance/weval': 0.3.3
       '@bytecodealliance/wizer': 7.0.5
       es-module-lexer: 1.6.0
 
-  '@bytecodealliance/jco@1.8.1':
+  '@bytecodealliance/jco@1.9.1':
     dependencies:
-      '@bytecodealliance/componentize-js': 0.14.0
+      '@bytecodealliance/componentize-js': 0.15.1
       '@bytecodealliance/preview2-shim': 0.17.1
       binaryen: 120.0.0
       chalk-template: 1.1.0
