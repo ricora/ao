@@ -84,8 +84,8 @@ importers:
         specifier: 9.19.0
         version: 9.19.0(jiti@1.21.7)
       eslint-config-flat-gitignore:
-        specifier: 1.0.0
-        version: 1.0.0(eslint@9.19.0(jiti@1.21.7))
+        specifier: 1.0.1
+        version: 1.0.1(eslint@9.19.0(jiti@1.21.7))
       eslint-config-prettier:
         specifier: 10.0.1
         version: 10.0.1(eslint@9.19.0(jiti@1.21.7))
@@ -2323,8 +2323,8 @@ packages:
     resolution: {integrity: sha512-/veY75JbMK4j1yjvuUxuVsiS/hr/4iHs9FTT6cgTexxdE0Ly/glccBAkloH/DofkjRbZU3bnoj38mOmhkZ0lHw==}
     engines: {node: '>=12'}
 
-  eslint-config-flat-gitignore@1.0.0:
-    resolution: {integrity: sha512-EWpSLrAP80IdcYK5sIhq/qAY0pmUdBnbzqzpE3QAn6H6wLBN26cMRoMNU9Di8upTzUSL6TXeYRxWhTYuz8+UQA==}
+  eslint-config-flat-gitignore@1.0.1:
+    resolution: {integrity: sha512-wjBmJ8TAb67G2or/gBp/H62uCIkDCjpCmlGPSG41/7QagUjMgh+iegVB3gY8eNYhTAmecjKtclT4wGAjHz5yWA==}
     peerDependencies:
       eslint: ^9.5.0
 
@@ -7390,11 +7390,10 @@ snapshots:
 
   escape-string-regexp@5.0.0: {}
 
-  eslint-config-flat-gitignore@1.0.0(eslint@9.19.0(jiti@1.21.7)):
+  eslint-config-flat-gitignore@1.0.1(eslint@9.19.0(jiti@1.21.7)):
     dependencies:
       '@eslint/compat': 1.2.5(eslint@9.19.0(jiti@1.21.7))
       eslint: 9.19.0(jiti@1.21.7)
-      find-up-simple: 1.0.0
 
   eslint-config-prettier@10.0.1(eslint@9.19.0(jiti@1.21.7)):
     dependencies:
