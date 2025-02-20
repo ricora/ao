@@ -45,7 +45,7 @@ importers:
         version: 11.18.2(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       justd-icons:
         specifier: ^1.10.8
-        version: 1.10.24(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+        version: 1.10.25(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       react:
         specifier: ^19.0.0
         version: 19.0.0
@@ -265,8 +265,8 @@ packages:
     peerDependencies:
       '@babel/core': ^7.0.0-0
 
-  '@babel/runtime@7.26.7':
-    resolution: {integrity: sha512-AOPI3D+a8dXnja+iwsUqGRjr1BbZIe771sXdapOtYI531gSqpi92vXivKcq2asu/DFpdl1ceFAKZyRzK2PCVcQ==}
+  '@babel/runtime@7.26.9':
+    resolution: {integrity: sha512-aA63XwOkcl4xxQa3HjPMqOP6LiK0ZDv3mUPYEFXkpHbaFjtGggE1A61FjFzJnB+p7/oy2gA8E+rcBNl/zC1tMg==}
     engines: {node: '>=6.9.0'}
 
   '@babel/template@7.25.9':
@@ -2976,8 +2976,8 @@ packages:
     resolution: {integrity: sha512-ZZow9HBI5O6EPgSJLUb8n2NKgmVWTwCvHGwFuJlMjvLFqlGG6pjirPhtdsseaLZjSibD8eegzmYpUZwoIlj2cQ==}
     engines: {node: '>=4.0'}
 
-  justd-icons@1.10.24:
-    resolution: {integrity: sha512-4UGz7ltvzNuTVne/YSadfYN89ZXePc8CGE7IECjVDFJI/gjrzkiN4TzMeoYgr7TG7Dj+++kuYYGFYZRwKfBCNg==}
+  justd-icons@1.10.25:
+    resolution: {integrity: sha512-ZpqkyysiN8E/tTXhjdiVaI3Jol19rKeTDeQOyI84ba5BkmXW0hT2+wr0EdQ+GltMH3ZMX6Gg84O1/mA118bSUA==}
     peerDependencies:
       react: ^19.0.0
       react-dom: ^19.0.0
@@ -4755,7 +4755,7 @@ snapshots:
       '@babel/core': 7.26.7
       '@babel/helper-plugin-utils': 7.26.5
 
-  '@babel/runtime@7.26.7':
+  '@babel/runtime@7.26.9':
     dependencies:
       regenerator-runtime: 0.14.1
 
@@ -7976,7 +7976,7 @@ snapshots:
 
   i18next@23.16.8:
     dependencies:
-      '@babel/runtime': 7.26.7
+      '@babel/runtime': 7.26.9
 
   ieee754@1.2.1: {}
 
@@ -8221,9 +8221,9 @@ snapshots:
       object.assign: 4.1.7
       object.values: 1.2.1
 
-  justd-icons@1.10.24(react-dom@19.0.0(react@19.0.0))(react@19.0.0):
+  justd-icons@1.10.25(react-dom@19.0.0(react@19.0.0))(react@19.0.0):
     dependencies:
-      '@babel/runtime': 7.26.7
+      '@babel/runtime': 7.26.9
       react: 19.0.0
       react-dom: 19.0.0(react@19.0.0)
 
