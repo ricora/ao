@@ -23,8 +23,8 @@ importers:
         specifier: ^5.1.4
         version: 5.1.5(astro@5.2.5(jiti@1.21.7)(rollup@4.34.2)(terser@5.37.0)(typescript@5.7.3)(yaml@2.7.0))(tailwindcss@3.4.17)
       '@bytecodealliance/jco':
-        specifier: 1.9.1
-        version: 1.9.1
+        specifier: 1.10.0
+        version: 1.10.0
       '@bytecodealliance/preview2-shim':
         specifier: ^0.17.1
         version: 0.17.1
@@ -281,11 +281,11 @@ packages:
     resolution: {integrity: sha512-t8kDRGrKXyp6+tjUh7hw2RLyclsW4TRoRvRHtSyAX9Bb5ldlFh+90YAYY6awRXrlB4G5G2izNeGySpATlFzmOg==}
     engines: {node: '>=6.9.0'}
 
-  '@bytecodealliance/componentize-js@0.15.1':
-    resolution: {integrity: sha512-bTQT+uwWNeyFXRiV6cp+5ERUKC2g6lyiMoeMys2/yg8IcWPwq+3btV1Pj/q0ueAwyiIsuQ//c+peMHPrNTmHOg==}
+  '@bytecodealliance/componentize-js@0.17.0':
+    resolution: {integrity: sha512-FDgO5UPipfjyq5OghSB4JW313LkQJK3Sl647WH1jvIuYAyCq1j+bMt+Q66c3UF6IVs6PneNTGfGSjYgzID/k0w==}
 
-  '@bytecodealliance/jco@1.9.1':
-    resolution: {integrity: sha512-Xmd1iw2OrWhlLOPZraFTBuE1AGfMSQVqKzswmq3k1vQ5B0EJe8O1CFG/UJeRXwbq1fxHHS9DTtlfAZiTeOdLWQ==}
+  '@bytecodealliance/jco@1.10.0':
+    resolution: {integrity: sha512-//xTgQquW9k+UjC8yWMZiE5Yiy344JZNUf09WrlXEfPHwUBgMAzg1AaxgsSj3SqeLe7TvqpzE/cViU+/bvo9tA==}
     hasBin: true
 
   '@bytecodealliance/preview2-shim@0.17.1':
@@ -1884,8 +1884,8 @@ packages:
     resolution: {integrity: sha512-Ceh+7ox5qe7LJuLHoY0feh3pHuUDHAcRUeyL2VYghZwfpkNIy/+8Ocg0a3UuSoYzavmylwuLWQOf3hl0jjMMIw==}
     engines: {node: '>=8'}
 
-  binaryen@120.0.0:
-    resolution: {integrity: sha512-MaNC1qW5ubk5S7MNNxNpAb9ivKp6TAf8CDknRk4XeCC2wkrpdaubK10S1CAwUXaDDF54gZLtk6opzbEA9VTtJw==}
+  binaryen@122.0.0:
+    resolution: {integrity: sha512-XOvjvucq04e5UW0cuoiEZX4wxzepuF7q8sz24JtaXltqjgCqQOZHPXAq5ja/eLljF/orWYmaxuWivpp7paVUCQ==}
     hasBin: true
 
   bl@1.2.3:
@@ -4780,18 +4780,18 @@ snapshots:
       '@babel/helper-string-parser': 7.25.9
       '@babel/helper-validator-identifier': 7.25.9
 
-  '@bytecodealliance/componentize-js@0.15.1':
+  '@bytecodealliance/componentize-js@0.17.0':
     dependencies:
-      '@bytecodealliance/jco': 1.9.1
+      '@bytecodealliance/jco': 1.10.0
       '@bytecodealliance/weval': 0.3.3
       '@bytecodealliance/wizer': 7.0.5
       es-module-lexer: 1.6.0
 
-  '@bytecodealliance/jco@1.9.1':
+  '@bytecodealliance/jco@1.10.0':
     dependencies:
-      '@bytecodealliance/componentize-js': 0.15.1
+      '@bytecodealliance/componentize-js': 0.17.0
       '@bytecodealliance/preview2-shim': 0.17.1
-      binaryen: 120.0.0
+      binaryen: 122.0.0
       chalk-template: 1.1.0
       commander: 12.1.0
       mkdirp: 3.0.1
@@ -6870,7 +6870,7 @@ snapshots:
 
   binary-extensions@2.3.0: {}
 
-  binaryen@120.0.0: {}
+  binaryen@122.0.0: {}
 
   bl@1.2.3:
     dependencies:
