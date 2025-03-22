@@ -23,8 +23,8 @@ importers:
         specifier: ^5.1.4
         version: 5.1.5(astro@5.5.4(jiti@1.21.7)(rollup@4.36.0)(terser@5.37.0)(typescript@5.7.3)(yaml@2.7.0))(tailwindcss@3.4.17)
       '@bytecodealliance/jco':
-        specifier: 1.10.0
-        version: 1.10.0
+        specifier: 1.10.2
+        version: 1.10.2
       '@bytecodealliance/preview2-shim':
         specifier: ^0.17.1
         version: 0.17.1
@@ -284,12 +284,15 @@ packages:
   '@bytecodealliance/componentize-js@0.17.0':
     resolution: {integrity: sha512-FDgO5UPipfjyq5OghSB4JW313LkQJK3Sl647WH1jvIuYAyCq1j+bMt+Q66c3UF6IVs6PneNTGfGSjYgzID/k0w==}
 
-  '@bytecodealliance/jco@1.10.0':
-    resolution: {integrity: sha512-//xTgQquW9k+UjC8yWMZiE5Yiy344JZNUf09WrlXEfPHwUBgMAzg1AaxgsSj3SqeLe7TvqpzE/cViU+/bvo9tA==}
+  '@bytecodealliance/jco@1.10.2':
+    resolution: {integrity: sha512-ShBb9Jul4CYo4asmfDdjmYE2+4TgJLSHhsRMyVDvROA5j6s+cAKMmlsUjOrS6QM5TL8GJb48G9jsxif6na6qYg==}
     hasBin: true
 
   '@bytecodealliance/preview2-shim@0.17.1':
     resolution: {integrity: sha512-h1qLL0TN5KXk/zagY2BtbZuDX6xYjz4Br9RZXEa0ID4UpiPc0agUMhTdz9r89G4vX5SU/tqBg1A6UNv2+DJ5pg==}
+
+  '@bytecodealliance/preview2-shim@0.17.2':
+    resolution: {integrity: sha512-mNm/lblgES8UkVle8rGImXOz4TtL3eU3inHay/7TVchkKrb/lgcVvTK0+VAw8p5zQ0rgQsXm1j5dOlAAd+MeoA==}
 
   '@bytecodealliance/weval@0.3.3':
     resolution: {integrity: sha512-hrQI47O1l3ilFscixu0uuSJTj5tbQW0QmCATQWWNW0E8wJxbKH4yo8y57O5gqpRSKk/T+da1sH/GJNrnGHTFNA==}
@@ -4814,15 +4817,15 @@ snapshots:
 
   '@bytecodealliance/componentize-js@0.17.0':
     dependencies:
-      '@bytecodealliance/jco': 1.10.0
+      '@bytecodealliance/jco': 1.10.2
       '@bytecodealliance/weval': 0.3.3
       '@bytecodealliance/wizer': 7.0.5
       es-module-lexer: 1.6.0
 
-  '@bytecodealliance/jco@1.10.0':
+  '@bytecodealliance/jco@1.10.2':
     dependencies:
       '@bytecodealliance/componentize-js': 0.17.0
-      '@bytecodealliance/preview2-shim': 0.17.1
+      '@bytecodealliance/preview2-shim': 0.17.2
       binaryen: 122.0.0
       chalk-template: 1.1.0
       commander: 12.1.0
@@ -4831,6 +4834,8 @@ snapshots:
       terser: 5.37.0
 
   '@bytecodealliance/preview2-shim@0.17.1': {}
+
+  '@bytecodealliance/preview2-shim@0.17.2': {}
 
   '@bytecodealliance/weval@0.3.3':
     dependencies:
