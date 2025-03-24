@@ -33,7 +33,7 @@ importers:
         version: 4.7.0(monaco-editor@0.52.2)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       '@rollup/browser':
         specifier: ^4.29.1
-        version: 4.34.8
+        version: 4.37.0
       astro:
         specifier: ^5.1.1
         version: 5.5.4(jiti@1.21.7)(rollup@4.36.0)(terser@5.37.0)(typescript@5.8.2)(yaml@2.7.0)
@@ -1472,8 +1472,8 @@ packages:
     peerDependencies:
       react: ^16.8.0 || ^17.0.0-rc.1 || ^18.0.0 || ^19.0.0-rc.1
 
-  '@rollup/browser@4.34.8':
-    resolution: {integrity: sha512-WoWo3kVh/QRGvvmSoehVe1lb0dKOsAMr8hqDVO1vt2QNRQymXTXM9OfKWOuHDxyUnSd7QZt5aiVOWKt25SfgUw==}
+  '@rollup/browser@4.37.0':
+    resolution: {integrity: sha512-7HetQbimG6BXh6p4LomWikjN2Q6U/DXOzQrBos5hD61fQuCqDAGtK8da6Rcg0oabgwt94R1ft//JpB+8vOEPgQ==}
 
   '@rollup/pluginutils@5.1.4':
     resolution: {integrity: sha512-USm05zrsFxYLPdWWq+K3STlWiT/3ELn3RcV5hJMghpeAIhxfsUIg6mt12CBJBInWMV4VneoV7SfGv8xIwo2qNQ==}
@@ -6370,7 +6370,7 @@ snapshots:
       '@react-types/shared': 3.27.0(react@19.0.0)
       react: 19.0.0
 
-  '@rollup/browser@4.34.8':
+  '@rollup/browser@4.37.0':
     dependencies:
       '@types/estree': 1.0.6
 
