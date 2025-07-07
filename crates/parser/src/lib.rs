@@ -45,7 +45,7 @@ where
     let expression = recursive(|expression| {
         let function_call_args = expression
             .clone()
-            .separated_by(just(Token::Comma))
+            .repeated()
             .collect::<Vec<_>>()
             .delimited_by(just(Token::LParen), just(Token::RParen));
 
@@ -73,11 +73,12 @@ where
                 })
             });
 
-        let atom = literal
-            .map(|lit| ast::Expression::IntegerLiteral(lit))
-            .or(identifier.clone().map(|id| ast::Expression::Identifier(id)))
-            .or(assignment)
+        // if_else_expression will be implemented later - it needs block_with_expression
+
+        let atom = assignment
             .or(function_call)
+            .or(literal.map(|lit| ast::Expression::IntegerLiteral(lit)))
+            .or(identifier.clone().map(|id| ast::Expression::Identifier(id)))
             .or(expression
                 .clone()
                 .delimited_by(just(Token::LParen), just(Token::RParen)));
@@ -239,7 +240,20 @@ where
     })
     .boxed();
 
-    let statement = recursive(|_statement| {
+    let statement = recursive(|statement| {
+        let block_without_expression = statement
+            .clone()
+            .repeated()
+            .collect::<Vec<_>>()
+            .map_with(|statements, e| ast::Block {
+                statements: ast::Statements {
+                    statements,
+                    location: ast::Location::from(e.span()),
+                },
+                location: ast::Location::from(e.span()),
+            })
+            .delimited_by(just(Token::LBrace), just(Token::RBrace));
+
         let variable_definition = just(Token::LetDeclaration)
             .or(just(Token::VarDeclaration))
             .then(identifier.clone())
@@ -257,6 +271,23 @@ where
                 })
             });
 
+        let if_statement = just(Token::If)
+            .ignore_then(expression.clone())
+            .then(block_without_expression.clone())
+            .then(
+                just(Token::Else)
+                    .ignore_then(block_without_expression.clone())
+                    .or_not()
+            )
+            .map_with(|((condition, then_block), else_block), e| {
+                ast::Statement::IfStatement(ast::IfStatement {
+                    condition,
+                    then_block,
+                    else_block,
+                    location: ast::Location::from(e.span()),
+                })
+            });
+
         let expression_statement = expression
             .clone()
             .then_ignore(just(Token::Semicolon))
@@ -267,32 +298,22 @@ where
                 })
             });
 
-        variable_definition.or(expression_statement)
+        variable_definition.or(if_statement).or(expression_statement)
     })
     .boxed();
 
-    let block_without_expression = statement
-        .clone()
-        .repeated()
-        .collect::<Vec<_>>()
-        .map_with(|statements, e| ast::Block {
-            statements: ast::Statements {
-                statements,
-                location: ast::Location::from(e.span()),
-            },
-            location: ast::Location::from(e.span()),
-        })
-        .delimited_by(just(Token::LBrace), just(Token::RBrace))
-        .boxed();
 
-    let block_with_expression = statement
+    // Now fix the normal block parser to match BNF: block = "{" statement* expression? "}"
+    let block = statement
         .clone()
         .repeated()
         .collect::<Vec<_>>()
-        .then(expression.clone())
+        .then(expression.clone().or_not())
         .map_with(|(statements, final_expr), e| {
             let mut all_statements = statements;
-            all_statements.push(ast::Statement::Expression(final_expr));
+            if let Some(expr) = final_expr {
+                all_statements.push(ast::Statement::Expression(expr));
+            }
             ast::Block {
                 statements: ast::Statements {
                     statements: all_statements,
@@ -328,7 +349,7 @@ where
         .then(parameters)
         .then_ignore(just(Token::RightArrow))
         .then(r#type.clone())
-        .then(block_with_expression.clone())
+        .then(block.clone())
         .map_with(
             |(((name, params), return_type), body), e| ast::FunctionDefinition {
                 name,
@@ -380,7 +401,7 @@ mod tests {
     #[test]
     fn block_returns_none_when_multiple_expressions() {
         let source = indoc! {"
-            {
+            fn test() -> i32 {
                 1
                 2
             }
@@ -392,9 +413,9 @@ mod tests {
     #[test]
     fn block_returns_statements() {
         let source = indoc! {"
-            {
-                var x: i32;
-                x = 0;
+            fn test() -> i32 {
+                var x: i32 = 0;
+                x = 1;
                 x
             }
         "};
