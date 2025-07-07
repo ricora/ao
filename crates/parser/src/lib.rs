@@ -1,6 +1,9 @@
 mod token;
 
-use chumsky::{input::ValueInput, prelude::*};
+use chumsky::{
+    input::{MapExtra, ValueInput},
+    prelude::*,
+};
 use logos::Logos;
 use token::Token;
 
@@ -8,12 +11,57 @@ pub fn parser<'a, I>() -> impl Parser<'a, I, ast::Program<'a>, extra::Err<Rich<'
 where
     I: ValueInput<'a, Token = Token<'a>, Span = SimpleSpan>,
 {
+    type E<'a> = extra::Err<Rich<'a, Token<'a>>>;
+
+    let r#type = select! {
+        Token::Identifier(ident) if ident == "i32" => ast::TypeKind::I32,
+        Token::Identifier(ident) if ident == "i64" => ast::TypeKind::I64
+    }
+    .map_with(|kind, e: &mut MapExtra<'_, '_, I, E<'_>>| ast::Type {
+        name: kind,
+        location: ast::Location::from(e.span()),
+    });
+
     let identifier = select! {
         Token::Identifier(ident) => ident,
     }
-    .map_with(|ident, e| ast::Identifier {
-        name: ident,
-        location: ast::Location::from(e.span()),
+    .map_with(
+        |ident, e: &mut MapExtra<'_, '_, I, E<'_>>| ast::Identifier {
+            name: ident,
+            location: ast::Location::from(e.span()),
+        },
+    );
+
+    let literal = select! {
+        Token::Integer(lit) => lit,
+    }
+    .map_with(
+        |lit, e: &mut MapExtra<'_, '_, I, E<'_>>| ast::IntegerLiteral {
+            value: lit,
+            location: ast::Location::from(e.span()),
+        },
+    );
+
+    let expression = recursive(|expr| {
+        let function_call_args = expr
+            .clone()
+            .separated_by(just(Token::Comma))
+            .collect::<Vec<_>>()
+            .delimited_by(just(Token::LParen), just(Token::RParen));
+
+        let function_call = identifier
+            .then(function_call_args)
+            .map_with(|(name, args), e| {
+                ast::Expression::FunctionCall(ast::FunctionCall {
+                    name,
+                    arguments: args,
+                    location: ast::Location::from(e.span()),
+                })
+            });
+
+        // TODO: Implement other expressions
+
+        function_call
     });
 
     // TODO: Implement the full parser for the AST
