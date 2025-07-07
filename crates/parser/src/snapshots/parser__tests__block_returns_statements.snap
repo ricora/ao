@@ -1,0 +1,114 @@
+---
+source: crates/parser/src/lib.rs
+expression: ast
+---
+statements:
+  statements:
+    - VariableDefinition:
+        name:
+          name: x
+          location:
+            start:
+              index: 10
+              line: 2
+              column: 9
+            end:
+              index: 11
+              line: 2
+              column: 10
+        mutable: true
+        variable_type:
+          name: I32
+          location:
+            start:
+              index: 13
+              line: 2
+              column: 12
+            end:
+              index: 16
+              line: 2
+              column: 15
+        value: ~
+        location:
+          start:
+            index: 6
+            line: 2
+            column: 5
+          end:
+            index: 17
+            line: 2
+            column: 16
+    - ExpressionStatement:
+        expression:
+          AssignmentExpression:
+            name:
+              name: x
+              location:
+                start:
+                  index: 22
+                  line: 3
+                  column: 5
+                end:
+                  index: 23
+                  line: 3
+                  column: 6
+            value:
+              IntegerLiteral:
+                value: "0"
+                location:
+                  start:
+                    index: 26
+                    line: 3
+                    column: 9
+                  end:
+                    index: 27
+                    line: 3
+                    column: 10
+            location:
+              start:
+                index: 22
+                line: 3
+                column: 5
+              end:
+                index: 27
+                line: 3
+                column: 10
+        location:
+          start:
+            index: 22
+            line: 3
+            column: 5
+          end:
+            index: 28
+            line: 3
+            column: 11
+    - Expression:
+        Identifier:
+          name: x
+          location:
+            start:
+              index: 33
+              line: 4
+              column: 5
+            end:
+              index: 34
+              line: 4
+              column: 6
+  location:
+    start:
+      index: 0
+      line: 1
+      column: 1
+    end:
+      index: 36
+      line: 5
+      column: 2
+location:
+  start:
+    index: 0
+    line: 1
+    column: 1
+  end:
+    index: 36
+    line: 5
+    column: 2

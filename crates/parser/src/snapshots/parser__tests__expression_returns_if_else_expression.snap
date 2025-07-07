@@ -1,0 +1,103 @@
+---
+source: crates/parser/src/lib.rs
+expression: ast
+---
+IfElseExpression:
+  condition:
+    Identifier:
+      name: condition
+      location:
+        start:
+          index: 3
+          line: 1
+          column: 4
+        end:
+          index: 12
+          line: 1
+          column: 13
+  then_block:
+    statements:
+      statements:
+        - Expression:
+            IntegerLiteral:
+              value: "1"
+              location:
+                start:
+                  index: 15
+                  line: 1
+                  column: 16
+                end:
+                  index: 16
+                  line: 1
+                  column: 17
+      location:
+        start:
+          index: 13
+          line: 1
+          column: 14
+        end:
+          index: 18
+          line: 1
+          column: 19
+    location:
+      start:
+        index: 13
+        line: 1
+        column: 14
+      end:
+        index: 18
+        line: 1
+        column: 19
+  else_block:
+    statements:
+      statements:
+        - Expression:
+            IntegerLiteral:
+              value: "0"
+              location:
+                start:
+                  index: 26
+                  line: 1
+                  column: 27
+                end:
+                  index: 27
+                  line: 1
+                  column: 28
+      location:
+        start:
+          index: 24
+          line: 1
+          column: 25
+        end:
+          index: 29
+          line: 1
+          column: 30
+    location:
+      start:
+        index: 24
+        line: 1
+        column: 25
+      end:
+        index: 29
+        line: 1
+        column: 30
+  return_type:
+    name: I32
+    location:
+      start:
+        index: 33
+        line: 1
+        column: 34
+      end:
+        index: 36
+        line: 1
+        column: 37
+  location:
+    start:
+      index: 0
+      line: 1
+      column: 1
+    end:
+      index: 36
+      line: 1
+      column: 37

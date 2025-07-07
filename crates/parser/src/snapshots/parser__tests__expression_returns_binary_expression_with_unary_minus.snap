@@ -1,0 +1,151 @@
+---
+source: crates/parser/src/lib.rs
+expression: ast
+---
+BinaryExpression:
+  left:
+    BinaryExpression:
+      left:
+        IntegerLiteral:
+          value: "0"
+          location:
+            start:
+              index: 0
+              line: 1
+              column: 1
+            end:
+              index: 0
+              line: 1
+              column: 1
+      operator:
+        operator: Subtract
+        location:
+          start:
+            index: 0
+            line: 1
+            column: 1
+          end:
+            index: 1
+            line: 1
+            column: 2
+      right:
+        IntegerLiteral:
+          value: "1"
+          location:
+            start:
+              index: 1
+              line: 1
+              column: 2
+            end:
+              index: 2
+              line: 1
+              column: 3
+      location:
+        start:
+          index: 0
+          line: 1
+          column: 1
+        end:
+          index: 2
+          line: 1
+          column: 3
+  operator:
+    operator: Subtract
+    location:
+      start:
+        index: 3
+        line: 1
+        column: 4
+      end:
+        index: 4
+        line: 1
+        column: 5
+  right:
+    BinaryExpression:
+      left:
+        BinaryExpression:
+          left:
+            IntegerLiteral:
+              value: "0"
+              location:
+                start:
+                  index: 5
+                  line: 1
+                  column: 6
+                end:
+                  index: 5
+                  line: 1
+                  column: 6
+          operator:
+            operator: Subtract
+            location:
+              start:
+                index: 5
+                line: 1
+                column: 6
+              end:
+                index: 6
+                line: 1
+                column: 7
+          right:
+            IntegerLiteral:
+              value: "2"
+              location:
+                start:
+                  index: 6
+                  line: 1
+                  column: 7
+                end:
+                  index: 7
+                  line: 1
+                  column: 8
+          location:
+            start:
+              index: 5
+              line: 1
+              column: 6
+            end:
+              index: 7
+              line: 1
+              column: 8
+      operator:
+        operator: Multiply
+        location:
+          start:
+            index: 8
+            line: 1
+            column: 9
+          end:
+            index: 9
+            line: 1
+            column: 10
+      right:
+        IntegerLiteral:
+          value: "3"
+          location:
+            start:
+              index: 10
+              line: 1
+              column: 11
+            end:
+              index: 11
+              line: 1
+              column: 12
+      location:
+        start:
+          index: 5
+          line: 1
+          column: 6
+        end:
+          index: 11
+          line: 1
+          column: 12
+  location:
+    start:
+      index: 0
+      line: 1
+      column: 1
+    end:
+      index: 11
+      line: 1
+      column: 12

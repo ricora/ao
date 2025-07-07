@@ -1,0 +1,37 @@
+---
+source: crates/parser/src/lib.rs
+expression: ast
+---
+UnaryExpression:
+  operator:
+    operator: LogicalNot
+    location:
+      start:
+        index: 0
+        line: 1
+        column: 1
+      end:
+        index: 1
+        line: 1
+        column: 2
+  operand:
+    Identifier:
+      name: a
+      location:
+        start:
+          index: 1
+          line: 1
+          column: 2
+        end:
+          index: 2
+          line: 1
+          column: 3
+  location:
+    start:
+      index: 0
+      line: 1
+      column: 1
+    end:
+      index: 2
+      line: 1
+      column: 3

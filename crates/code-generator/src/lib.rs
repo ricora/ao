@@ -374,20 +374,25 @@ mod tests {
         component::{Component, Linker, Val},
         Config, Engine, Store,
     };
-    use wasmtime_wasi::{pipe::MemoryOutputPipe, ResourceTable, WasiCtx, WasiCtxBuilder, WasiView};
+    use wasmtime_wasi::{
+        p2::{pipe::MemoryOutputPipe, IoView, WasiCtx, WasiCtxBuilder, WasiView},
+        ResourceTable,
+    };
 
     struct State {
         ctx: WasiCtx,
         table: ResourceTable,
     }
 
+    impl IoView for State {
+        fn table(&mut self) -> &mut ResourceTable {
+            &mut self.table
+        }
+    }
+
     impl WasiView for State {
         fn ctx(&mut self) -> &mut WasiCtx {
             &mut self.ctx
-        }
-
-        fn table(&mut self) -> &mut ResourceTable {
-            &mut self.table
         }
     }
 
@@ -413,13 +418,13 @@ mod tests {
         let engine = Engine::new(&config)?;
 
         let mut linker = Linker::<State>::new(&engine);
-        wasmtime_wasi::add_to_linker_sync(&mut linker)?;
+        wasmtime_wasi::p2::add_to_linker_sync(&mut linker)?;
 
-        let stdout_steram = MemoryOutputPipe::new(1024);
+        let stdout_stream = MemoryOutputPipe::new(1024);
         let stderr_stream = MemoryOutputPipe::new(1024);
 
         let mut builder = WasiCtxBuilder::new();
-        builder.stdout(stdout_steram.clone());
+        builder.stdout(stdout_stream.clone());
         builder.stderr(stderr_stream.clone());
         let wasi_ctx = builder.build();
 
@@ -436,24 +441,20 @@ mod tests {
 
         let instance = linker.instantiate(&mut store, &component)?;
 
-        let main_index = instance
-            .get_export(&mut store, None, "wasi:cli/run@0.2.2")
-            .context(
-                "failed to find the index of the exported instance named 'wasi:cli/run@0.2.2'",
-            )?;
-        let run_index = instance
-            .get_export(&mut store, Some(&main_index), "run")
-            .context(
-            "failed to find the index of the exported function named 'run' in the 'wasi:cli/run@0.2.2' instance",
-        )?;
-        let run = instance.get_func(&mut store, run_index).context(
-            "failed to find the exported function named 'run' in the 'wasi:cli/run@0.2.2' instance",
-        )?;
+        let command = wasmtime_wasi::p2::bindings::sync::Command::instantiate(&mut store, &component, &linker)?;
 
-        let mut results = [Val::Result(Ok(None))];
-        run.call(&mut store, &[], &mut results)?;
+        let result = command.wasi_cli_run().call_run(&mut store)?;
+        match result {
+            Ok(_) => {
+                // 正常終了
+            }
+            Err(()) => {
+                // エラー処理
+                return Err(anyhow::anyhow!("Component execution failed"));
+            }
+        }
 
-        let stdout_bytes = stdout_steram.contents();
+        let stdout_bytes = stdout_stream.contents();
         let stdout_str = str::from_utf8(&stdout_bytes)?;
 
         let stderr_bytes = stderr_stream.contents();

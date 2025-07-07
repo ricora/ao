@@ -1,0 +1,185 @@
+---
+source: crates/parser/src/lib.rs
+expression: ast
+---
+BinaryExpression:
+  left:
+    BinaryExpression:
+      left:
+        BinaryExpression:
+          left:
+            IntegerLiteral:
+              value: "1"
+              location:
+                start:
+                  index: 0
+                  line: 1
+                  column: 1
+                end:
+                  index: 1
+                  line: 1
+                  column: 2
+          operator:
+            operator: Add
+            location:
+              start:
+                index: 2
+                line: 1
+                column: 3
+              end:
+                index: 3
+                line: 1
+                column: 4
+          right:
+            IntegerLiteral:
+              value: "2"
+              location:
+                start:
+                  index: 4
+                  line: 1
+                  column: 5
+                end:
+                  index: 5
+                  line: 1
+                  column: 6
+          location:
+            start:
+              index: 0
+              line: 1
+              column: 1
+            end:
+              index: 5
+              line: 1
+              column: 6
+      operator:
+        operator: Equal
+        location:
+          start:
+            index: 6
+            line: 1
+            column: 7
+          end:
+            index: 8
+            line: 1
+            column: 9
+      right:
+        BinaryExpression:
+          left:
+            IntegerLiteral:
+              value: "3"
+              location:
+                start:
+                  index: 9
+                  line: 1
+                  column: 10
+                end:
+                  index: 10
+                  line: 1
+                  column: 11
+          operator:
+            operator: Multiply
+            location:
+              start:
+                index: 11
+                line: 1
+                column: 12
+              end:
+                index: 12
+                line: 1
+                column: 13
+          right:
+            IntegerLiteral:
+              value: "4"
+              location:
+                start:
+                  index: 13
+                  line: 1
+                  column: 14
+                end:
+                  index: 14
+                  line: 1
+                  column: 15
+          location:
+            start:
+              index: 9
+              line: 1
+              column: 10
+            end:
+              index: 14
+              line: 1
+              column: 15
+      location:
+        start:
+          index: 0
+          line: 1
+          column: 1
+        end:
+          index: 14
+          line: 1
+          column: 15
+  operator:
+    operator: NotEqual
+    location:
+      start:
+        index: 15
+        line: 1
+        column: 16
+      end:
+        index: 17
+        line: 1
+        column: 18
+  right:
+    BinaryExpression:
+      left:
+        IntegerLiteral:
+          value: "5"
+          location:
+            start:
+              index: 18
+              line: 1
+              column: 19
+            end:
+              index: 19
+              line: 1
+              column: 20
+      operator:
+        operator: Divide
+        location:
+          start:
+            index: 20
+            line: 1
+            column: 21
+          end:
+            index: 21
+            line: 1
+            column: 22
+      right:
+        IntegerLiteral:
+          value: "6"
+          location:
+            start:
+              index: 22
+              line: 1
+              column: 23
+            end:
+              index: 23
+              line: 1
+              column: 24
+      location:
+        start:
+          index: 18
+          line: 1
+          column: 19
+        end:
+          index: 23
+          line: 1
+          column: 24
+  location:
+    start:
+      index: 0
+      line: 1
+      column: 1
+    end:
+      index: 23
+      line: 1
+      column: 24

@@ -1,0 +1,15 @@
+---
+source: crates/parser/src/lib.rs
+expression: ast
+---
+Identifier:
+  name: abc
+  location:
+    start:
+      index: 0
+      line: 1
+      column: 1
+    end:
+      index: 3
+      line: 1
+      column: 4

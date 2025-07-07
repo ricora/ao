@@ -1,0 +1,49 @@
+---
+source: crates/parser/src/lib.rs
+expression: ast
+---
+VariableDefinition:
+  name:
+    name: x
+    location:
+      start:
+        index: 4
+        line: 1
+        column: 5
+      end:
+        index: 5
+        line: 1
+        column: 6
+  mutable: true
+  variable_type:
+    name: I32
+    location:
+      start:
+        index: 7
+        line: 1
+        column: 8
+      end:
+        index: 10
+        line: 1
+        column: 11
+  value:
+    IntegerLiteral:
+      value: "0"
+      location:
+        start:
+          index: 13
+          line: 1
+          column: 14
+        end:
+          index: 14
+          line: 1
+          column: 15
+  location:
+    start:
+      index: 0
+      line: 1
+      column: 1
+    end:
+      index: 15
+      line: 1
+      column: 16

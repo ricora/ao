@@ -1,0 +1,37 @@
+---
+source: crates/parser/src/lib.rs
+expression: ast
+---
+AssignmentExpression:
+  name:
+    name: x
+    location:
+      start:
+        index: 0
+        line: 1
+        column: 1
+      end:
+        index: 1
+        line: 1
+        column: 2
+  value:
+    IntegerLiteral:
+      value: "123"
+      location:
+        start:
+          index: 4
+          line: 1
+          column: 5
+        end:
+          index: 7
+          line: 1
+          column: 8
+  location:
+    start:
+      index: 0
+      line: 1
+      column: 1
+    end:
+      index: 7
+      line: 1
+      column: 8

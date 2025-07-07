@@ -1,0 +1,176 @@
+---
+source: crates/parser/src/lib.rs
+expression: ast
+---
+functions:
+  - name:
+      name: add
+      location:
+        start:
+          index: 3
+          line: 1
+          column: 4
+        end:
+          index: 6
+          line: 1
+          column: 7
+    parameters:
+      parameters:
+        - name:
+            name: x
+            location:
+              start:
+                index: 7
+                line: 1
+                column: 8
+              end:
+                index: 8
+                line: 1
+                column: 9
+          parameter_type:
+            name: I64
+            location:
+              start:
+                index: 10
+                line: 1
+                column: 11
+              end:
+                index: 13
+                line: 1
+                column: 14
+          location:
+            start:
+              index: 7
+              line: 1
+              column: 8
+            end:
+              index: 13
+              line: 1
+              column: 14
+        - name:
+            name: y
+            location:
+              start:
+                index: 15
+                line: 1
+                column: 16
+              end:
+                index: 16
+                line: 1
+                column: 17
+          parameter_type:
+            name: I64
+            location:
+              start:
+                index: 18
+                line: 1
+                column: 19
+              end:
+                index: 21
+                line: 1
+                column: 22
+          location:
+            start:
+              index: 15
+              line: 1
+              column: 16
+            end:
+              index: 21
+              line: 1
+              column: 22
+      location:
+        start:
+          index: 6
+          line: 1
+          column: 7
+        end:
+          index: 22
+          line: 1
+          column: 23
+    return_type:
+      name: I64
+      location:
+        start:
+          index: 26
+          line: 1
+          column: 27
+        end:
+          index: 29
+          line: 1
+          column: 30
+    body:
+      statements:
+        statements:
+          - Expression:
+              BinaryExpression:
+                left:
+                  Identifier:
+                    name: x
+                    location:
+                      start:
+                        index: 36
+                        line: 2
+                        column: 5
+                      end:
+                        index: 37
+                        line: 2
+                        column: 6
+                operator:
+                  operator: Add
+                  location:
+                    start:
+                      index: 38
+                      line: 2
+                      column: 7
+                    end:
+                      index: 39
+                      line: 2
+                      column: 8
+                right:
+                  Identifier:
+                    name: y
+                    location:
+                      start:
+                        index: 40
+                        line: 2
+                        column: 9
+                      end:
+                        index: 41
+                        line: 2
+                        column: 10
+                location:
+                  start:
+                    index: 36
+                    line: 2
+                    column: 5
+                  end:
+                    index: 41
+                    line: 2
+                    column: 10
+        location:
+          start:
+            index: 30
+            line: 1
+            column: 31
+          end:
+            index: 43
+            line: 3
+            column: 2
+      location:
+        start:
+          index: 30
+          line: 1
+          column: 31
+        end:
+          index: 43
+          line: 3
+          column: 2
+    location:
+      start:
+        index: 3
+        line: 1
+        column: 4
+      end:
+        index: 43
+        line: 3
+        column: 2

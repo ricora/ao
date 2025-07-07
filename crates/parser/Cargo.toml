@@ -4,9 +4,13 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+ariadne = "0.5.1"
 ast = { workspace = true }
+chumsky = "0.10.1"
+logos = "0.15.0"
 tokenizer = { workspace = true }
 
 [dev-dependencies]
 indoc = { workspace = true }
 pretty_assertions = { workspace = true }
+insta = { workspace = true }

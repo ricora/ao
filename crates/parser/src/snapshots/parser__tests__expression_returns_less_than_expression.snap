@@ -1,0 +1,49 @@
+---
+source: crates/parser/src/lib.rs
+expression: ast
+---
+BinaryExpression:
+  left:
+    IntegerLiteral:
+      value: "1"
+      location:
+        start:
+          index: 0
+          line: 1
+          column: 1
+        end:
+          index: 1
+          line: 1
+          column: 2
+  operator:
+    operator: LessThan
+    location:
+      start:
+        index: 2
+        line: 1
+        column: 3
+      end:
+        index: 3
+        line: 1
+        column: 4
+  right:
+    IntegerLiteral:
+      value: "2"
+      location:
+        start:
+          index: 4
+          line: 1
+          column: 5
+        end:
+          index: 5
+          line: 1
+          column: 6
+  location:
+    start:
+      index: 0
+      line: 1
+      column: 1
+    end:
+      index: 5
+      line: 1
+      column: 6
