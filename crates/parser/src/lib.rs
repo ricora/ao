@@ -42,32 +42,310 @@ where
         },
     );
 
-    let expression = recursive(|expr| {
-        let function_call_args = expr
+    let expression = recursive(|expression| {
+        let function_call_args = expression
             .clone()
             .separated_by(just(Token::Comma))
             .collect::<Vec<_>>()
             .delimited_by(just(Token::LParen), just(Token::RParen));
 
-        let function_call = identifier
-            .then(function_call_args)
-            .map_with(|(name, args), e| {
-                ast::Expression::FunctionCall(ast::FunctionCall {
+        let function_call =
+            identifier
+                .clone()
+                .then(function_call_args)
+                .map_with(|(name, args), e| {
+                    ast::Expression::FunctionCall(ast::FunctionCall {
+                        name,
+                        arguments: args,
+                        location: ast::Location::from(e.span()),
+                    })
+                });
+
+        let assignment = identifier
+            .clone()
+            .then_ignore(just(Token::Assign))
+            .then(expression.clone())
+            .map_with(|(name, value), e| {
+                ast::Expression::AssignmentExpression(ast::AssignmentExpression {
                     name,
-                    arguments: args,
+                    value: Box::new(value),
                     location: ast::Location::from(e.span()),
                 })
             });
 
-        // TODO: Implement other expressions
+        let atom = literal
+            .map(|lit| ast::Expression::IntegerLiteral(lit))
+            .or(identifier.clone().map(|id| ast::Expression::Identifier(id)))
+            .or(assignment)
+            .or(function_call)
+            .or(expression
+                .clone()
+                .delimited_by(just(Token::LParen), just(Token::RParen)));
 
-        function_call
-    });
+        let unary = just(Token::Sub)
+            .or(just(Token::Not))
+            .repeated()
+            .foldr(atom, |op, expr| {
+                let op_kind = match op {
+                    Token::Sub => ast::OperatorKind::Subtract,
+                    Token::Not => ast::OperatorKind::LogicalNot,
+                    _ => unreachable!(),
+                };
+                ast::Expression::UnaryExpression(ast::UnaryExpression {
+                    operator: ast::Operator {
+                        operator: op_kind,
+                        location: ast::Location {
+                            start: 0,
+                            end: 0,
+                            context: (),
+                        },
+                    },
+                    operand: Box::new(expr),
+                    location: ast::Location {
+                        start: 0,
+                        end: 0,
+                        context: (),
+                    },
+                })
+            });
 
-    // TODO: Implement the full parser for the AST
-    identifier
+        let mul = unary.clone().foldl(
+            just(Token::Mul).or(just(Token::Div)).then(unary).repeated(),
+            |left, (op, right)| {
+                let op_kind = match op {
+                    Token::Mul => ast::OperatorKind::Multiply,
+                    Token::Div => ast::OperatorKind::Divide,
+                    _ => unreachable!(),
+                };
+                ast::Expression::BinaryExpression(ast::BinaryExpression {
+                    left: Box::new(left),
+                    operator: ast::Operator {
+                        operator: op_kind,
+                        location: ast::Location {
+                            start: 0,
+                            end: 0,
+                            context: (),
+                        },
+                    },
+                    right: Box::new(right),
+                    location: ast::Location {
+                        start: 0,
+                        end: 0,
+                        context: (),
+                    },
+                })
+            },
+        );
+
+        let add = mul.clone().foldl(
+            just(Token::Add).or(just(Token::Sub)).then(mul).repeated(),
+            |left, (op, right)| {
+                let op_kind = match op {
+                    Token::Add => ast::OperatorKind::Add,
+                    Token::Sub => ast::OperatorKind::Subtract,
+                    _ => unreachable!(),
+                };
+                ast::Expression::BinaryExpression(ast::BinaryExpression {
+                    left: Box::new(left),
+                    operator: ast::Operator {
+                        operator: op_kind,
+                        location: ast::Location {
+                            start: 0,
+                            end: 0,
+                            context: (),
+                        },
+                    },
+                    right: Box::new(right),
+                    location: ast::Location {
+                        start: 0,
+                        end: 0,
+                        context: (),
+                    },
+                })
+            },
+        );
+
+        let comparison = add.clone().foldl(
+            just(Token::LessThan)
+                .or(just(Token::LessThanOrEqual))
+                .or(just(Token::GreaterThan))
+                .or(just(Token::GreaterThanOrEqual))
+                .or(just(Token::Equal))
+                .or(just(Token::NotEqual))
+                .then(add)
+                .repeated(),
+            |left, (op, right)| {
+                let op_kind = match op {
+                    Token::LessThan => ast::OperatorKind::LessThan,
+                    Token::LessThanOrEqual => ast::OperatorKind::LessThanOrEqual,
+                    Token::GreaterThan => ast::OperatorKind::GreaterThan,
+                    Token::GreaterThanOrEqual => ast::OperatorKind::GreaterThanOrEqual,
+                    Token::Equal => ast::OperatorKind::Equal,
+                    Token::NotEqual => ast::OperatorKind::NotEqual,
+                    _ => unreachable!(),
+                };
+                ast::Expression::BinaryExpression(ast::BinaryExpression {
+                    left: Box::new(left),
+                    operator: ast::Operator {
+                        operator: op_kind,
+                        location: ast::Location {
+                            start: 0,
+                            end: 0,
+                            context: (),
+                        },
+                    },
+                    right: Box::new(right),
+                    location: ast::Location {
+                        start: 0,
+                        end: 0,
+                        context: (),
+                    },
+                })
+            },
+        );
+
+        let logical = comparison.clone().foldl(
+            just(Token::And)
+                .or(just(Token::Or))
+                .then(comparison)
+                .repeated(),
+            |left, (op, right)| {
+                let op_kind = match op {
+                    Token::And => ast::OperatorKind::LogicalAnd,
+                    Token::Or => ast::OperatorKind::LogicalOr,
+                    _ => unreachable!(),
+                };
+                ast::Expression::BinaryExpression(ast::BinaryExpression {
+                    left: Box::new(left),
+                    operator: ast::Operator {
+                        operator: op_kind,
+                        location: ast::Location {
+                            start: 0,
+                            end: 0,
+                            context: (),
+                        },
+                    },
+                    right: Box::new(right),
+                    location: ast::Location {
+                        start: 0,
+                        end: 0,
+                        context: (),
+                    },
+                })
+            },
+        );
+
+        logical
+    })
+    .boxed();
+
+    let statement = recursive(|_statement| {
+        let variable_definition = just(Token::LetDeclaration)
+            .or(just(Token::VarDeclaration))
+            .then(identifier.clone())
+            .then_ignore(just(Token::Colon))
+            .then(r#type.clone())
+            .then(just(Token::Assign).ignore_then(expression.clone()).or_not())
+            .then_ignore(just(Token::Semicolon))
+            .map_with(|(((keyword, name), var_type), value), e| {
+                ast::Statement::VariableDefinition(ast::VariableDefinition {
+                    name,
+                    mutable: keyword == Token::VarDeclaration,
+                    variable_type: var_type,
+                    value,
+                    location: ast::Location::from(e.span()),
+                })
+            });
+
+        let expression_statement = expression
+            .clone()
+            .then_ignore(just(Token::Semicolon))
+            .map_with(|expr, e| {
+                ast::Statement::ExpressionStatement(ast::ExpressionStatement {
+                    expression: expr,
+                    location: ast::Location::from(e.span()),
+                })
+            });
+
+        variable_definition.or(expression_statement)
+    })
+    .boxed();
+
+    let block_without_expression = statement
+        .clone()
+        .repeated()
+        .collect::<Vec<_>>()
+        .map_with(|statements, e| ast::Block {
+            statements: ast::Statements {
+                statements,
+                location: ast::Location::from(e.span()),
+            },
+            location: ast::Location::from(e.span()),
+        })
+        .delimited_by(just(Token::LBrace), just(Token::RBrace))
+        .boxed();
+
+    let block_with_expression = statement
+        .clone()
+        .repeated()
+        .collect::<Vec<_>>()
+        .then(expression.clone())
+        .map_with(|(statements, final_expr), e| {
+            let mut all_statements = statements;
+            all_statements.push(ast::Statement::Expression(final_expr));
+            ast::Block {
+                statements: ast::Statements {
+                    statements: all_statements,
+                    location: ast::Location::from(e.span()),
+                },
+                location: ast::Location::from(e.span()),
+            }
+        })
+        .delimited_by(just(Token::LBrace), just(Token::RBrace))
+        .boxed();
+
+    let parameter = identifier
+        .clone()
+        .then_ignore(just(Token::Colon))
+        .then(r#type.clone())
+        .map_with(|(name, param_type), e| ast::Parameter {
+            name,
+            parameter_type: param_type,
+            location: ast::Location::from(e.span()),
+        });
+
+    let parameters = parameter
+        .separated_by(just(Token::Comma))
+        .collect::<Vec<_>>()
+        .map_with(|params, e| ast::Parameters {
+            parameters: params,
+            location: ast::Location::from(e.span()),
+        })
+        .delimited_by(just(Token::LParen), just(Token::RParen));
+
+    let function_definition = just(Token::FunctionDeclaration)
+        .ignore_then(identifier.clone())
+        .then(parameters)
+        .then_ignore(just(Token::RightArrow))
+        .then(r#type.clone())
+        .then(block_with_expression.clone())
+        .map_with(
+            |(((name, params), return_type), body), e| ast::FunctionDefinition {
+                name,
+                parameters: params,
+                return_type,
+                body,
+                location: ast::Location::from(e.span()),
+            },
+        );
+
+    let program = function_definition
+        .repeated()
+        .collect::<Vec<_>>()
         .then_ignore(end())
-        .map(|_| ast::Program { functions: vec![] }) // TODO: Replace with actual function definitions
+        .map(|functions| ast::Program { functions });
+
+    program
 }
 
 pub fn parse(src: &str) -> ParseResult<ast::Program, chumsky::error::Rich<'_, Token<'_>>> {
