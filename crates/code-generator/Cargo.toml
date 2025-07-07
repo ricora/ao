@@ -7,7 +7,6 @@ edition = "2021"
 indoc = { workspace = true }
 parser = { workspace = true }
 pretty_assertions = { workspace = true }
-tokenizer = { workspace = true }
 wasmtime = "33.0.1"
 wasmtime-wasi = "33.0.1"
 
@@ -16,5 +15,4 @@ anyhow = { workspace = true }
 ast = { workspace = true }
 parser = { workspace = true }
 thiserror = { workspace = true }
-tokenizer = { workspace = true }
 wast = { workspace = true }

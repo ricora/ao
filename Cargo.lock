@@ -123,8 +123,8 @@ dependencies = [
 name = "ast"
 version = "0.1.0"
 dependencies = [
+ "chumsky",
  "serde",
- "tokenizer",
 ]
 
 [[package]]
@@ -366,7 +366,6 @@ dependencies = [
  "parser",
  "pretty_assertions",
  "thiserror 2.0.12",
- "tokenizer",
  "wasmtime",
  "wasmtime-wasi",
  "wast 221.0.3",
@@ -1169,7 +1168,6 @@ dependencies = [
  "code-generator",
  "indoc",
  "parser",
- "tokenizer",
 ]
 
 [[package]]
@@ -1349,7 +1347,6 @@ dependencies = [
  "insta",
  "logos",
  "pretty_assertions",
- "tokenizer",
 ]
 
 [[package]]
@@ -1839,15 +1836,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "tokenizer"
-version = "0.1.0"
-dependencies = [
- "indoc",
- "pretty_assertions",
- "serde",
-]
-
-[[package]]
 name = "tokio"
 version = "1.43.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1905,7 +1893,6 @@ dependencies = [
  "parser",
  "serde_json",
  "thiserror 2.0.12",
- "tokenizer",
  "wit-bindgen-rt",
 ]
 
