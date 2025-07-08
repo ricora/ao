@@ -2,113 +2,93 @@
 source: crates/parser/src/lib.rs
 expression: ast
 ---
-statements:
-  statements:
-    - VariableDefinition:
-        name:
-          name: x
-          location:
-            start:
-              index: 10
-              line: 2
-              column: 9
-            end:
-              index: 11
-              line: 2
-              column: 10
-        mutable: true
-        variable_type:
-          name: I32
-          location:
-            start:
-              index: 13
-              line: 2
-              column: 12
-            end:
-              index: 16
-              line: 2
-              column: 15
-        value: ~
-        location:
-          start:
-            index: 6
-            line: 2
-            column: 5
-          end:
-            index: 17
-            line: 2
-            column: 16
-    - ExpressionStatement:
-        expression:
-          AssignmentExpression:
-            name:
-              name: x
-              location:
-                start:
-                  index: 22
-                  line: 3
-                  column: 5
-                end:
-                  index: 23
-                  line: 3
-                  column: 6
-            value:
-              IntegerLiteral:
-                value: "0"
+functions:
+  - name:
+      name: test
+      location:
+        start: 3
+        end: 7
+        context: ~
+    parameters:
+      parameters: []
+      location:
+        start: 8
+        end: 8
+        context: ~
+    return_type:
+      name: I32
+      location:
+        start: 13
+        end: 16
+        context: ~
+    body:
+      statements:
+        statements:
+          - VariableDefinition:
+              name:
+                name: x
                 location:
-                  start:
-                    index: 26
-                    line: 3
-                    column: 9
-                  end:
-                    index: 27
-                    line: 3
-                    column: 10
-            location:
-              start:
-                index: 22
-                line: 3
-                column: 5
-              end:
-                index: 27
-                line: 3
-                column: 10
+                  start: 27
+                  end: 28
+                  context: ~
+              mutable: true
+              variable_type:
+                name: I32
+                location:
+                  start: 30
+                  end: 33
+                  context: ~
+              value:
+                IntegerLiteral:
+                  value: "0"
+                  location:
+                    start: 36
+                    end: 37
+                    context: ~
+              location:
+                start: 23
+                end: 38
+                context: ~
+          - ExpressionStatement:
+              expression:
+                AssignmentExpression:
+                  name:
+                    name: x
+                    location:
+                      start: 43
+                      end: 44
+                      context: ~
+                  value:
+                    IntegerLiteral:
+                      value: "1"
+                      location:
+                        start: 47
+                        end: 48
+                        context: ~
+                  location:
+                    start: 43
+                    end: 48
+                    context: ~
+              location:
+                start: 43
+                end: 49
+                context: ~
+          - Expression:
+              Identifier:
+                name: x
+                location:
+                  start: 54
+                  end: 55
+                  context: ~
         location:
-          start:
-            index: 22
-            line: 3
-            column: 5
-          end:
-            index: 28
-            line: 3
-            column: 11
-    - Expression:
-        Identifier:
-          name: x
-          location:
-            start:
-              index: 33
-              line: 4
-              column: 5
-            end:
-              index: 34
-              line: 4
-              column: 6
-  location:
-    start:
-      index: 0
-      line: 1
-      column: 1
-    end:
-      index: 36
-      line: 5
-      column: 2
-location:
-  start:
-    index: 0
-    line: 1
-    column: 1
-  end:
-    index: 36
-    line: 5
-    column: 2
+          start: 23
+          end: 55
+          context: ~
+      location:
+        start: 23
+        end: 55
+        context: ~
+    location:
+      start: 0
+      end: 57
+      context: ~

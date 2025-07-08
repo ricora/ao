@@ -6,36 +6,21 @@ functions:
   - name:
       name: main
       location:
-        start:
-          index: 3
-          line: 1
-          column: 4
-        end:
-          index: 7
-          line: 1
-          column: 8
+        start: 3
+        end: 7
+        context: ~
     parameters:
       parameters: []
       location:
-        start:
-          index: 7
-          line: 1
-          column: 8
-        end:
-          index: 9
-          line: 1
-          column: 10
+        start: 8
+        end: 8
+        context: ~
     return_type:
       name: I32
       location:
-        start:
-          index: 13
-          line: 1
-          column: 14
-        end:
-          index: 16
-          line: 1
-          column: 17
+        start: 13
+        end: 16
+        context: ~
     body:
       statements:
         statements:
@@ -43,38 +28,18 @@ functions:
               IntegerLiteral:
                 value: "0"
                 location:
-                  start:
-                    index: 19
-                    line: 1
-                    column: 20
-                  end:
-                    index: 20
-                    line: 1
-                    column: 21
+                  start: 19
+                  end: 20
+                  context: ~
         location:
-          start:
-            index: 17
-            line: 1
-            column: 18
-          end:
-            index: 22
-            line: 1
-            column: 23
+          start: 19
+          end: 20
+          context: ~
       location:
-        start:
-          index: 17
-          line: 1
-          column: 18
-        end:
-          index: 22
-          line: 1
-          column: 23
+        start: 19
+        end: 20
+        context: ~
     location:
-      start:
-        index: 3
-        line: 1
-        column: 4
-      end:
-        index: 22
-        line: 1
-        column: 23
+      start: 0
+      end: 22
+      context: ~
