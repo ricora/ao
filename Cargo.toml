@@ -30,6 +30,6 @@ serde_json = "1.0.133"
 thiserror = "2.0.4"
 indoc = "2.0.5"
 insta = { version = "1.43.1", features = ["yaml"] }
-wast = "221.0.2"
+wast = "235.0.0"
 chumsky = "0.10.1"
 logos = "0.15.0"

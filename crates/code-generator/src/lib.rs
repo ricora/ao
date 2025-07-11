@@ -277,32 +277,6 @@ impl<'a> CodeGenerator<'a> {
                 };
                 instructions
             }
-            ast::Expression::IfElseExpression(expr) => {
-                let condition = self.generate_expression(&expr.condition);
-                let then_block = self.generate_instructions(&expr.then_block);
-                let else_block = self.generate_instructions(&expr.else_block);
-                let return_type = self.generate_type(&expr.return_type);
-
-                let mut instructions =
-                    Vec::with_capacity(condition.len() + then_block.len() + else_block.len() + 3);
-                instructions.extend(condition);
-                instructions.push(core::Instruction::If(Box::new(core::BlockType {
-                    label: None,
-                    label_name: None,
-                    ty: core::TypeUse {
-                        index: None,
-                        inline: Some(core::FunctionType {
-                            params: Box::new([]),
-                            results: Box::new([return_type]),
-                        }),
-                    },
-                })));
-                instructions.extend(then_block);
-                instructions.push(core::Instruction::Else(None));
-                instructions.extend(else_block);
-                instructions.push(core::Instruction::End(None));
-                instructions
-            }
             ast::Expression::AssignmentExpression(expr) => {
                 let value = self.generate_expression(&expr.value);
                 let mut instuctions = Vec::with_capacity(value.len() + 2);
@@ -572,21 +546,6 @@ mod tests {
         assert_eq!(stdout, "3");
     }
 
-    #[test]
-    fn if_expression() {
-        let source = indoc! {"
-            fn main() -> i32 {
-                print_int(if 1 { 1 } else { 2 } as i32);
-                print_char(32); // ' '
-                print_int(if 0 { 3 } else { 4 } as i32);
-                print_char(32); // ' '
-                print_int(if 0 { 5 } else if 1 { 6 } else { 7 } as i32);
-                0
-            }
-        "};
-        let stdout = run(source).unwrap().stdout;
-        assert_eq!(stdout, "1 4 6");
-    }
 
     #[test]
     fn comparison_expression() {

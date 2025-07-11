@@ -48,7 +48,7 @@ where
     let expression = recursive(|expression| {
         let function_call_args = expression
             .clone()
-            .repeated()
+            .separated_by(just(Token::Comma))
             .collect::<Vec<_>>()
             .delimited_by(just(Token::LParen), just(Token::RParen));
 
@@ -287,22 +287,44 @@ where
                 })
             });
 
-        let if_statement = just(Token::If)
-            .ignore_then(expression.clone())
-            .then(block_without_expression.clone())
-            .then(
-                just(Token::Else)
-                    .ignore_then(block_without_expression.clone())
-                    .or_not(),
-            )
-            .map_with(|((condition, then_block), else_block), e| {
-                ast::Statement::IfStatement(ast::IfStatement {
-                    condition,
-                    then_block,
-                    else_block,
-                    location: ast::Location::from(e.span()),
+        let if_statement = recursive(|if_statement| {
+            just(Token::If)
+                .ignore_then(expression.clone())
+                .then(block_without_expression.clone())
+                .then(
+                    just(Token::Else)
+                        .ignore_then(
+                            block_without_expression
+                                .clone()
+                                .map(Some)
+                                .or(if_statement.map(|stmt| {
+                                    // Convert the if statement to a block with a single statement
+                                    let location = ast::Location {
+                                        start: 0,
+                                        end: 0,
+                                        context: (),
+                                    };
+                                    Some(ast::Block {
+                                        statements: ast::Statements {
+                                            statements: vec![stmt],
+                                            location: location.clone(),
+                                        },
+                                        location,
+                                    })
+                                }))
+                                .or(empty().to(None)),
+                        )
+                        .or_not(),
+                )
+                .map_with(|((condition, then_block), else_block), e| {
+                    ast::Statement::IfStatement(ast::IfStatement {
+                        condition,
+                        then_block,
+                        else_block: else_block.flatten(),
+                        location: ast::Location::from(e.span()),
+                    })
                 })
-            });
+        });
 
         let expression_statement = expression
             .clone()
@@ -496,4 +518,5 @@ mod tests {
         let ast = result.into_result().unwrap();
         assert_yaml_snapshot!(ast);
     }
+
 }

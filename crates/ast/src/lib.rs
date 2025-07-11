@@ -123,8 +123,6 @@ pub enum Expression<'a> {
     #[serde(borrow)]
     AssignmentExpression(AssignmentExpression<'a>),
     #[serde(borrow)]
-    IfElseExpression(IfElseExpression<'a>),
-    #[serde(borrow)]
     Identifier(Identifier<'a>),
     #[serde(borrow)]
     IntegerLiteral(IntegerLiteral<'a>),
@@ -140,7 +138,6 @@ impl<'a> Expression<'a> {
             Expression::AssignmentExpression(assignment_expression) => {
                 &assignment_expression.location
             }
-            Expression::IfElseExpression(if_else_expression) => &if_else_expression.location,
             Expression::Identifier(identifier) => &identifier.location,
             Expression::IntegerLiteral(integer_literal) => &integer_literal.location,
             Expression::FunctionCall(function_call) => &function_call.location,
@@ -241,17 +238,6 @@ pub struct AssignmentExpression<'a> {
     pub location: Location,
 }
 
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-pub struct IfElseExpression<'a> {
-    #[serde(borrow)]
-    pub condition: Box<Expression<'a>>,
-    #[serde(borrow)]
-    pub then_block: Block<'a>,
-    #[serde(borrow)]
-    pub else_block: Block<'a>,
-    pub return_type: Type,
-    pub location: Location,
-}
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct Identifier<'a> {

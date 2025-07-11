@@ -21,11 +21,11 @@
       (case "last-operation-failed" (own $error))
       (case "closed")
     ))
-    (export $stream-error "stream-error" (type (eq $stream-error-type)))
+    (export "stream-error" (type $stream-error (eq $stream-error-type)))
 
-    (export $output-stream "output-stream" (type (sub resource)))
-    (export $output-stream.blocking-write-and-flush "[method]output-stream.blocking-write-and-flush"
-      (func
+    (export "output-stream" (type $output-stream (sub resource)))
+    (export "[method]output-stream.blocking-write-and-flush"
+      (func $output-stream.blocking-write-and-flush
         (param "self" (borrow $output-stream))
         (param "contents" (list u8))
         (result (result (error $stream-error)))
@@ -43,7 +43,7 @@
 
   (import "wasi:cli/stdout@0.2.2" (instance $wasi:cli/stdout@0.2.2
     (alias outer 1 $output-stream (type $output-stream))
-    (export $get-stdout "get-stdout"
+    (export "get-stdout"
       (func (result (own $output-stream)))
     )
   ))

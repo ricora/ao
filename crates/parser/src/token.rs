@@ -28,8 +28,6 @@ pub enum Token<'a> {
     #[token("return")]
     Return,
 
-    #[token("as")]
-    As,
 
     #[regex(r"[a-zA-Z_][a-zA-Z0-9_]*")]
     Identifier(&'a str),
@@ -129,7 +127,6 @@ impl std::fmt::Display for Token<'_> {
             Self::While => write!(f, "while"),
             Self::For => write!(f, "for"),
             Self::Return => write!(f, "return"),
-            Self::As => write!(f, "as"),
             Self::Identifier(value) => write!(f, "{value}"),
             Self::Integer(value) => write!(f, "{value}"),
             Self::Add => write!(f, "+"),
