@@ -56,9 +56,9 @@ fn main() {
         Mode::Parse => {
             let ast = parse(&source).unwrap(); // TODO: handle errors properly
             if let Some(output) = args.output {
-                std::fs::write(output, format!("{:#?}", ast)).expect("Failed to write output");
+                std::fs::write(output, format!("{ast:#?}")).expect("Failed to write output");
             } else {
-                println!("{:#?}", ast);
+                println!("{ast:#?}");
             }
         }
         Mode::Compile => {
@@ -69,7 +69,7 @@ fn main() {
             if let Some(output) = args.output {
                 std::fs::write(output, &wasm).expect("Failed to write output");
             } else {
-                println!("{:#?}", wat);
+                println!("{wat:#?}");
             }
         }
     }
