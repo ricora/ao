@@ -323,7 +323,7 @@ impl<'a> CodeGenerator<'a> {
     }
 
     fn generate_identifier(&self, identifier: &'a ast::Identifier) -> wast::token::Id<'a> {
-        wast::token::Id::new(&identifier.name, self.span)
+        wast::token::Id::new(identifier.name, self.span)
     }
 
     fn generate_type(&self, ast_type: &'a ast::Type) -> core::ValType<'a> {
