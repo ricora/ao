@@ -420,7 +420,7 @@ mod tests {
                 // 正常終了
             }
             Err(()) => {
-                // エラー処理
+                // Error handling
                 return Err(anyhow::anyhow!("Component execution failed"));
             }
         }
