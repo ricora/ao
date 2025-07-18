@@ -410,8 +410,6 @@ mod tests {
         let wasm = compile(source)?;
         let component = Component::from_binary(&engine, &wasm)?;
 
-        let instance = linker.instantiate(&mut store, &component)?;
-
         let command = wasmtime_wasi::p2::bindings::sync::Command::instantiate(
             &mut store, &component, &linker,
         )?;

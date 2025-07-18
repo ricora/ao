@@ -79,8 +79,8 @@ where
 
         let atom = assignment
             .or(function_call)
-            .or(literal.map(|lit| ast::Expression::IntegerLiteral(lit)))
-            .or(identifier.clone().map(|id| ast::Expression::Identifier(id)))
+            .or(literal.map(ast::Expression::IntegerLiteral))
+            .or(identifier.clone().map(ast::Expression::Identifier))
             .or(expression
                 .clone()
                 .delimited_by(just(Token::LParen), just(Token::RParen)))
@@ -399,11 +399,12 @@ where
             },
         );
 
+    #[allow(clippy::let_and_return)]
     let program = function_definition
         .repeated()
         .collect::<Vec<_>>()
         .then_ignore(end())
-        .map(|functions| ast::Program { functions });
+        .map_with(|functions, _| ast::Program { functions });
 
     program
 }
