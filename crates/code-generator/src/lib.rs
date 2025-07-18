@@ -367,7 +367,7 @@ mod tests {
     }
 
     fn compile(source: &str) -> Result<Vec<u8>> {
-        let ast = parser::parse(source).into_result().unwrap(); // TODO: Implement error handling
+        let ast = parser::parse(source).into_result().expect("Failed to parse source code into AST"); // TODO: Implement error handling
         let mut generator = CodeGenerator::new(ast)?;
         let mut wat = generator.generate()?;
         let wasm = wat.encode()?;
