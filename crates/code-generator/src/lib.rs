@@ -198,10 +198,7 @@ impl<'a> CodeGenerator<'a> {
             .collect()
     }
 
-    fn generate_expression(
-        &self,
-        expression: &'a ast::Expression,
-    ) -> Vec<core::Instruction<'a>> {
+    fn generate_expression(&self, expression: &'a ast::Expression) -> Vec<core::Instruction<'a>> {
         match expression {
             ast::Expression::BinaryExpression(expr) => {
                 let lhs = self.generate_expression(&expr.left);
@@ -545,7 +542,6 @@ mod tests {
         let stdout = run(source).unwrap().stdout;
         assert_eq!(stdout, "3");
     }
-
 
     #[test]
     fn comparison_expression() {

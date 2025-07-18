@@ -518,5 +518,4 @@ mod tests {
         let ast = result.into_result().unwrap();
         assert_yaml_snapshot!(ast);
     }
-
 }

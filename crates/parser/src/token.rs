@@ -28,7 +28,6 @@ pub enum Token<'a> {
     #[token("return")]
     Return,
 
-
     #[regex(r"[a-zA-Z_][a-zA-Z0-9_]*")]
     Identifier(&'a str),
 

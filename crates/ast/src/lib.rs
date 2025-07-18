@@ -238,7 +238,6 @@ pub struct AssignmentExpression<'a> {
     pub location: Location,
 }
 
-
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct Identifier<'a> {
     #[serde(borrow)]
