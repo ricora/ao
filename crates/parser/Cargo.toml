@@ -4,7 +4,6 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-ariadne = "0.5.1"
 ast = { workspace = true }
 chumsky = { workspace = true }
 logos = { workspace = true }
