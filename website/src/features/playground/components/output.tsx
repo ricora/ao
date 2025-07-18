@@ -37,19 +37,12 @@ export const Output: FC<OutputProps> = memo(({ output }) => {
       <Tabs.List className="px-4 pt-2">
         <Tabs.Tab id="output">Output</Tabs.Tab>
         <Tabs.Tab id="ast">AST</Tabs.Tab>
-        <Tabs.Tab id="tokens">Tokens</Tabs.Tab>
       </Tabs.List>
       <Tabs.Panel className="h-full" id="output">
         <Editor language="plaintext" value={output?.output ?? ""} />
       </Tabs.Panel>
       <Tabs.Panel className="h-full" id="ast">
         <Editor language="json" value={JSON.stringify(output?.ast, null, 2)} />
-      </Tabs.Panel>
-      <Tabs.Panel className="h-full" id="tokens">
-        <Editor
-          language="json"
-          value={JSON.stringify(output?.tokens, null, 2)}
-        />
       </Tabs.Panel>
     </Tabs>
   )
