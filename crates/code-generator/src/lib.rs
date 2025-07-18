@@ -417,7 +417,7 @@ mod tests {
         let result = command.wasi_cli_run().call_run(&mut store)?;
         match result {
             Ok(_) => {
-                // 正常終了
+                // Normal termination
             }
             Err(()) => {
                 // Error handling
