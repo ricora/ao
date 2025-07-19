@@ -243,6 +243,32 @@ impl TypeChecker {
         Ok(())
     }
 
+    pub fn check_if_statement(
+        &mut self,
+        if_stmt: &ast::IfStatement,
+    ) -> Result<Type, TypeCheckError> {
+        // Check that the condition is of type bool
+        let condition_type = self.check_expression(&if_stmt.condition)?;
+        if condition_type != Type::Bool {
+            return Err(TypeCheckError::TypeMismatch {
+                expected: "bool".to_string(),
+                found: condition_type.to_string(),
+                location: if_stmt.condition.location().clone(),
+            });
+        }
+
+        // Check the then block
+        self.check_block(&if_stmt.then_block)?;
+
+        // Check the else block if it exists
+        if let Some(else_block) = &if_stmt.else_block {
+            self.check_block(else_block)?;
+        }
+
+        // According to the specification, if statements have type Unit
+        Ok(Type::Unit)
+    }
+
     pub fn check_statement(&mut self, statement: &ast::Statement) -> Result<Type, TypeCheckError> {
         match statement {
             ast::Statement::VariableDefinition(var_def) => {
@@ -253,10 +279,7 @@ impl TypeChecker {
                 self.check_expression(&expr_stmt.expression)?;
                 Ok(Type::Unit)
             }
-            ast::Statement::IfStatement(_) => {
-                // TODO: Handle if statements
-                Ok(Type::Unit)
-            }
+            ast::Statement::IfStatement(if_stmt) => self.check_if_statement(if_stmt),
             ast::Statement::Expression(expr) => self.check_expression(expr),
         }
     }
@@ -994,5 +1017,221 @@ mod tests {
             result.unwrap_err(),
             TypeCheckError::TypeMismatch { .. }
         ));
+    }
+
+    #[test]
+    fn test_check_if_statement_valid_condition() {
+        use parser;
+
+        let mut checker = TypeChecker::new();
+
+        // Test if statement with boolean condition (using comparison that returns bool)
+        let source = r#"
+            fn test() -> i32 {
+                if 1 == 1 { 
+                    let x: i32 = 1; 
+                }
+                42
+            }
+        "#;
+
+        let parse_result = parser::parse(source);
+        assert!(parse_result.output().is_some());
+
+        let program = parse_result.output().unwrap();
+        let function = &program.functions[0];
+
+        let result = checker.check_function_definition(function);
+        assert!(result.is_ok());
+    }
+
+    #[test]
+    fn test_check_if_statement_with_else() {
+        use parser;
+
+        let mut checker = TypeChecker::new();
+
+        // Test if-else statement with boolean condition (using comparison that returns bool)
+        let source = r#"
+            fn test() -> i32 {
+                if 2 > 1 { 
+                    let x: i32 = 1; 
+                } else {
+                    let y: i32 = 2;
+                }
+                42
+            }
+        "#;
+
+        let parse_result = parser::parse(source);
+        assert!(parse_result.output().is_some());
+
+        let program = parse_result.output().unwrap();
+        let function = &program.functions[0];
+
+        let result = checker.check_function_definition(function);
+        assert!(result.is_ok());
+    }
+
+    #[test]
+    fn test_check_if_statement_invalid_condition() {
+        use parser;
+
+        let mut checker = TypeChecker::new();
+
+        // Test if statement with non-boolean condition (should fail)
+        let source = r#"
+            fn test() -> i32 {
+                if 42 { 
+                    let x: i32 = 1; 
+                }
+                42
+            }
+        "#;
+
+        let parse_result = parser::parse(source);
+        assert!(parse_result.output().is_some());
+
+        let program = parse_result.output().unwrap();
+        let function = &program.functions[0];
+
+        let result = checker.check_function_definition(function);
+        assert!(result.is_err());
+        assert!(matches!(
+            result.unwrap_err(),
+            TypeCheckError::TypeMismatch { .. }
+        ));
+    }
+
+    #[test]
+    fn test_check_if_statement_returns_unit() {
+        use ast::{
+            BinaryExpression, Block, Expression, IfStatement, IntegerLiteral, Location, Operator,
+            OperatorKind, Statement, Statements,
+        };
+
+        let mut checker = TypeChecker::new();
+
+        // Create a manual if statement with a boolean condition (1 == 1)
+        let left = Box::new(Expression::IntegerLiteral(IntegerLiteral {
+            value: "1",
+            location: Location {
+                start: 3,
+                end: 4,
+                context: (),
+            },
+        }));
+        let right = Box::new(Expression::IntegerLiteral(IntegerLiteral {
+            value: "1",
+            location: Location {
+                start: 8,
+                end: 9,
+                context: (),
+            },
+        }));
+        let condition = Expression::BinaryExpression(BinaryExpression {
+            left,
+            operator: Operator {
+                operator: OperatorKind::Equal,
+                location: Location {
+                    start: 5,
+                    end: 7,
+                    context: (),
+                },
+            },
+            right,
+            location: Location {
+                start: 3,
+                end: 9,
+                context: (),
+            },
+        });
+
+        let if_stmt = IfStatement {
+            condition,
+            then_block: Block {
+                statements: Statements {
+                    statements: vec![],
+                    location: Location {
+                        start: 11,
+                        end: 13,
+                        context: (),
+                    },
+                },
+                location: Location {
+                    start: 11,
+                    end: 13,
+                    context: (),
+                },
+            },
+            else_block: None,
+            location: Location {
+                start: 0,
+                end: 13,
+                context: (),
+            },
+        };
+
+        // Test that check_if_statement returns Unit type
+        let result = checker.check_statement(&Statement::IfStatement(if_stmt));
+        assert!(result.is_ok());
+        assert_eq!(result.unwrap(), Type::Unit);
+    }
+
+    #[test]
+    fn test_check_if_statement_scoping_variables_tdd() {
+        use parser;
+
+        let mut checker = TypeChecker::new();
+
+        // TDD Test: if statement variables should not leak to outer scope
+        let source = r#"
+            fn test() -> i32 {
+                if 1 == 1 {
+                    let x: i32 = 42;
+                }
+                x
+            }
+        "#;
+
+        let parse_result = parser::parse(source);
+        assert!(parse_result.output().is_some());
+
+        let program = parse_result.output().unwrap();
+        let function = &program.functions[0];
+
+        // This should fail because variable x is not accessible outside the if block
+        let result = checker.check_function_definition(function);
+        assert!(result.is_err());
+        assert!(matches!(
+            result.unwrap_err(),
+            TypeCheckError::UndefinedIdentifier { .. }
+        ));
+    }
+
+    #[test]
+    fn test_check_if_statement_missing_else_for_expression_tdd() {
+        use parser;
+
+        let mut checker = TypeChecker::new();
+
+        // RED: Test that if expressions without else should fail when used as expression
+        let source = r#"
+            fn test() -> i32 {
+                if 1 == 1 {
+                    42
+                }
+            }
+        "#;
+
+        let parse_result = parser::parse(source);
+        assert!(parse_result.output().is_some());
+
+        let program = parse_result.output().unwrap();
+        let function = &program.functions[0];
+
+        // This should fail because if expression without else cannot be used where value is expected
+        let result = checker.check_function_definition(function);
+        assert!(result.is_err(), "If expression without else should fail when used as function return");
     }
 }
