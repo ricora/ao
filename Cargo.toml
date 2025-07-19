@@ -17,6 +17,7 @@ members = [
   "crates/code-generator",
   "crates/parser",
   "crates/tools",
+  "crates/type-checker",
 ]
 
 [workspace.dependencies]
