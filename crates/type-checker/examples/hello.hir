@@ -1,0 +1,387 @@
+DefId(0:0 ~ hello[8309]) => OwnerNodes {
+    node: ParentedNode {
+        parent: 4294967040,
+        node: Crate(
+            Mod {
+                spans: ModSpans {
+                    inner_span: hello.rs:1:1: 3:2 (#0),
+                    inject_use_span: no-location (#0),
+                },
+                item_ids: [
+                    ItemId {
+                        owner_id: DefId(0:1 ~ hello[8309]::{use#0}),
+                    },
+                    ItemId {
+                        owner_id: DefId(0:2 ~ hello[8309]::std),
+                    },
+                    ItemId {
+                        owner_id: DefId(0:3 ~ hello[8309]::main),
+                    },
+                ],
+            },
+        ),
+    },
+    parents: [
+        (0, 4294967040),
+    ],
+    bodies: {},
+    opt_hash_including_bodies: None,
+}
+DefId(0:1 ~ hello[8309]::{use#0}) => OwnerNodes {
+    node: ParentedNode {
+        parent: 4294967040,
+        node: Item(
+            Item {
+                owner_id: DefId(0:1 ~ hello[8309]::{use#0}),
+                kind: Use(
+                    Path {
+                        span: no-location (#1),
+                        res: PerNS {
+                            value_ns: Some(
+                                Err,
+                            ),
+                            type_ns: Some(
+                                Err,
+                            ),
+                            macro_ns: Some(
+                                Err,
+                            ),
+                        },
+                        segments: [
+                            PathSegment {
+                                ident: {{root}}#1,
+                                hir_id: HirId(DefId(0:1 ~ hello[8309]::{use#0}).1),
+                                res: Def(
+                                    Mod,
+                                    DefId(0:0 ~ hello[8309]),
+                                ),
+                                args: None,
+                                infer_args: false,
+                            },
+                            PathSegment {
+                                ident: std#1,
+                                hir_id: HirId(DefId(0:1 ~ hello[8309]::{use#0}).2),
+                                res: Def(
+                                    Mod,
+                                    DefId(1:0 ~ std[647d]),
+                                ),
+                                args: None,
+                                infer_args: false,
+                            },
+                            PathSegment {
+                                ident: prelude#1,
+                                hir_id: HirId(DefId(0:1 ~ hello[8309]::{use#0}).3),
+                                res: Def(
+                                    Mod,
+                                    DefId(1:48 ~ std[647d]::prelude),
+                                ),
+                                args: None,
+                                infer_args: false,
+                            },
+                            PathSegment {
+                                ident: rust_2015#1,
+                                hir_id: HirId(DefId(0:1 ~ hello[8309]::{use#0}).4),
+                                res: Def(
+                                    Mod,
+                                    DefId(1:138 ~ std[647d]::prelude::rust_2015),
+                                ),
+                                args: None,
+                                infer_args: false,
+                            },
+                        ],
+                    },
+                    Glob,
+                ),
+                span: no-location (#1),
+                vis_span: no-location (#1),
+                has_delayed_lints: false,
+            },
+        ),
+    },
+    parents: [
+        (0, 4294967040),
+        (1, 0),
+        (2, 0),
+        (3, 0),
+        (4, 0),
+    ],
+    bodies: {},
+    opt_hash_including_bodies: None,
+}
+DefId(0:2 ~ hello[8309]::std) => OwnerNodes {
+    node: ParentedNode {
+        parent: 4294967040,
+        node: Item(
+            Item {
+                owner_id: DefId(0:2 ~ hello[8309]::std),
+                kind: ExternCrate(
+                    None,
+                    std#2,
+                ),
+                span: no-location (#1),
+                vis_span: no-location (#1),
+                has_delayed_lints: false,
+            },
+        ),
+    },
+    parents: [
+        (0, 4294967040),
+    ],
+    bodies: {},
+    opt_hash_including_bodies: None,
+}
+DefId(0:3 ~ hello[8309]::main) => OwnerNodes {
+    node: ParentedNode {
+        parent: 4294967040,
+        node: Item(
+            Item {
+                owner_id: DefId(0:3 ~ hello[8309]::main),
+                kind: Fn {
+                    sig: FnSig {
+                        header: FnHeader {
+                            safety: Normal(
+                                Safe,
+                            ),
+                            constness: NotConst,
+                            asyncness: NotAsync,
+                            abi: Rust,
+                        },
+                        decl: FnDecl {
+                            inputs: [],
+                            output: DefaultReturn(
+                                hello.rs:1:10: 1:10 (#0),
+                            ),
+                            c_variadic: false,
+                            implicit_self: None,
+                            lifetime_elision_allowed: false,
+                        },
+                        span: hello.rs:1:1: 1:10 (#0),
+                    },
+                    ident: main#0,
+                    generics: Generics {
+                        params: [],
+                        predicates: [],
+                        has_where_clause_predicates: false,
+                        where_clause_span: hello.rs:1:10: 1:10 (#0),
+                        span: hello.rs:1:8: 1:8 (#0),
+                    },
+                    body: BodyId {
+                        hir_id: HirId(DefId(0:3 ~ hello[8309]::main).19),
+                    },
+                    has_body: true,
+                },
+                span: hello.rs:1:1: 3:2 (#0),
+                vis_span: no-location (#0),
+                has_delayed_lints: false,
+            },
+        ),
+    },
+    parents: [
+        (0, 4294967040),
+        (1, 19),
+        (2, 18),
+        (3, 2),
+        (4, 17),
+        (5, 4),
+        (6, 5),
+        (7, 5),
+        (8, 5),
+        (9, 4),
+        (10, 11),
+        (11, 12),
+        (12, 9),
+        (13, 14),
+        (14, 16),
+        (15, 16),
+        (16, 9),
+        (17, 3),
+        (18, 1),
+        (19, 0),
+    ],
+    bodies: {
+        19: Body {
+            params: [],
+            value: Expr {
+                hir_id: HirId(DefId(0:3 ~ hello[8309]::main).19),
+                kind: Block(
+                    Block {
+                        stmts: [
+                            Stmt {
+                                hir_id: HirId(DefId(0:3 ~ hello[8309]::main).18),
+                                kind: Semi(
+                                    Expr {
+                                        hir_id: HirId(DefId(0:3 ~ hello[8309]::main).2),
+                                        kind: Block(
+                                            Block {
+                                                stmts: [
+                                                    Stmt {
+                                                        hir_id: HirId(DefId(0:3 ~ hello[8309]::main).17),
+                                                        kind: Semi(
+                                                            Expr {
+                                                                hir_id: HirId(DefId(0:3 ~ hello[8309]::main).4),
+                                                                kind: Call(
+                                                                    Expr {
+                                                                        hir_id: HirId(DefId(0:3 ~ hello[8309]::main).5),
+                                                                        kind: Path(
+                                                                            Resolved(
+                                                                                None,
+                                                                                Path {
+                                                                                    span: /rustc/a2d45f73c70d9dec57140c9412f83586eda895f8/library/std/src/macros.rs:143:9: 143:27 (#4),
+                                                                                    res: Def(
+                                                                                        Fn,
+                                                                                        DefId(1:3785 ~ std[647d]::io::stdio::_print),
+                                                                                    ),
+                                                                                    segments: [
+                                                                                        PathSegment {
+                                                                                            ident: $crate#4,
+                                                                                            hir_id: HirId(DefId(0:3 ~ hello[8309]::main).6),
+                                                                                            res: Def(
+                                                                                                Mod,
+                                                                                                DefId(1:0 ~ std[647d]),
+                                                                                            ),
+                                                                                            args: None,
+                                                                                            infer_args: true,
+                                                                                        },
+                                                                                        PathSegment {
+                                                                                            ident: io#4,
+                                                                                            hir_id: HirId(DefId(0:3 ~ hello[8309]::main).7),
+                                                                                            res: Def(
+                                                                                                Mod,
+                                                                                                DefId(1:2712 ~ std[647d]::io),
+                                                                                            ),
+                                                                                            args: None,
+                                                                                            infer_args: true,
+                                                                                        },
+                                                                                        PathSegment {
+                                                                                            ident: _print#4,
+                                                                                            hir_id: HirId(DefId(0:3 ~ hello[8309]::main).8),
+                                                                                            res: Def(
+                                                                                                Fn,
+                                                                                                DefId(1:3785 ~ std[647d]::io::stdio::_print),
+                                                                                            ),
+                                                                                            args: None,
+                                                                                            infer_args: true,
+                                                                                        },
+                                                                                    ],
+                                                                                },
+                                                                            ),
+                                                                        ),
+                                                                        span: /rustc/a2d45f73c70d9dec57140c9412f83586eda895f8/library/std/src/macros.rs:143:9: 143:27 (#4),
+                                                                    },
+                                                                    [
+                                                                        Expr {
+                                                                            hir_id: HirId(DefId(0:3 ~ hello[8309]::main).9),
+                                                                            kind: Call(
+                                                                                Expr {
+                                                                                    hir_id: HirId(DefId(0:3 ~ hello[8309]::main).16),
+                                                                                    kind: Path(
+                                                                                        TypeRelative(
+                                                                                            Ty {
+                                                                                                hir_id: HirId(DefId(0:3 ~ hello[8309]::main).14),
+                                                                                                span: /rustc/a2d45f73c70d9dec57140c9412f83586eda895f8/library/std/src/macros.rs:143:28: 143:61 (#7),
+                                                                                                kind: Path(
+                                                                                                    Resolved(
+                                                                                                        None,
+                                                                                                        Path {
+                                                                                                            span: /rustc/a2d45f73c70d9dec57140c9412f83586eda895f8/library/std/src/macros.rs:143:28: 143:61 (#7),
+                                                                                                            res: Def(
+                                                                                                                Struct,
+                                                                                                                DefId(2:50983 ~ core[6776]::fmt::Arguments),
+                                                                                                            ),
+                                                                                                            segments: [
+                                                                                                                PathSegment {
+                                                                                                                    ident: format_arguments#7,
+                                                                                                                    hir_id: HirId(DefId(0:3 ~ hello[8309]::main).13),
+                                                                                                                    res: Def(
+                                                                                                                        Struct,
+                                                                                                                        DefId(2:50983 ~ core[6776]::fmt::Arguments),
+                                                                                                                    ),
+                                                                                                                    args: None,
+                                                                                                                    infer_args: true,
+                                                                                                                },
+                                                                                                            ],
+                                                                                                        },
+                                                                                                    ),
+                                                                                                ),
+                                                                                            },
+                                                                                            PathSegment {
+                                                                                                ident: new_const#7,
+                                                                                                hir_id: HirId(DefId(0:3 ~ hello[8309]::main).15),
+                                                                                                res: Err,
+                                                                                                args: None,
+                                                                                                infer_args: true,
+                                                                                            },
+                                                                                        ),
+                                                                                    ),
+                                                                                    span: /rustc/a2d45f73c70d9dec57140c9412f83586eda895f8/library/std/src/macros.rs:143:28: 143:61 (#7),
+                                                                                },
+                                                                                [
+                                                                                    Expr {
+                                                                                        hir_id: HirId(DefId(0:3 ~ hello[8309]::main).12),
+                                                                                        kind: AddrOf(
+                                                                                            Ref,
+                                                                                            Not,
+                                                                                            Expr {
+                                                                                                hir_id: HirId(DefId(0:3 ~ hello[8309]::main).11),
+                                                                                                kind: Array(
+                                                                                                    [
+                                                                                                        Expr {
+                                                                                                            hir_id: HirId(DefId(0:3 ~ hello[8309]::main).10),
+                                                                                                            kind: Lit(
+                                                                                                                Spanned {
+                                                                                                                    node: Str(
+                                                                                                                        "Hello, Type Checker!\n",
+                                                                                                                        Cooked,
+                                                                                                                    ),
+                                                                                                                    span: hello.rs:2:14: 2:36 (#0),
+                                                                                                                },
+                                                                                                            ),
+                                                                                                            span: hello.rs:2:14: 2:36 (#0),
+                                                                                                        },
+                                                                                                    ],
+                                                                                                ),
+                                                                                                span: hello.rs:2:14: 2:36 (#0),
+                                                                                            },
+                                                                                        ),
+                                                                                        span: hello.rs:2:14: 2:36 (#0),
+                                                                                    },
+                                                                                ],
+                                                                            ),
+                                                                            span: /rustc/a2d45f73c70d9dec57140c9412f83586eda895f8/library/std/src/macros.rs:143:28: 143:61 (#5),
+                                                                        },
+                                                                    ],
+                                                                ),
+                                                                span: /rustc/a2d45f73c70d9dec57140c9412f83586eda895f8/library/std/src/macros.rs:143:9: 143:62 (#4),
+                                                            },
+                                                        ),
+                                                        span: /rustc/a2d45f73c70d9dec57140c9412f83586eda895f8/library/std/src/macros.rs:143:9: 143:63 (#4),
+                                                    },
+                                                ],
+                                                expr: None,
+                                                hir_id: HirId(DefId(0:3 ~ hello[8309]::main).3),
+                                                rules: DefaultBlock,
+                                                span: /rustc/a2d45f73c70d9dec57140c9412f83586eda895f8/library/std/src/macros.rs:142:23: 144:6 (#4),
+                                                targeted_by_break: false,
+                                            },
+                                            None,
+                                        ),
+                                        span: /rustc/a2d45f73c70d9dec57140c9412f83586eda895f8/library/std/src/macros.rs:142:23: 144:6 (#4),
+                                    },
+                                ),
+                                span: /rustc/a2d45f73c70d9dec57140c9412f83586eda895f8/library/std/src/macros.rs:142:23: 144:6 (#4),
+                            },
+                        ],
+                        expr: None,
+                        hir_id: HirId(DefId(0:3 ~ hello[8309]::main).1),
+                        rules: DefaultBlock,
+                        span: hello.rs:1:11: 3:2 (#0),
+                        targeted_by_break: false,
+                    },
+                    None,
+                ),
+                span: hello.rs:1:11: 3:2 (#0),
+            },
+        },
+    },
+    opt_hash_including_bodies: None,
+}

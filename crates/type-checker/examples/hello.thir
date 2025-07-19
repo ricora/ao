@@ -1,0 +1,235 @@
+DefId(0:3 ~ hello[8309]::main):
+params: [
+]
+body:
+    Expr {
+        ty: ()
+        temp_lifetime: TempLifetime { temp_lifetime: Some(Node(19)), backwards_incompatible: None }
+        span: hello.rs:1:11: 3:2 (#0)
+        kind: 
+            Scope {
+                region_scope: Node(19)
+                lint_level: Explicit(HirId(DefId(0:3 ~ hello[8309]::main).19))
+                value:
+                    Expr {
+                        ty: ()
+                        temp_lifetime: TempLifetime { temp_lifetime: Some(Node(19)), backwards_incompatible: None }
+                        span: hello.rs:1:11: 3:2 (#0)
+                        kind: 
+                            Block {
+                                targeted_by_break: false
+                                span: hello.rs:1:11: 3:2 (#0)
+                                region_scope: Node(1)
+                                safety_mode: Safe
+                                stmts: [
+                                    Stmt {
+                                        kind: Expr {
+                                            scope: Node(18)
+                                            expr:
+                                                Expr {
+                                                    ty: ()
+                                                    temp_lifetime: TempLifetime { temp_lifetime: Some(Node(18)), backwards_incompatible: None }
+                                                    span: /rustc/a2d45f73c70d9dec57140c9412f83586eda895f8/library/std/src/macros.rs:142:23: 144:6 (#4)
+                                                    kind: 
+                                                        Scope {
+                                                            region_scope: Node(2)
+                                                            lint_level: Explicit(HirId(DefId(0:3 ~ hello[8309]::main).2))
+                                                            value:
+                                                                Expr {
+                                                                    ty: ()
+                                                                    temp_lifetime: TempLifetime { temp_lifetime: Some(Node(18)), backwards_incompatible: None }
+                                                                    span: /rustc/a2d45f73c70d9dec57140c9412f83586eda895f8/library/std/src/macros.rs:142:23: 144:6 (#4)
+                                                                    kind: 
+                                                                        Block {
+                                                                            targeted_by_break: false
+                                                                            span: /rustc/a2d45f73c70d9dec57140c9412f83586eda895f8/library/std/src/macros.rs:142:23: 144:6 (#4)
+                                                                            region_scope: Node(3)
+                                                                            safety_mode: Safe
+                                                                            stmts: [
+                                                                                Stmt {
+                                                                                    kind: Expr {
+                                                                                        scope: Node(17)
+                                                                                        expr:
+                                                                                            Expr {
+                                                                                                ty: ()
+                                                                                                temp_lifetime: TempLifetime { temp_lifetime: Some(Node(17)), backwards_incompatible: None }
+                                                                                                span: /rustc/a2d45f73c70d9dec57140c9412f83586eda895f8/library/std/src/macros.rs:143:9: 143:62 (#4)
+                                                                                                kind: 
+                                                                                                    Scope {
+                                                                                                        region_scope: Node(4)
+                                                                                                        lint_level: Explicit(HirId(DefId(0:3 ~ hello[8309]::main).4))
+                                                                                                        value:
+                                                                                                            Expr {
+                                                                                                                ty: ()
+                                                                                                                temp_lifetime: TempLifetime { temp_lifetime: Some(Node(17)), backwards_incompatible: None }
+                                                                                                                span: /rustc/a2d45f73c70d9dec57140c9412f83586eda895f8/library/std/src/macros.rs:143:9: 143:62 (#4)
+                                                                                                                kind: 
+                                                                                                                    Call {
+                                                                                                                        ty: FnDef(DefId(1:3785 ~ std[647d]::io::stdio::_print), [])
+                                                                                                                        from_hir_call: true
+                                                                                                                        fn_span: /rustc/a2d45f73c70d9dec57140c9412f83586eda895f8/library/std/src/macros.rs:143:9: 143:62 (#4)
+                                                                                                                        fun:
+                                                                                                                            Expr {
+                                                                                                                                ty: FnDef(DefId(1:3785 ~ std[647d]::io::stdio::_print), [])
+                                                                                                                                temp_lifetime: TempLifetime { temp_lifetime: Some(Node(17)), backwards_incompatible: None }
+                                                                                                                                span: /rustc/a2d45f73c70d9dec57140c9412f83586eda895f8/library/std/src/macros.rs:143:9: 143:27 (#4)
+                                                                                                                                kind: 
+                                                                                                                                    Scope {
+                                                                                                                                        region_scope: Node(5)
+                                                                                                                                        lint_level: Explicit(HirId(DefId(0:3 ~ hello[8309]::main).5))
+                                                                                                                                        value:
+                                                                                                                                            Expr {
+                                                                                                                                                ty: FnDef(DefId(1:3785 ~ std[647d]::io::stdio::_print), [])
+                                                                                                                                                temp_lifetime: TempLifetime { temp_lifetime: Some(Node(17)), backwards_incompatible: None }
+                                                                                                                                                span: /rustc/a2d45f73c70d9dec57140c9412f83586eda895f8/library/std/src/macros.rs:143:9: 143:27 (#4)
+                                                                                                                                                kind: 
+                                                                                                                                                    ZstLiteral(user_ty: None)
+                                                                                                                                            }
+                                                                                                                                    }
+                                                                                                                            }
+                                                                                                                        args: [
+                                                                                                                            Expr {
+                                                                                                                                ty: std::fmt::Arguments<'{erased}>
+                                                                                                                                temp_lifetime: TempLifetime { temp_lifetime: Some(Node(17)), backwards_incompatible: None }
+                                                                                                                                span: /rustc/a2d45f73c70d9dec57140c9412f83586eda895f8/library/std/src/macros.rs:143:28: 143:61 (#5)
+                                                                                                                                kind: 
+                                                                                                                                    Scope {
+                                                                                                                                        region_scope: Node(9)
+                                                                                                                                        lint_level: Explicit(HirId(DefId(0:3 ~ hello[8309]::main).9))
+                                                                                                                                        value:
+                                                                                                                                            Expr {
+                                                                                                                                                ty: std::fmt::Arguments<'{erased}>
+                                                                                                                                                temp_lifetime: TempLifetime { temp_lifetime: Some(Node(17)), backwards_incompatible: None }
+                                                                                                                                                span: /rustc/a2d45f73c70d9dec57140c9412f83586eda895f8/library/std/src/macros.rs:143:28: 143:61 (#5)
+                                                                                                                                                kind: 
+                                                                                                                                                    Call {
+                                                                                                                                                        ty: FnDef(DefId(2:11768 ~ core[6776]::fmt::rt::{impl#1}::new_const), ['{erased}, 1_usize])
+                                                                                                                                                        from_hir_call: true
+                                                                                                                                                        fn_span: /rustc/a2d45f73c70d9dec57140c9412f83586eda895f8/library/std/src/macros.rs:143:28: 143:61 (#5)
+                                                                                                                                                        fun:
+                                                                                                                                                            Expr {
+                                                                                                                                                                ty: FnDef(DefId(2:11768 ~ core[6776]::fmt::rt::{impl#1}::new_const), ['{erased}, 1_usize])
+                                                                                                                                                                temp_lifetime: TempLifetime { temp_lifetime: Some(Node(17)), backwards_incompatible: None }
+                                                                                                                                                                span: /rustc/a2d45f73c70d9dec57140c9412f83586eda895f8/library/std/src/macros.rs:143:28: 143:61 (#7)
+                                                                                                                                                                kind: 
+                                                                                                                                                                    Scope {
+                                                                                                                                                                        region_scope: Node(16)
+                                                                                                                                                                        lint_level: Explicit(HirId(DefId(0:3 ~ hello[8309]::main).16))
+                                                                                                                                                                        value:
+                                                                                                                                                                            Expr {
+                                                                                                                                                                                ty: FnDef(DefId(2:11768 ~ core[6776]::fmt::rt::{impl#1}::new_const), ['{erased}, 1_usize])
+                                                                                                                                                                                temp_lifetime: TempLifetime { temp_lifetime: Some(Node(17)), backwards_incompatible: None }
+                                                                                                                                                                                span: /rustc/a2d45f73c70d9dec57140c9412f83586eda895f8/library/std/src/macros.rs:143:28: 143:61 (#7)
+                                                                                                                                                                                kind: 
+                                                                                                                                                                                    ZstLiteral(user_ty: Some(Canonical { value: UserType { kind: TypeOf(DefId(2:11768 ~ core[6776]::fmt::rt::{impl#1}::new_const), UserArgs { args: ['^0, ^1], user_self_ty: Some(UserSelfTy { impl_def_id: DefId(2:11766 ~ core[6776]::fmt::rt::{impl#1}), self_ty: std::fmt::Arguments<'^2> }) }), bounds: [] }, max_universe: U0, variables: [Region(U0), Const(U0), Region(U0)] }))
+                                                                                                                                                                            }
+                                                                                                                                                                    }
+                                                                                                                                                            }
+                                                                                                                                                        args: [
+                                                                                                                                                            Expr {
+                                                                                                                                                                ty: &'{erased} [&'{erased} str; 1_usize]
+                                                                                                                                                                temp_lifetime: TempLifetime { temp_lifetime: Some(Node(17)), backwards_incompatible: None }
+                                                                                                                                                                span: hello.rs:2:14: 2:36 (#0)
+                                                                                                                                                                kind: 
+                                                                                                                                                                    Scope {
+                                                                                                                                                                        region_scope: Node(12)
+                                                                                                                                                                        lint_level: Explicit(HirId(DefId(0:3 ~ hello[8309]::main).12))
+                                                                                                                                                                        value:
+                                                                                                                                                                            Expr {
+                                                                                                                                                                                ty: &'{erased} [&'{erased} str; 1_usize]
+                                                                                                                                                                                temp_lifetime: TempLifetime { temp_lifetime: Some(Node(17)), backwards_incompatible: None }
+                                                                                                                                                                                span: hello.rs:2:14: 2:36 (#0)
+                                                                                                                                                                                kind: 
+                                                                                                                                                                                    Borrow (
+                                                                                                                                                                                        borrow_kind: Shared
+                                                                                                                                                                                        arg:
+                                                                                                                                                                                            Expr {
+                                                                                                                                                                                                ty: [&'{erased} str; 1_usize]
+                                                                                                                                                                                                temp_lifetime: TempLifetime { temp_lifetime: Some(Node(17)), backwards_incompatible: None }
+                                                                                                                                                                                                span: hello.rs:2:14: 2:36 (#0)
+                                                                                                                                                                                                kind: 
+                                                                                                                                                                                                    Deref {
+                                                                                                                                                                                                        Expr {
+                                                                                                                                                                                                            ty: &'{erased} [&'{erased} str; 1_usize]
+                                                                                                                                                                                                            temp_lifetime: TempLifetime { temp_lifetime: Some(Node(17)), backwards_incompatible: None }
+                                                                                                                                                                                                            span: hello.rs:2:14: 2:36 (#0)
+                                                                                                                                                                                                            kind: 
+                                                                                                                                                                                                                Borrow (
+                                                                                                                                                                                                                    borrow_kind: Shared
+                                                                                                                                                                                                                    arg:
+                                                                                                                                                                                                                        Expr {
+                                                                                                                                                                                                                            ty: [&'{erased} str; 1_usize]
+                                                                                                                                                                                                                            temp_lifetime: TempLifetime { temp_lifetime: Some(Node(17)), backwards_incompatible: None }
+                                                                                                                                                                                                                            span: hello.rs:2:14: 2:36 (#0)
+                                                                                                                                                                                                                            kind: 
+                                                                                                                                                                                                                                Scope {
+                                                                                                                                                                                                                                    region_scope: Node(11)
+                                                                                                                                                                                                                                    lint_level: Explicit(HirId(DefId(0:3 ~ hello[8309]::main).11))
+                                                                                                                                                                                                                                    value:
+                                                                                                                                                                                                                                        Expr {
+                                                                                                                                                                                                                                            ty: [&'{erased} str; 1_usize]
+                                                                                                                                                                                                                                            temp_lifetime: TempLifetime { temp_lifetime: Some(Node(17)), backwards_incompatible: None }
+                                                                                                                                                                                                                                            span: hello.rs:2:14: 2:36 (#0)
+                                                                                                                                                                                                                                            kind: 
+                                                                                                                                                                                                                                                Array {
+                                                                                                                                                                                                                                                    fields: [
+                                                                                                                                                                                                                                                        Expr {
+                                                                                                                                                                                                                                                            ty: &'{erased} str
+                                                                                                                                                                                                                                                            temp_lifetime: TempLifetime { temp_lifetime: Some(Node(17)), backwards_incompatible: None }
+                                                                                                                                                                                                                                                            span: hello.rs:2:14: 2:36 (#0)
+                                                                                                                                                                                                                                                            kind: 
+                                                                                                                                                                                                                                                                Scope {
+                                                                                                                                                                                                                                                                    region_scope: Node(10)
+                                                                                                                                                                                                                                                                    lint_level: Explicit(HirId(DefId(0:3 ~ hello[8309]::main).10))
+                                                                                                                                                                                                                                                                    value:
+                                                                                                                                                                                                                                                                        Expr {
+                                                                                                                                                                                                                                                                            ty: &'{erased} str
+                                                                                                                                                                                                                                                                            temp_lifetime: TempLifetime { temp_lifetime: Some(Node(17)), backwards_incompatible: None }
+                                                                                                                                                                                                                                                                            span: hello.rs:2:14: 2:36 (#0)
+                                                                                                                                                                                                                                                                            kind: 
+                                                                                                                                                                                                                                                                                Literal( lit: Spanned { node: Str("Hello, Type Checker!\n", Cooked), span: hello.rs:2:14: 2:36 (#0) }, neg: false)
+
+                                                                                                                                                                                                                                                                        }
+                                                                                                                                                                                                                                                                }
+                                                                                                                                                                                                                                                        }
+                                                                                                                                                                                                                                                    ]
+                                                                                                                                                                                                                                                }
+                                                                                                                                                                                                                                        }
+                                                                                                                                                                                                                                }
+                                                                                                                                                                                                                        }
+                                                                                                                                                                                                                )
+                                                                                                                                                                                                        }
+                                                                                                                                                                                                    }
+                                                                                                                                                                                            }
+                                                                                                                                                                                    )
+                                                                                                                                                                            }
+                                                                                                                                                                    }
+                                                                                                                                                            }
+                                                                                                                                                        ]
+                                                                                                                                                    }
+                                                                                                                                            }
+                                                                                                                                    }
+                                                                                                                            }
+                                                                                                                        ]
+                                                                                                                    }
+                                                                                                            }
+                                                                                                    }
+                                                                                            }
+                                                                                    }
+                                                                                }
+                                                                            ]
+                                                                            expr: []
+                                                                        }
+                                                                }
+                                                        }
+                                                }
+                                        }
+                                    }
+                                ]
+                                expr: []
+                            }
+                    }
+            }
+    }
+
+

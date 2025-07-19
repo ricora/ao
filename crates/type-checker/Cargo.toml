@@ -1,0 +1,12 @@
+[package]
+name = "type-checker"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+ast = { workspace = true }
+thiserror = "2.0"
+ariadne = "0.4"
+
+[dev-dependencies]
+parser = { workspace = true }

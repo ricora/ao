@@ -1,0 +1,112 @@
+Crate {
+    attrs: [],
+    items: [
+        Item {
+            attrs: [],
+            id: NodeId(4294967040),
+            span: hello.rs:1:1: 3:2 (#0),
+            vis: Visibility {
+                kind: Inherited,
+                span: no-location (#0),
+                tokens: None,
+            },
+            kind: Fn(
+                Fn {
+                    defaultness: Final,
+                    ident: main#0,
+                    generics: Generics {
+                        params: [],
+                        where_clause: WhereClause {
+                            has_where_token: false,
+                            predicates: [],
+                            span: hello.rs:1:10: 1:10 (#0),
+                        },
+                        span: hello.rs:1:8: 1:8 (#0),
+                    },
+                    sig: FnSig {
+                        header: FnHeader {
+                            safety: Default,
+                            coroutine_kind: None,
+                            constness: No,
+                            ext: None,
+                        },
+                        decl: FnDecl {
+                            inputs: [],
+                            output: Default(
+                                hello.rs:1:10: 1:10 (#0),
+                            ),
+                        },
+                        span: hello.rs:1:1: 1:10 (#0),
+                    },
+                    contract: None,
+                    define_opaque: None,
+                    body: Some(
+                        Block {
+                            stmts: [
+                                Stmt {
+                                    id: NodeId(4294967040),
+                                    kind: MacCall(
+                                        MacCallStmt {
+                                            mac: MacCall {
+                                                path: Path {
+                                                    span: hello.rs:2:5: 2:12 (#0),
+                                                    segments: [
+                                                        PathSegment {
+                                                            ident: println#0,
+                                                            id: NodeId(4294967040),
+                                                            args: None,
+                                                        },
+                                                    ],
+                                                    tokens: None,
+                                                },
+                                                args: DelimArgs {
+                                                    dspan: DelimSpan {
+                                                        open: hello.rs:2:13: 2:14 (#0),
+                                                        close: hello.rs:2:36: 2:37 (#0),
+                                                    },
+                                                    delim: Parenthesis,
+                                                    tokens: TokenStream(
+                                                        [
+                                                            Token(
+                                                                Token {
+                                                                    kind: Literal(
+                                                                        Lit {
+                                                                            kind: Str,
+                                                                            symbol: "Hello, Type Checker!",
+                                                                            suffix: None,
+                                                                        },
+                                                                    ),
+                                                                    span: hello.rs:2:14: 2:36 (#0),
+                                                                },
+                                                                JointHidden,
+                                                            ),
+                                                        ],
+                                                    ),
+                                                },
+                                            },
+                                            style: Semicolon,
+                                            attrs: [],
+                                            tokens: None,
+                                        },
+                                    ),
+                                    span: hello.rs:2:5: 2:38 (#0),
+                                },
+                            ],
+                            id: NodeId(4294967040),
+                            rules: Default,
+                            span: hello.rs:1:11: 3:2 (#0),
+                            tokens: None,
+                        },
+                    ),
+                },
+            ),
+            tokens: None,
+        },
+    ],
+    spans: ModSpans {
+        inner_span: hello.rs:1:1: 3:2 (#0),
+        inject_use_span: no-location (#0),
+    },
+    id: NodeId(4294967040),
+    is_placeholder: false,
+}

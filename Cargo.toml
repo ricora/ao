@@ -10,6 +10,7 @@ indoc = { workspace = true }
 parser = { workspace = true }
 code-generator = { workspace = true }
 clap = { version = "4.5.21", features = ["derive"] }
+type-checker = { workspace = true }
 
 [workspace]
 members = [
@@ -17,12 +18,14 @@ members = [
   "crates/code-generator",
   "crates/parser",
   "crates/tools",
+  "crates/type-checker",
 ]
 
 [workspace.dependencies]
 anyhow = "1.0.94"
 ast = { path = "crates/ast" }
 code-generator = { path = "crates/code-generator" }
+type-checker = { path = "crates/type-checker" }
 parser = { path = "crates/parser" }
 pretty_assertions = "1.4.1"
 serde = { version = "1.0.215", features = ["derive"] }
