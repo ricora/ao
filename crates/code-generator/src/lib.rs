@@ -106,7 +106,8 @@ impl<'a> CodeGenerator<'a> {
                 index: None,
                 inline: Some(core::FunctionType {
                     params: self.generate_parameters(&function.parameters),
-                    results: Box::new([self.generate_type(&function.return_type)]),
+                    // TODO: Replace unwrap() with proper type inference implementation
+                    results: Box::new([self.generate_type(function.return_type.as_ref().unwrap())]),
                 }),
             },
         }
@@ -121,7 +122,8 @@ impl<'a> CodeGenerator<'a> {
                     Some(core::Local {
                         id: Some(self.generate_identifier(&variable.name)),
                         name: None,
-                        ty: self.generate_type(&variable.variable_type),
+                        // TODO: Replace unwrap() with proper type inference implementation
+                        ty: self.generate_type(variable.variable_type.as_ref().unwrap()),
                     })
                 } else {
                     None
@@ -235,21 +237,37 @@ impl<'a> CodeGenerator<'a> {
                 // apply operator
                 match expr.operator.operator {
                     ast::BinaryOperatorKind::Add => instructions.push(core::Instruction::I32Add),
-                    ast::BinaryOperatorKind::Subtract => instructions.push(core::Instruction::I32Sub),
-                    ast::BinaryOperatorKind::Multiply => instructions.push(core::Instruction::I32Mul),
-                    ast::BinaryOperatorKind::Divide => instructions.push(core::Instruction::I32DivS),
+                    ast::BinaryOperatorKind::Subtract => {
+                        instructions.push(core::Instruction::I32Sub)
+                    }
+                    ast::BinaryOperatorKind::Multiply => {
+                        instructions.push(core::Instruction::I32Mul)
+                    }
+                    ast::BinaryOperatorKind::Divide => {
+                        instructions.push(core::Instruction::I32DivS)
+                    }
                     ast::BinaryOperatorKind::Equal => instructions.push(core::Instruction::I32Eq),
-                    ast::BinaryOperatorKind::NotEqual => instructions.push(core::Instruction::I32Ne),
-                    ast::BinaryOperatorKind::LessThan => instructions.push(core::Instruction::I32LtS),
+                    ast::BinaryOperatorKind::NotEqual => {
+                        instructions.push(core::Instruction::I32Ne)
+                    }
+                    ast::BinaryOperatorKind::LessThan => {
+                        instructions.push(core::Instruction::I32LtS)
+                    }
                     ast::BinaryOperatorKind::LessThanOrEqual => {
                         instructions.push(core::Instruction::I32LeS)
                     }
-                    ast::BinaryOperatorKind::GreaterThan => instructions.push(core::Instruction::I32GtS),
+                    ast::BinaryOperatorKind::GreaterThan => {
+                        instructions.push(core::Instruction::I32GtS)
+                    }
                     ast::BinaryOperatorKind::GreaterThanOrEqual => {
                         instructions.push(core::Instruction::I32GeS)
                     }
-                    ast::BinaryOperatorKind::LogicalAnd => instructions.push(core::Instruction::I32And),
-                    ast::BinaryOperatorKind::LogicalOr => instructions.push(core::Instruction::I32Or),
+                    ast::BinaryOperatorKind::LogicalAnd => {
+                        instructions.push(core::Instruction::I32And)
+                    }
+                    ast::BinaryOperatorKind::LogicalOr => {
+                        instructions.push(core::Instruction::I32Or)
+                    }
                 };
                 instructions
             }
@@ -299,7 +317,7 @@ impl<'a> CodeGenerator<'a> {
             }
             ast::Expression::IdentifierExpression(identifier) => {
                 vec![core::Instruction::LocalGet(wast::token::Index::Id(
-                    self.generate_identifier(identifier),
+                    self.generate_identifier(&identifier.identifier),
                 ))]
             }
             ast::Expression::IntegerLiteral(literal) => {
@@ -321,7 +339,8 @@ impl<'a> CodeGenerator<'a> {
                 (
                     Some(self.generate_identifier(&param.name)),
                     None,
-                    self.generate_type(&param.parameter_type),
+                    // TODO: Replace unwrap() with proper type inference implementation
+                    self.generate_type(param.parameter_type.as_ref().unwrap()),
                 )
             })
             .collect()

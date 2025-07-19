@@ -41,6 +41,7 @@ functions:
               value:
                 IntegerLiteral:
                   value: "0"
+                  type: ~
                   location:
                     start: 36
                     end: 37
@@ -61,6 +62,7 @@ functions:
                   value:
                     IntegerLiteral:
                       value: "1"
+                      type: ~
                       location:
                         start: 47
                         end: 48
@@ -74,8 +76,14 @@ functions:
                 end: 49
                 context: ~
           - Expression:
-              Identifier:
-                name: x
+              IdentifierExpression:
+                identifier:
+                  name: x
+                  location:
+                    start: 54
+                    end: 55
+                    context: ~
+                type: ~
                 location:
                   start: 54
                   end: 55

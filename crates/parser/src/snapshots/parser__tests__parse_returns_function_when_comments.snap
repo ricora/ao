@@ -27,6 +27,7 @@ functions:
           - Expression:
               IntegerLiteral:
                 value: "0"
+                type: ~
                 location:
                   start: 78
                   end: 79

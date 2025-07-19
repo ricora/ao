@@ -41,6 +41,7 @@ functions:
               value:
                 BooleanLiteral:
                   value: true
+                  type: ~
                   location:
                     start: 37
                     end: 41
@@ -66,6 +67,7 @@ functions:
               value:
                 BooleanLiteral:
                   value: false
+                  type: ~
                   location:
                     start: 61
                     end: 66
@@ -77,6 +79,7 @@ functions:
           - Expression:
               IntegerLiteral:
                 value: "0"
+                type: ~
                 location:
                   start: 72
                   end: 73

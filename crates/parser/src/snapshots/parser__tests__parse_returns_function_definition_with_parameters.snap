@@ -59,8 +59,14 @@ functions:
           - Expression:
               BinaryExpression:
                 left:
-                  Identifier:
-                    name: x
+                  IdentifierExpression:
+                    identifier:
+                      name: x
+                      location:
+                        start: 36
+                        end: 37
+                        context: ~
+                    type: ~
                     location:
                       start: 36
                       end: 37
@@ -72,12 +78,19 @@ functions:
                     end: 0
                     context: ~
                 right:
-                  Identifier:
-                    name: y
+                  IdentifierExpression:
+                    identifier:
+                      name: y
+                      location:
+                        start: 40
+                        end: 41
+                        context: ~
+                    type: ~
                     location:
                       start: 40
                       end: 41
                       context: ~
+                type: ~
                 location:
                   start: 0
                   end: 0

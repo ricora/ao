@@ -47,13 +47,13 @@ impl TypeChecker {
 
     pub fn check_identifier_expression(
         &self,
-        identifier: &ast::Identifier,
+        identifier: &ast::IdentifierExpression,
     ) -> Result<TypeKind, TypeCheckError> {
-        match self.environment.get_variable(identifier.name) {
+        match self.environment.get_variable(identifier.identifier.name) {
             Some(var_info) => {
                 if !var_info.initialized {
                     Err(TypeCheckError::UninitializedVariable {
-                        name: identifier.name.to_string(),
+                        name: identifier.identifier.name.to_string(),
                         location: identifier.location.clone(),
                     })
                 } else {
@@ -61,7 +61,7 @@ impl TypeChecker {
                 }
             }
             None => Err(TypeCheckError::UndefinedIdentifier {
-                name: identifier.name.to_string(),
+                name: identifier.identifier.name.to_string(),
                 location: identifier.location.clone(),
             }),
         }
@@ -120,7 +120,9 @@ impl TypeChecker {
             ast::Expression::AssignmentExpression(assignment) => {
                 self.check_assignment_expression(assignment)
             }
-            ast::Expression::IdentifierExpression(identifier) => self.check_identifier_expression(identifier),
+            ast::Expression::IdentifierExpression(identifier) => {
+                self.check_identifier_expression(identifier)
+            }
             ast::Expression::FunctionCall(function_call) => self.check_function_call(function_call),
         }
     }
@@ -263,7 +265,14 @@ impl TypeChecker {
         &mut self,
         var_def: &ast::VariableDefinition,
     ) -> Result<(), TypeCheckError> {
-        let declared_type = var_def.variable_type.kind.clone();
+        let declared_type = match &var_def.variable_type {
+            Some(type_info) => type_info.kind.clone(),
+            None => {
+                return Err(TypeCheckError::MissingTypeAnnotation {
+                    location: var_def.location.clone(),
+                });
+            }
+        };
 
         let initialized = if let Some(value_expr) = &var_def.value {
             // Check if the value expression type matches the declared type
@@ -386,7 +395,14 @@ impl TypeChecker {
         &mut self,
         func_def: &ast::FunctionDefinition,
     ) -> Result<(), TypeCheckError> {
-        let return_type = func_def.return_type.kind.clone();
+        let return_type = match &func_def.return_type {
+            Some(type_info) => type_info.kind.clone(),
+            None => {
+                return Err(TypeCheckError::MissingTypeAnnotation {
+                    location: func_def.location.clone(),
+                });
+            }
+        };
 
         // Check for duplicate function definition
         if self.environment.get_function(func_def.name.name).is_some() {
@@ -401,8 +417,13 @@ impl TypeChecker {
             .parameters
             .parameters
             .iter()
-            .map(|param| param.parameter_type.kind.clone())
-            .collect();
+            .map(|param| match &param.parameter_type {
+                Some(type_info) => Ok(type_info.kind.clone()),
+                None => Err(TypeCheckError::MissingTypeAnnotation {
+                    location: param.location.clone(),
+                }),
+            })
+            .collect::<Result<Vec<_>, _>>()?;
 
         // Add function to environment
         self.environment.add_function(
@@ -483,6 +504,7 @@ mod tests {
                 end: 2,
                 context: (),
             },
+            r#type: None,
         };
 
         let result = checker.check_integer_literal(&literal);
@@ -491,7 +513,10 @@ mod tests {
 
     #[test]
     fn test_check_binary_expression_arithmetic() {
-        use ast::{BinaryExpression, Expression, IntegerLiteral, Location, BinaryOperator, BinaryOperatorKind};
+        use ast::{
+            BinaryExpression, BinaryOperator, BinaryOperatorKind, Expression, IntegerLiteral,
+            Location,
+        };
 
         let mut checker = TypeChecker::new();
 
@@ -502,6 +527,7 @@ mod tests {
                 end: 1,
                 context: (),
             },
+            r#type: None,
         }));
 
         let right = Box::new(Expression::IntegerLiteral(IntegerLiteral {
@@ -511,6 +537,7 @@ mod tests {
                 end: 5,
                 context: (),
             },
+            r#type: None,
         }));
 
         let binary_expr = BinaryExpression {
@@ -529,6 +556,7 @@ mod tests {
                 end: 5,
                 context: (),
             },
+            r#type: None,
         };
 
         let result = checker.check_binary_expression(&binary_expr);
@@ -780,7 +808,9 @@ mod tests {
 
     #[test]
     fn test_check_unary_expression_logical_not() {
-        use ast::{Expression, IntegerLiteral, Location, UnaryOperator, UnaryOperatorKind, UnaryExpression};
+        use ast::{
+            Expression, IntegerLiteral, Location, UnaryExpression, UnaryOperator, UnaryOperatorKind,
+        };
 
         let mut checker = TypeChecker::new();
 
@@ -792,6 +822,7 @@ mod tests {
                 end: 3,
                 context: (),
             },
+            r#type: None,
         }));
 
         let unary_expr = UnaryExpression {
@@ -809,6 +840,7 @@ mod tests {
                 end: 3,
                 context: (),
             },
+            r#type: None,
         };
 
         let result = checker.check_unary_expression(&unary_expr);
@@ -847,8 +879,8 @@ mod tests {
 
         // Create a manual test with comparison that returns bool
         use ast::{
-            BinaryExpression, Expression, IntegerLiteral, Location, BinaryOperator, BinaryOperatorKind,
-            UnaryExpression, UnaryOperator, UnaryOperatorKind,
+            BinaryExpression, BinaryOperator, BinaryOperatorKind, Expression, IntegerLiteral,
+            Location, UnaryExpression, UnaryOperator, UnaryOperatorKind,
         };
 
         // Create 1 == 2 (which is bool)
@@ -859,6 +891,7 @@ mod tests {
                 end: 1,
                 context: (),
             },
+            r#type: None,
         }));
         let right = Box::new(Expression::IntegerLiteral(IntegerLiteral {
             value: "2",
@@ -867,6 +900,7 @@ mod tests {
                 end: 6,
                 context: (),
             },
+            r#type: None,
         }));
         let comparison = Box::new(Expression::BinaryExpression(BinaryExpression {
             left,
@@ -884,6 +918,7 @@ mod tests {
                 end: 6,
                 context: (),
             },
+            r#type: None,
         }));
 
         // Apply logical not to the comparison: !(1 == 2)
@@ -902,6 +937,7 @@ mod tests {
                 end: 7,
                 context: (),
             },
+            r#type: None,
         };
 
         let result = checker.check_unary_expression(&unary_expr);
@@ -942,6 +978,7 @@ mod tests {
                     end: 6,
                     context: (),
                 },
+                r#type: None,
             })),
             location: Location {
                 start: 0,
@@ -988,6 +1025,7 @@ mod tests {
                     end: 6,
                     context: (),
                 },
+                r#type: None,
             })),
             location: Location {
                 start: 0,
@@ -1027,6 +1065,7 @@ mod tests {
                     end: 6,
                     context: (),
                 },
+                r#type: None,
             })),
             location: Location {
                 start: 0,
@@ -1076,6 +1115,7 @@ mod tests {
                     end: 6,
                     context: (),
                 },
+                r#type: None,
             })),
             location: Location {
                 start: 0,
@@ -1179,8 +1219,8 @@ mod tests {
     #[test]
     fn test_check_if_statement_returns_unit() {
         use ast::{
-            BinaryExpression, Block, Expression, IfStatement, IntegerLiteral, Location, BinaryOperator,
-            BinaryOperatorKind, Statement, Statements,
+            BinaryExpression, BinaryOperator, BinaryOperatorKind, Block, Expression, IfStatement,
+            IntegerLiteral, Location, Statement, Statements,
         };
 
         let mut checker = TypeChecker::new();
@@ -1193,6 +1233,7 @@ mod tests {
                 end: 4,
                 context: (),
             },
+            r#type: None,
         }));
         let right = Box::new(Expression::IntegerLiteral(IntegerLiteral {
             value: "1",
@@ -1201,6 +1242,7 @@ mod tests {
                 end: 9,
                 context: (),
             },
+            r#type: None,
         }));
         let condition = Expression::BinaryExpression(BinaryExpression {
             left,
@@ -1218,6 +1260,7 @@ mod tests {
                 end: 9,
                 context: (),
             },
+            r#type: None,
         });
 
         let if_stmt = IfStatement {

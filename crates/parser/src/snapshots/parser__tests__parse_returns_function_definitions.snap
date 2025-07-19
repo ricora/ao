@@ -27,6 +27,7 @@ functions:
           - Expression:
               IntegerLiteral:
                 value: "0"
+                type: ~
                 location:
                   start: 18
                   end: 19
@@ -67,6 +68,7 @@ functions:
           - Expression:
               IntegerLiteral:
                 value: "1"
+                type: ~
                 location:
                   start: 40
                   end: 41

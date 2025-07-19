@@ -19,9 +19,11 @@ where
         Token::Identifier(ident) if ident == "bool" => ast::TypeKind::Bool,
         Token::Identifier(ident) if ident == "()" => ast::TypeKind::Unit
     }
-    .map_with(|kind, e: &mut MapExtra<'_, '_, I, E<'_>>| ast::Type {
-        kind,
-        location: ast::Location::from(e.span()),
+    .map_with(|kind, e: &mut MapExtra<'_, '_, I, E<'_>>| {
+        Some(ast::Type {
+            kind,
+            location: ast::Location::from(e.span()),
+        })
     })
     .boxed();
 
@@ -39,14 +41,17 @@ where
     let literal = select! {
         Token::Integer(value) = e => ast::Expression::IntegerLiteral(ast::IntegerLiteral {
             value,
+            r#type: None,
             location: ast::Location::from(e.span()),
         }),
         Token::True = e => ast::Expression::BooleanLiteral(ast::BooleanLiteral {
             value: true,
+            r#type: None,
             location: ast::Location::from(e.span()),
         }),
         Token::False = e => ast::Expression::BooleanLiteral(ast::BooleanLiteral {
             value: false,
+            r#type: None,
             location: ast::Location::from(e.span()),
         }),
     }
@@ -66,6 +71,7 @@ where
                 ast::Expression::FunctionCall(ast::FunctionCall {
                     name,
                     arguments: args,
+                    r#type: None,
                     location: ast::Location::from(e.span()),
                 })
             })
@@ -87,7 +93,13 @@ where
         let atom = assignment
             .or(function_call)
             .or(literal)
-            .or(identifier.clone().map(ast::Expression::IdentifierExpression))
+            .or(identifier.clone().map(|id| {
+                ast::Expression::IdentifierExpression(ast::IdentifierExpression {
+                    identifier: id.clone(),
+                    r#type: None,
+                    location: id.location.clone(),
+                })
+            }))
             .or(expression
                 .clone()
                 .delimited_by(just(Token::LParen), just(Token::RParen)))
@@ -112,6 +124,7 @@ where
                         },
                     },
                     operand: Box::new(expr),
+                    r#type: None,
                     location: ast::Location {
                         start: 0,
                         end: 0,
@@ -142,6 +155,7 @@ where
                             },
                         },
                         right: Box::new(right),
+                        r#type: None,
                         location: ast::Location {
                             start: 0,
                             end: 0,
@@ -173,6 +187,7 @@ where
                             },
                         },
                         right: Box::new(right),
+                        r#type: None,
                         location: ast::Location {
                             start: 0,
                             end: 0,
@@ -215,6 +230,7 @@ where
                             },
                         },
                         right: Box::new(right),
+                        r#type: None,
                         location: ast::Location {
                             start: 0,
                             end: 0,
@@ -249,6 +265,7 @@ where
                             },
                         },
                         right: Box::new(right),
+                        r#type: None,
                         location: ast::Location {
                             start: 0,
                             end: 0,
