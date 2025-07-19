@@ -14,7 +14,8 @@
     "lint": "eslint --cache --cache-location ./node_modules/.cache/eslint .",
     "lint:write": "eslint --cache --cache-location ./node_modules/.cache/eslint --fix .",
     "format": "prettier --ignore-path .gitignore --check .",
-    "format:write": "prettier --ignore-path .gitignore --write ."
+    "format:write": "prettier --ignore-path .gitignore --write .",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@astrojs/react": "^4.1.2",
