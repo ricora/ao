@@ -24,7 +24,7 @@ importers:
         version: 1.10.2
       '@bytecodealliance/preview2-shim':
         specifier: ^0.17.1
-        version: 0.17.1
+        version: 0.17.2
       '@intentui/icons':
         specifier: ^1.11.0
         version: 1.11.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
@@ -291,9 +291,6 @@ packages:
   '@bytecodealliance/jco@1.10.2':
     resolution: {integrity: sha512-ShBb9Jul4CYo4asmfDdjmYE2+4TgJLSHhsRMyVDvROA5j6s+cAKMmlsUjOrS6QM5TL8GJb48G9jsxif6na6qYg==}
     hasBin: true
-
-  '@bytecodealliance/preview2-shim@0.17.1':
-    resolution: {integrity: sha512-h1qLL0TN5KXk/zagY2BtbZuDX6xYjz4Br9RZXEa0ID4UpiPc0agUMhTdz9r89G4vX5SU/tqBg1A6UNv2+DJ5pg==}
 
   '@bytecodealliance/preview2-shim@0.17.2':
     resolution: {integrity: sha512-mNm/lblgES8UkVle8rGImXOz4TtL3eU3inHay/7TVchkKrb/lgcVvTK0+VAw8p5zQ0rgQsXm1j5dOlAAd+MeoA==}
@@ -4905,8 +4902,6 @@ snapshots:
       mkdirp: 3.0.1
       ora: 8.1.1
       terser: 5.37.0
-
-  '@bytecodealliance/preview2-shim@0.17.1': {}
 
   '@bytecodealliance/preview2-shim@0.17.2': {}
 
