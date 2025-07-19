@@ -126,6 +126,7 @@ pub enum Expression<'a> {
     Identifier(Identifier<'a>),
     #[serde(borrow)]
     IntegerLiteral(IntegerLiteral<'a>),
+    BooleanLiteral(BooleanLiteral),
     #[serde(borrow)]
     FunctionCall(FunctionCall<'a>),
 }
@@ -140,6 +141,7 @@ impl<'a> Expression<'a> {
             }
             Expression::Identifier(identifier) => &identifier.location,
             Expression::IntegerLiteral(integer_literal) => &integer_literal.location,
+            Expression::BooleanLiteral(boolean_literal) => &boolean_literal.location,
             Expression::FunctionCall(function_call) => &function_call.location,
         }
     }
@@ -249,6 +251,12 @@ pub struct Identifier<'a> {
 pub struct IntegerLiteral<'a> {
     #[serde(borrow)]
     pub value: &'a str,
+    pub location: Location,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct BooleanLiteral {
+    pub value: bool,
     pub location: Location,
 }
 

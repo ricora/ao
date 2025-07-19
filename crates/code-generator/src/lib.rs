@@ -305,6 +305,10 @@ impl<'a> CodeGenerator<'a> {
                 let value: i32 = literal.value.parse().unwrap();
                 vec![core::Instruction::I32Const(value)]
             }
+            ast::Expression::BooleanLiteral(boolean_literal) => {
+                let value = if boolean_literal.value { 1 } else { 0 };
+                vec![core::Instruction::I32Const(value)]
+            }
         }
     }
 

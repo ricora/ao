@@ -37,6 +37,14 @@ impl TypeChecker {
         Ok(TypeKind::I32)
     }
 
+    pub fn check_boolean_literal(
+        &self,
+        _literal: &ast::BooleanLiteral,
+    ) -> Result<TypeKind, TypeCheckError> {
+        // Boolean literals always have type Bool
+        Ok(TypeKind::Bool)
+    }
+
     pub fn check_identifier_expression(
         &self,
         identifier: &ast::Identifier,
@@ -104,6 +112,9 @@ impl TypeChecker {
     pub fn check_expression(&mut self, expr: &ast::Expression) -> Result<TypeKind, TypeCheckError> {
         match expr {
             ast::Expression::IntegerLiteral(literal) => self.check_integer_literal(literal),
+            ast::Expression::BooleanLiteral(boolean_literal) => {
+                self.check_boolean_literal(boolean_literal)
+            }
             ast::Expression::BinaryExpression(binary) => self.check_binary_expression(binary),
             ast::Expression::UnaryExpression(unary) => self.check_unary_expression(unary),
             ast::Expression::AssignmentExpression(assignment) => {

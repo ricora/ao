@@ -37,14 +37,19 @@ where
     .boxed();
 
     let literal = select! {
-        Token::Integer(lit) => lit,
-    }
-    .map_with(
-        |lit, e: &mut MapExtra<'_, '_, I, E<'_>>| ast::IntegerLiteral {
-            value: lit,
+        Token::Integer(value) = e => ast::Expression::IntegerLiteral(ast::IntegerLiteral {
+            value,
             location: ast::Location::from(e.span()),
-        },
-    )
+        }),
+        Token::True = e => ast::Expression::BooleanLiteral(ast::BooleanLiteral {
+            value: true,
+            location: ast::Location::from(e.span()),
+        }),
+        Token::False = e => ast::Expression::BooleanLiteral(ast::BooleanLiteral {
+            value: false,
+            location: ast::Location::from(e.span()),
+        }),
+    }
     .boxed();
 
     let expression = recursive(|expression| {
@@ -81,7 +86,7 @@ where
 
         let atom = assignment
             .or(function_call)
-            .or(literal.map(ast::Expression::IntegerLiteral))
+            .or(literal)
             .or(identifier.clone().map(ast::Expression::Identifier))
             .or(expression
                 .clone()
@@ -439,6 +444,22 @@ mod tests {
     use super::parse;
     use indoc::indoc;
     use insta::assert_yaml_snapshot;
+
+    #[test]
+    fn parse_bool_literal() {
+        let source = indoc! {"
+            fn main() -> i32 {
+                let x: bool = true;
+                let y: bool = false;
+                0
+            }
+        "};
+        let result = parse(source);
+        assert!(result.errors().len() == 0);
+
+        let ast = result.into_result().unwrap();
+        assert_yaml_snapshot!(ast);
+    }
 
     #[test]
     fn block_returns_none_when_multiple_expressions() {

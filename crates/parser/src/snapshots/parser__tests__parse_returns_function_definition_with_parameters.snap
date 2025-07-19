@@ -18,7 +18,7 @@ functions:
               end: 8
               context: ~
           parameter_type:
-            name: I64
+            kind: I64
             location:
               start: 10
               end: 13
@@ -34,7 +34,7 @@ functions:
               end: 16
               context: ~
           parameter_type:
-            name: I64
+            kind: I64
             location:
               start: 18
               end: 21
@@ -48,7 +48,7 @@ functions:
         end: 21
         context: ~
     return_type:
-      name: I64
+      kind: I64
       location:
         start: 26
         end: 29

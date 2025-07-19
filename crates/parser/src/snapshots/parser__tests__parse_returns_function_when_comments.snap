@@ -16,7 +16,7 @@ functions:
         end: 26
         context: ~
     return_type:
-      name: I32
+      kind: I32
       location:
         start: 42
         end: 45
