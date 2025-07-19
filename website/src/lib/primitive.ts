@@ -4,9 +4,9 @@ import { composeRenderProps } from "react-aria-components"
 import { type ClassNameValue, twMerge } from "tailwind-merge"
 
 function composeTailwindRenderProps<T>(
-  className: string | ((v: T) => string) | undefined,
+  className: ((v: T) => string) | string | undefined,
   tailwind: ClassNameValue,
-): string | ((v: T) => string) {
+): ((v: T) => string) | string {
   return composeRenderProps(className, (className) =>
     twMerge(tailwind, className),
   )

@@ -4,6 +4,8 @@ import type {
   TabProps as TabPrimitiveProps,
   TabsProps as TabsPrimitiveProps,
 } from "react-aria-components"
+
+import { composeTailwindRenderProps } from "@/lib/primitive"
 import {
   composeRenderProps,
   TabList as TabListPrimitive,
@@ -13,9 +15,7 @@ import {
 } from "react-aria-components"
 import { twMerge } from "tailwind-merge"
 
-import { composeTailwindRenderProps } from "@/lib/primitive"
-
-interface TabsProps extends TabsPrimitiveProps {
+type TabsProps = TabsPrimitiveProps & {
   ref?: React.RefObject<HTMLDivElement>
 }
 const Tabs = ({ className, ref, ...props }: TabsProps) => {
@@ -31,7 +31,7 @@ const Tabs = ({ className, ref, ...props }: TabsProps) => {
   )
 }
 
-interface TabListProps<T extends object> extends TabListPrimitiveProps<T> {
+type TabListProps<T extends object> = TabListPrimitiveProps<T> & {
   ref?: React.RefObject<HTMLDivElement>
 }
 const TabList = <T extends object>({
@@ -56,7 +56,7 @@ const TabList = <T extends object>({
   )
 }
 
-interface TabProps extends TabPrimitiveProps {
+type TabProps = TabPrimitiveProps & {
   ref?: React.RefObject<HTMLButtonElement>
 }
 const Tab = ({ children, className, ref, ...props }: TabProps) => {
@@ -78,12 +78,12 @@ const Tab = ({ children, className, ref, ...props }: TabProps) => {
           {children}
           {isSelected && (
             <span
-              data-slot="selected-indicator"
               className={twMerge(
                 "bg-fg absolute rounded",
                 "group-orientation-horizontal/tabs:-bottom-px group-orientation-horizontal/tabs:inset-x-0 group-orientation-horizontal/tabs:h-0.5 group-orientation-horizontal/tabs:w-full",
                 "group-orientation-vertical/tabs:left-0 group-orientation-vertical/tabs:h-[calc(100%-10%)] group-orientation-vertical/tabs:w-0.5 group-orientation-vertical/tabs:transform",
               )}
+              data-slot="selected-indicator"
             />
           )}
         </>
@@ -92,21 +92,21 @@ const Tab = ({ children, className, ref, ...props }: TabProps) => {
   )
 }
 
-interface TabPanelProps extends TabPanelPrimitiveProps {
+type TabPanelProps = TabPanelPrimitiveProps & {
   ref?: React.RefObject<HTMLDivElement>
 }
 const TabPanel = ({ className, ref, ...props }: TabPanelProps) => {
   return (
     <TabPanelPrimitive
       {...props}
-      ref={ref}
       className={composeTailwindRenderProps(
         className,
         "text-fg flex-1 text-sm focus-visible:outline-hidden",
       )}
+      ref={ref}
     />
   )
 }
 
-export type { TabsProps, TabListProps, TabProps, TabPanelProps }
-export { Tabs, TabList, Tab, TabPanel }
+export type { TabListProps, TabPanelProps, TabProps, TabsProps }
+export { Tab, TabList, TabPanel, Tabs }
