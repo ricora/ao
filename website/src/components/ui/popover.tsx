@@ -48,7 +48,7 @@ const PopoverContent = ({
   return (
     <PopoverPrimitive
       className={composeTailwindRenderProps(className, [
-        "group/popover min-w-(--trigger-width) max-w-xs rounded-xl border bg-overlay text-overlay-fg shadow-xs outline-hidden transition-transform [--gutter:--spacing(6)] sm:text-sm dark:backdrop-saturate-200 **:[[role=dialog]]:[--gutter:--spacing(4)]",
+        "group/popover bg-overlay text-overlay-fg max-w-xs min-w-(--trigger-width) rounded-xl border shadow-xs outline-hidden transition-transform [--gutter:--spacing(6)] sm:text-sm dark:backdrop-saturate-200 **:[[role=dialog]]:[--gutter:--spacing(4)]",
         "entering:fade-in entering:animate-in",
         "exiting:fade-out exiting:animate-out",
         "placement-left:entering:slide-in-from-right-1 placement-right:entering:slide-in-from-left-1 placement-top:entering:slide-in-from-bottom-1 placement-bottom:entering:slide-in-from-top-1",
@@ -64,7 +64,7 @@ const PopoverContent = ({
           {showArrow && (
             <OverlayArrow className="group">
               <svg
-                className="group-placement-left:-rotate-90 block fill-overlay stroke-border group-placement-bottom:rotate-180 group-placement-right:rotate-90 forced-colors:fill-[Canvas] forced-colors:stroke-[ButtonBorder]"
+                className="group-placement-left:-rotate-90 fill-overlay stroke-border group-placement-bottom:rotate-180 group-placement-right:rotate-90 block forced-colors:fill-[Canvas] forced-colors:stroke-[ButtonBorder]"
                 height={12}
                 viewBox="0 0 12 12"
                 width={12}

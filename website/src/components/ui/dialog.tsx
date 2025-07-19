@@ -71,7 +71,9 @@ const DialogHeader = ({ className, ...props }: DialogHeaderProps) => {
       ref={headerRef}
     >
       {props.title && <DialogTitle>{props.title}</DialogTitle>}
-      {props.description && <DialogDescription>{props.description}</DialogDescription>}
+      {props.description && (
+        <DialogDescription>{props.description}</DialogDescription>
+      )}
       {!props.title && typeof props.children === "string" ? (
         <DialogTitle {...props} />
       ) : (
@@ -86,7 +88,10 @@ type DialogTitleProps = HeadingProps & {
 }
 const DialogTitle = ({ className, ref, ...props }: DialogTitleProps) => (
   <Heading
-    className={twMerge("text-balance font-semibold text-fg text-lg/6 sm:text-base/6", className)}
+    className={twMerge(
+      "text-fg text-lg/6 font-semibold text-balance sm:text-base/6",
+      className,
+    )}
     ref={ref}
     slot="title"
     {...props}
@@ -96,10 +101,14 @@ const DialogTitle = ({ className, ref, ...props }: DialogTitleProps) => (
 type DialogDescriptionProps = TextProps & {
   ref?: React.Ref<HTMLDivElement>
 }
-const DialogDescription = ({ className, ref, ...props }: DialogDescriptionProps) => (
+const DialogDescription = ({
+  className,
+  ref,
+  ...props
+}: DialogDescriptionProps) => (
   <Text
     className={twMerge(
-      "text-pretty text-base/6 text-muted-fg group-disabled:opacity-50 sm:text-sm/6",
+      "text-muted-fg text-base/6 text-pretty group-disabled:opacity-50 sm:text-sm/6",
       className,
     )}
     ref={ref}
@@ -159,8 +168,21 @@ const DialogFooter = ({ className, ...props }: DialogFooterProps) => {
   )
 }
 
-const DialogClose = ({ className, intent = "outline", ref, ...props }: ButtonProps) => {
-  return <Button className={className} intent={intent} ref={ref} slot="close" {...props} />
+const DialogClose = ({
+  className,
+  intent = "outline",
+  ref,
+  ...props
+}: ButtonProps) => {
+  return (
+    <Button
+      className={className}
+      intent={intent}
+      ref={ref}
+      slot="close"
+      {...props}
+    />
+  )
 }
 
 type CloseButtonIndicatorProps = Omit<ButtonProps, "children"> & {
@@ -168,13 +190,16 @@ type CloseButtonIndicatorProps = Omit<ButtonProps, "children"> & {
   isDismissable?: boolean | undefined
 }
 
-const DialogCloseIcon = ({ className, ...props }: CloseButtonIndicatorProps) => {
+const DialogCloseIcon = ({
+  className,
+  ...props
+}: CloseButtonIndicatorProps) => {
   return props.isDismissable ? (
     <ButtonPrimitive
       aria-label="Close"
       className={composeTailwindRenderProps(
         className,
-        "close absolute top-1 right-1 z-50 grid size-8 place-content-center rounded-xl hover:bg-secondary focus:bg-secondary focus:outline-hidden focus-visible:ring-1 focus-visible:ring-primary sm:top-2 sm:right-2 sm:size-7 sm:rounded-md",
+        "close hover:bg-secondary focus:bg-secondary focus-visible:ring-primary absolute top-1 right-1 z-50 grid size-8 place-content-center rounded-xl focus:outline-hidden focus-visible:ring-1 sm:top-2 sm:right-2 sm:size-7 sm:rounded-md",
       )}
       slot="close"
     >

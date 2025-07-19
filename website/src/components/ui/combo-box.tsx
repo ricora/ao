@@ -16,13 +16,26 @@ import {
 } from "react-aria-components"
 
 import { Button } from "./button"
-import { DropdownDescription, DropdownItem, DropdownLabel, DropdownSection } from "./dropdown"
-import { Description, FieldError, FieldGroup, type FieldProps, Input, Label } from "./field"
+import {
+  DropdownDescription,
+  DropdownItem,
+  DropdownLabel,
+  DropdownSection,
+} from "./dropdown"
+import {
+  Description,
+  FieldError,
+  FieldGroup,
+  type FieldProps,
+  Input,
+  Label,
+} from "./field"
 import { PopoverContent } from "./popover"
 
-type ComboBoxProps<T extends object> = FieldProps & Omit<ComboboxPrimitiveProps<T>, "children"> & {
-  children: React.ReactNode
-}
+type ComboBoxProps<T extends object> = FieldProps &
+  Omit<ComboboxPrimitiveProps<T>, "children"> & {
+    children: React.ReactNode
+  }
 
 const ComboBox = <T extends object>({
   children,
@@ -36,7 +49,10 @@ const ComboBox = <T extends object>({
     <ComboboxPrimitive
       data-slot="combo-box"
       {...props}
-      className={composeTailwindRenderProps(className, "group flex w-full flex-col gap-y-1")}
+      className={composeTailwindRenderProps(
+        className,
+        "group flex w-full flex-col gap-y-1",
+      )}
     >
       {label && <Label>{label}</Label>}
       {children}
@@ -46,9 +62,13 @@ const ComboBox = <T extends object>({
   )
 }
 
-type ComboBoxListProps<T extends object> = Omit<ListBoxProps<T>, "layout" | "orientation"> & Pick<PopoverProps, "placement"> & {
-  popover?: Omit<PopoverProps, "children">
-}
+type ComboBoxListProps<T extends object> = Omit<
+  ListBoxProps<T>,
+  "layout" | "orientation"
+> &
+  Pick<PopoverProps, "placement"> & {
+    popover?: Omit<PopoverProps, "children">
+  }
 
 const ComboBoxList = <T extends object>({
   children,
@@ -87,13 +107,13 @@ const ComboBoxInput = (props: InputProps) => {
     <FieldGroup>
       <Input {...props} placeholder={props?.placeholder} />
       <Button
-        className="rounded pressed:bg-transparent outline-offset-0 hover:bg-transparent active:bg-transparent **:data-[slot=icon]:pressed:text-fg **:data-[slot=icon]:text-muted-fg **:data-[slot=icon]:hover:text-fg forced-colors:group-disabled:border-[GrayText] forced-colors:group-disabled:text-[GrayText]"
+        className="pressed:bg-transparent **:data-[slot=icon]:pressed:text-fg **:data-[slot=icon]:text-muted-fg **:data-[slot=icon]:hover:text-fg rounded outline-offset-0 hover:bg-transparent active:bg-transparent forced-colors:group-disabled:border-[GrayText] forced-colors:group-disabled:text-[GrayText]"
         intent="plain"
         size="sq-xs"
       >
         {!context?.inputValue && (
           <IconChevronsY
-            className="size-4 shrink-0 text-muted-fg group-open:text-fg"
+            className="text-muted-fg group-open:text-fg size-4 shrink-0"
             data-slot="chevron"
           />
         )}

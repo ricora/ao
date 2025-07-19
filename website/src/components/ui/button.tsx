@@ -10,10 +10,10 @@ import { tv, type VariantProps } from "tailwind-variants"
 const buttonStyles = tv({
   base: [
     "[--btn-icon-active:var(--btn-fg)] [--btn-outline:var(--btn-bg)] [--btn-ring:var(--btn-bg)]/20",
-    "bg-(--btn-bg) pressed:bg-(--btn-overlay) text-(--btn-fg) outline-(--btn-outline) ring-(--btn-ring) hover:bg-(--btn-overlay)",
-    "relative inset-ring inset-ring-fg/15 isolate inline-flex items-center justify-center font-medium",
-    "focus:outline-0 focus-visible:outline focus-visible:outline-offset-2 focus-visible:ring-2 focus-visible:ring-offset-3 focus-visible:ring-offset-bg",
-    "*:data-[slot=icon]:-mx-0.5 *:data-[slot=icon]:my-0.5 *:data-[slot=icon]:shrink-0 *:data-[slot=icon]:self-center *:data-[slot=icon]:text-(--btn-icon) pressed:*:data-[slot=icon]:text-(--btn-icon-active) focus-visible:*:data-[slot=icon]:text-(--btn-icon-active)/80 hover:*:data-[slot=icon]:text-(--btn-icon-active)/90 sm:*:data-[slot=icon]:my-1 forced-colors:[--btn-icon:ButtonText] forced-colors:hover:[--btn-icon:ButtonText]",
+    "pressed:bg-(--btn-overlay) bg-(--btn-bg) text-(--btn-fg) ring-(--btn-ring) outline-(--btn-outline) hover:bg-(--btn-overlay)",
+    "inset-ring-fg/15 relative isolate inline-flex items-center justify-center font-medium inset-ring",
+    "focus-visible:ring-offset-bg focus:outline-0 focus-visible:ring-2 focus-visible:ring-offset-3 focus-visible:outline focus-visible:outline-offset-2",
+    "pressed:*:data-[slot=icon]:text-(--btn-icon-active) *:data-[slot=icon]:-mx-0.5 *:data-[slot=icon]:my-0.5 *:data-[slot=icon]:shrink-0 *:data-[slot=icon]:self-center *:data-[slot=icon]:text-(--btn-icon) hover:*:data-[slot=icon]:text-(--btn-icon-active)/90 focus-visible:*:data-[slot=icon]:text-(--btn-icon-active)/80 sm:*:data-[slot=icon]:my-1 forced-colors:[--btn-icon:ButtonText] forced-colors:hover:[--btn-icon:ButtonText]",
     "*:data-[slot=loader]:-mx-0.5 *:data-[slot=loader]:my-0.5 *:data-[slot=loader]:shrink-0 *:data-[slot=loader]:self-center *:data-[slot=loader]:text-(--btn-icon) sm:*:data-[slot=loader]:my-1",
   ],
   compoundVariants: [
@@ -48,7 +48,7 @@ const buttonStyles = tv({
     },
 
     isDisabled: {
-      true: "inset-ring-0 opacity-50 forced-colors:text-[GrayText]",
+      true: "opacity-50 inset-ring-0 forced-colors:text-[GrayText]",
     },
     isPending: {
       true: "opacity-50",
@@ -86,11 +86,19 @@ const buttonStyles = tv({
   },
 })
 
-type ButtonProps = ButtonPrimitiveProps & VariantProps<typeof buttonStyles> & {
-  ref?: React.Ref<HTMLButtonElement>
-}
+type ButtonProps = ButtonPrimitiveProps &
+  VariantProps<typeof buttonStyles> & {
+    ref?: React.Ref<HTMLButtonElement>
+  }
 
-const Button = ({ className, intent, isCircle, ref, size, ...props }: ButtonProps) => {
+const Button = ({
+  className,
+  intent,
+  isCircle,
+  ref,
+  size,
+  ...props
+}: ButtonProps) => {
   return (
     <ButtonPrimitive
       ref={ref}
@@ -106,7 +114,11 @@ const Button = ({ className, intent, isCircle, ref, size, ...props }: ButtonProp
       )}
     >
       {(values) => (
-        <>{typeof props.children === "function" ? props.children(values) : props.children}</>
+        <>
+          {typeof props.children === "function"
+            ? props.children(values)
+            : props.children}
+        </>
       )}
     </ButtonPrimitive>
   )
