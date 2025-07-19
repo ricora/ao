@@ -1179,12 +1179,12 @@ mod tests {
     }
 
     #[test]
-    fn test_check_if_statement_scoping_variables_tdd() {
+    fn test_check_if_statement_scoping_variables() {
         use parser;
 
         let mut checker = TypeChecker::new();
 
-        // TDD Test: if statement variables should not leak to outer scope
+        // Test: if statement variables should not leak to outer scope
         let source = r#"
             fn test() -> i32 {
                 if 1 == 1 {
@@ -1210,7 +1210,7 @@ mod tests {
     }
 
     #[test]
-    fn test_check_if_statement_condition_validation_enhancement_tdd() {
+    fn test_check_if_statement_condition_validation_enhancement() {
         use ast::{
             BinaryExpression, Block, Expression, IfStatement, IntegerLiteral, Location, Operator,
             OperatorKind, Statement, Statements,
@@ -1218,7 +1218,7 @@ mod tests {
 
         let mut checker = TypeChecker::new();
 
-        // RED: Test that if statement validation gives specific error for arithmetic conditions
+        // Test that if statement validation gives specific error for arithmetic conditions
         let left = Box::new(Expression::IntegerLiteral(IntegerLiteral {
             value: "1",
             location: Location {
