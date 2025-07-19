@@ -151,6 +151,20 @@ jobs:
       - name: Check linting
         run: pnpm run --filter "*" lint
 
+  npm-typecheck:
+    name: Type Check (npm)
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+      - name: Install tools
+        uses: jdx/mise-action@bfb9fa0b029db830a8c570757cee683df207a6c5 # v2.4.0
+        with:
+          version: 2025.7.12
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Check linting
+        run: pnpm run --filter "*" typecheck
+
   npm-build:
     name: Build (npm)
     runs-on: ubuntu-24.04
