@@ -7,9 +7,25 @@ pub struct TypeChecker {
 
 impl TypeChecker {
     pub fn new() -> Self {
-        Self {
-            environment: TypeEnvironment::new(),
-        }
+        let mut environment = TypeEnvironment::new();
+
+        // Initialize the environment with built-in types and functions
+        environment.add_function(
+            "print_char".to_string(),
+            FunctionInfo {
+                parameters: vec![Type::I32],
+                return_type: Type::I32,
+            },
+        );
+        environment.add_function(
+            "print_int".to_string(),
+            FunctionInfo {
+                parameters: vec![Type::I32],
+                return_type: Type::I32,
+            },
+        );
+
+        Self { environment }
     }
 
     pub fn check_integer_literal(
@@ -420,6 +436,15 @@ impl TypeChecker {
                 found: body_type.to_string(),
                 location: func_def.body.location.clone(),
             });
+        }
+
+        Ok(())
+    }
+
+    pub fn check_program(&mut self, program: &ast::Program) -> Result<(), TypeCheckError> {
+        // Check each function definition
+        for func_def in &program.functions {
+            self.check_function_definition(func_def)?;
         }
 
         Ok(())
@@ -1375,7 +1400,7 @@ mod tests {
         // Test that function call returns correct type
         let source = r#"
             fn get_bool() -> i32 { 1 }
-            fn main() -> i32 { 
+            fn main() -> i32 {
                 let x: i32 = get_bool();
                 x
             }

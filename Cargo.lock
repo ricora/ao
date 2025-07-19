@@ -1168,6 +1168,7 @@ dependencies = [
  "code-generator",
  "indoc",
  "parser",
+ "type-checker",
 ]
 
 [[package]]
