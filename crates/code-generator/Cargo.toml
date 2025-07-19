@@ -8,7 +8,7 @@ indoc = { workspace = true }
 parser = { workspace = true }
 pretty_assertions = { workspace = true }
 wasmtime = "=33.0.2"
-wasmtime-wasi = "=33.0.1"
+wasmtime-wasi = "=33.0.2"
 
 [dependencies]
 anyhow = { workspace = true }
