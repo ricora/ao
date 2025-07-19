@@ -1208,4 +1208,31 @@ mod tests {
             TypeCheckError::UndefinedIdentifier { .. }
         ));
     }
+
+    #[test]
+    fn test_check_function_call_basic() {
+        use parser;
+
+        let mut checker = TypeChecker::new();
+
+        // First define a function to call
+        let source = r#"
+            fn add(x: i32, y: i32) -> i32 { x + y }
+            fn main() -> i32 { add(1, 2) }
+        "#;
+
+        let parse_result = parser::parse(source);
+        assert!(parse_result.output().is_some());
+
+        let program = parse_result.output().unwrap();
+        
+        // Register the add function first
+        let add_func = &program.functions[0];
+        checker.check_function_definition(add_func).unwrap();
+        
+        // Now check the main function with function call
+        let main_func = &program.functions[1];
+        let result = checker.check_function_definition(main_func);
+        assert!(result.is_ok());
+    }
 }
