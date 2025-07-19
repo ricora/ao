@@ -1,113 +1,89 @@
-import { LayoutGroup, motion } from "framer-motion"
-import * as React from "react"
-import {
-  TabList,
-  type TabListProps,
-  TabPanel,
-  type TabPanelProps,
-  Tab as TabPrimitive,
-  type TabProps,
-  Tabs as TabsPrimitive,
-  type TabsProps,
+import type {
+  TabListProps as TabListPrimitiveProps,
+  TabPanelProps as TabPanelPrimitiveProps,
+  TabProps as TabPrimitiveProps,
+  TabsProps as TabsPrimitiveProps,
 } from "react-aria-components"
-import { twJoin } from "tailwind-merge"
-import { tv } from "tailwind-variants"
 
-import { cn, cr } from "./primitive"
+import { composeTailwindRenderProps } from "@/lib/primitive"
+import {
+  composeRenderProps,
+  TabList as TabListPrimitive,
+  TabPanel as TabPanelPrimitive,
+  Tab as TabPrimitive,
+  Tabs as TabsPrimitive,
+} from "react-aria-components"
+import { twMerge } from "tailwind-merge"
 
-const tabsStyles = tv({
-  base: "group flex gap-4 forced-color-adjust-none",
-  variants: {
-    orientation: {
-      horizontal: "flex-col",
-      vertical: "w-[800px] flex-row",
-    },
-  },
-})
-
-const Tabs = (props: TabsProps) => {
+type TabsProps = TabsPrimitiveProps & {
+  ref?: React.RefObject<HTMLDivElement>
+}
+const Tabs = ({ className, ref, ...props }: TabsProps) => {
   return (
     <TabsPrimitive
+      className={composeTailwindRenderProps(
+        className,
+        "group/tabs orientation-vertical:w-[800px] orientation-vertical:flex-row orientation-horizontal:flex-col flex gap-4 forced-color-adjust-none",
+      )}
+      ref={ref}
       {...props}
-      className={cr(props.className, (className, renderProps) =>
-        tabsStyles({
-          ...renderProps,
+    />
+  )
+}
+
+type TabListProps<T extends object> = TabListPrimitiveProps<T> & {
+  ref?: React.RefObject<HTMLDivElement>
+}
+const TabList = <T extends object>({
+  className,
+  ref,
+  ...props
+}: TabListProps<T>) => {
+  return (
+    <TabListPrimitive
+      ref={ref}
+      {...props}
+      className={composeRenderProps(className, (className, { orientation }) =>
+        twMerge([
+          "flex forced-color-adjust-none",
+          orientation === "horizontal" &&
+            "border-border flex-row gap-x-5 border-b",
+          orientation === "vertical" && "flex-col items-start gap-y-4 border-l",
           className,
-        }),
+        ]),
       )}
     />
   )
 }
 
-const tabListStyles = tv({
-  base: "flex forced-color-adjust-none",
-  variants: {
-    orientation: {
-      horizontal: "flex-row gap-x-5 border-b border-border",
-      vertical: "flex-col items-start gap-y-4 border-l",
-    },
-  },
-})
-
-const List = <T extends object>(props: TabListProps<T>) => {
-  const id = React.useId()
-  return (
-    <LayoutGroup id={id}>
-      <TabList
-        {...props}
-        className={cr(props.className, (className, renderProps) =>
-          tabListStyles({ ...renderProps, className }),
-        )}
-      />
-    </LayoutGroup>
-  )
+type TabProps = TabPrimitiveProps & {
+  ref?: React.RefObject<HTMLButtonElement>
 }
-
-const tabStyles = tv({
-  base: [
-    "relative flex cursor-default items-center whitespace-nowrap rounded-full text-sm font-medium outline-none transition hover:text-fg [&>[data-slot=icon]]:mr-2 [&>[data-slot=icon]]:size-4",
-    // hor
-    "group-orientation-vertical:w-full group-orientation-vertical:py-0 group-orientation-vertical:pl-4 group-orientation-vertical:pr-2",
-    // ver
-    "group-orientation-horizontal:pb-3",
-  ],
-  variants: {
-    isDisabled: {
-      true: "text-muted-fg/50",
-    },
-    isFocused: { false: "ring-0", true: "text-fg" },
-    isSelected: {
-      false: "text-muted-fg",
-      true: "text-fg",
-    },
-  },
-})
-
-const Tab = ({ children, ...props }: TabProps) => {
+const Tab = ({ children, className, ref, ...props }: TabProps) => {
   return (
     <TabPrimitive
+      ref={ref}
       {...props}
-      className={cr(props.className, (_className, renderProps) =>
-        tabStyles({
-          ...renderProps,
-          className: twJoin("href" in props && "cursor-pointer", _className),
-        }),
-      )}
+      className={composeTailwindRenderProps(className, [
+        "text-fg hover:text-fg relative flex cursor-default items-center rounded-full text-sm font-medium whitespace-nowrap outline-hidden transition *:data-[slot=icon]:mr-2 *:data-[slot=icon]:size-4",
+        "group-orientation-vertical/tabs:w-full group-orientation-vertical/tabs:py-0 group-orientation-vertical/tabs:pr-2 group-orientation-vertical/tabs:pl-4",
+        "group-orientation-horizontal/tabs:pb-3",
+        "selected:text-fg text-muted-fg focus:ring-0",
+        "disabled:opacity-50",
+        "href" in props && "cursor-pointer",
+      ])}
     >
       {({ isSelected }) => (
         <>
-          {children as React.ReactNode}
+          {children}
           {isSelected && (
-            <motion.span
-              className={cn(
-                "absolute rounded bg-fg",
-                // horizontal
-                "group-orientation-horizontal:inset-x-0 group-orientation-horizontal:-bottom-px group-orientation-horizontal:h-0.5 group-orientation-horizontal:w-full",
-                // vertical
-                "group-orientation-vertical:left-0 group-orientation-vertical:h-[calc(100%-10%)] group-orientation-vertical:w-0.5 group-orientation-vertical:transform",
+            <span
+              className={twMerge(
+                "bg-fg absolute rounded",
+                "group-orientation-horizontal/tabs:-bottom-px group-orientation-horizontal/tabs:inset-x-0 group-orientation-horizontal/tabs:h-0.5 group-orientation-horizontal/tabs:w-full",
+                "group-orientation-vertical/tabs:left-0 group-orientation-vertical/tabs:h-[calc(100%-10%)] group-orientation-vertical/tabs:w-0.5 group-orientation-vertical/tabs:transform",
               )}
-              layoutId="current-selected"
-              transition={{ damping: 40, stiffness: 500, type: "spring" }}
+              data-slot="selected-indicator"
             />
           )}
         </>
@@ -116,28 +92,21 @@ const Tab = ({ children, ...props }: TabProps) => {
   )
 }
 
-const tabPanelStyles = tv({
-  base: "flex-1 text-sm text-fg",
-  variants: {
-    isFocusVisible: {
-      true: "outline-none",
-    },
-  },
-})
-
-const Panel = (props: TabPanelProps) => {
+type TabPanelProps = TabPanelPrimitiveProps & {
+  ref?: React.RefObject<HTMLDivElement>
+}
+const TabPanel = ({ className, ref, ...props }: TabPanelProps) => {
   return (
-    <TabPanel
+    <TabPanelPrimitive
       {...props}
-      className={cr(props.className, (className, renderProps) =>
-        tabPanelStyles({ ...renderProps, className }),
+      className={composeTailwindRenderProps(
+        className,
+        "text-fg flex-1 text-sm focus-visible:outline-hidden",
       )}
+      ref={ref}
     />
   )
 }
 
-Tabs.List = List
-Tabs.Tab = Tab
-Tabs.Panel = Panel
-
-export { Tabs }
+export type { TabListProps, TabPanelProps, TabProps, TabsProps }
+export { Tab, TabList, TabPanel, Tabs }

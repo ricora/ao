@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button"
-import { cn } from "@/lib/utils/classes"
 import MonacoEditor from "@monaco-editor/react"
 import { type FC, memo } from "react"
+import { twMerge } from "tailwind-merge"
 
 export type EditorProps = {
   className?: string
@@ -13,7 +13,7 @@ export type EditorProps = {
 export const Editor: FC<EditorProps> = memo(
   ({ className, code, run, setCode }) => {
     return (
-      <div className={cn("relative h-full flex-1", className)}>
+      <div className={twMerge("relative h-full flex-1", className)}>
         <MonacoEditor
           height="100%"
           language="plaintext"
@@ -27,8 +27,7 @@ export const Editor: FC<EditorProps> = memo(
           value={code}
         />
         <Button
-          appearance="solid"
-          className="absolute bottom-4 right-4 font-bold transition"
+          className="absolute right-4 bottom-4 font-bold transition"
           onPress={run}
         >
           Run

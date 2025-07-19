@@ -6,7 +6,6 @@ import prettier from "eslint-config-prettier"
 import jsxA11y from "eslint-plugin-jsx-a11y"
 import perfectionist from "eslint-plugin-perfectionist"
 import react from "eslint-plugin-react"
-// @ts-expect-error missing types
 import reactHooks from "eslint-plugin-react-hooks"
 import reactRefresh from "eslint-plugin-react-refresh"
 import unicorn from "eslint-plugin-unicorn"
@@ -50,9 +49,7 @@ export default tseslint.config(
     },
   },
   jsxA11y.flatConfigs.recommended,
-  // @ts-expect-error types are broken
   react.configs.flat.recommended,
-  // @ts-expect-error types are broken
   react.configs.flat["jsx-runtime"],
   {
     settings: {
