@@ -1,4 +1,4 @@
-use crate::env::{Type, TypeEnvironment, VariableInfo, FunctionInfo};
+use crate::env::{FunctionInfo, Type, TypeEnvironment, VariableInfo};
 use crate::error::TypeCheckError;
 
 pub struct TypeChecker {
@@ -42,13 +42,13 @@ impl TypeChecker {
         }
     }
 
-    pub fn check_expression(&self, expr: &ast::Expression) -> Result<Type, TypeCheckError> {
+    pub fn check_expression(&mut self, expr: &ast::Expression) -> Result<Type, TypeCheckError> {
         match expr {
             ast::Expression::IntegerLiteral(literal) => self.check_integer_literal(literal),
             ast::Expression::BinaryExpression(binary) => self.check_binary_expression(binary),
             ast::Expression::UnaryExpression(unary) => self.check_unary_expression(unary),
-            ast::Expression::AssignmentExpression(_) => {
-                todo!("Assignment expressions not implemented")
+            ast::Expression::AssignmentExpression(assignment) => {
+                self.check_assignment_expression(assignment)
             }
             ast::Expression::Identifier(identifier) => self.check_identifier_expression(identifier),
             ast::Expression::FunctionCall(_) => todo!("Function call expressions not implemented"),
@@ -56,7 +56,7 @@ impl TypeChecker {
     }
 
     pub fn check_unary_expression(
-        &self,
+        &mut self,
         unary: &ast::UnaryExpression,
     ) -> Result<Type, TypeCheckError> {
         let operand_type = self.check_expression(&unary.operand)?;
@@ -88,17 +88,54 @@ impl TypeChecker {
                 }
             }
             // Other operators are not valid for unary expressions
-            _ => {
-                Err(TypeCheckError::InvalidOperator {
-                    operator: unary.operator.operator.to_string(),
-                    location: unary.operator.location.clone(),
-                })
-            }
+            _ => Err(TypeCheckError::InvalidOperator {
+                operator: unary.operator.operator.to_string(),
+                location: unary.operator.location.clone(),
+            }),
         }
     }
 
+    pub fn check_assignment_expression(
+        &mut self,
+        assignment: &ast::AssignmentExpression,
+    ) -> Result<Type, TypeCheckError> {
+        // Check if the variable exists
+        let var_info = match self.environment.get_variable(assignment.name.name) {
+            Some(info) => info.clone(),
+            None => {
+                return Err(TypeCheckError::UndefinedIdentifier {
+                    name: assignment.name.name.to_string(),
+                    location: assignment.name.location.clone(),
+                });
+            }
+        };
+
+        // Check if the variable is mutable
+        if !var_info.mutable {
+            return Err(TypeCheckError::AssignmentToImmutable {
+                name: assignment.name.name.to_string(),
+                location: assignment.name.location.clone(),
+            });
+        }
+
+        // Check the type of the value being assigned
+        let value_type = self.check_expression(&assignment.value)?;
+
+        // Check if the types match
+        if value_type != var_info.var_type {
+            return Err(TypeCheckError::TypeMismatch {
+                expected: var_info.var_type.to_string(),
+                found: value_type.to_string(),
+                location: assignment.location.clone(),
+            });
+        }
+
+        // Assignment expression returns the type of the assigned value
+        Ok(value_type)
+    }
+
     pub fn check_binary_expression(
-        &self,
+        &mut self,
         binary: &ast::BinaryExpression,
     ) -> Result<Type, TypeCheckError> {
         let left_type = self.check_expression(&binary.left)?;
@@ -220,9 +257,7 @@ impl TypeChecker {
                 // TODO: Handle if statements
                 Ok(Type::Unit)
             }
-            ast::Statement::Expression(expr) => {
-                self.check_expression(expr)
-            }
+            ast::Statement::Expression(expr) => self.check_expression(expr),
         }
     }
 
@@ -245,7 +280,7 @@ impl TypeChecker {
                     location: expr.location().clone(),
                 });
             }
-            
+
             if let Err(e) = self.check_statement(statement) {
                 self.environment.pop_scope();
                 return Err(e);
@@ -362,7 +397,7 @@ mod tests {
     fn test_check_binary_expression_arithmetic() {
         use ast::{BinaryExpression, Expression, IntegerLiteral, Location, Operator, OperatorKind};
 
-        let checker = TypeChecker::new();
+        let mut checker = TypeChecker::new();
 
         let left = Box::new(Expression::IntegerLiteral(IntegerLiteral {
             value: "1",
@@ -651,7 +686,7 @@ mod tests {
     fn test_check_unary_expression_logical_not() {
         use ast::{Expression, IntegerLiteral, Location, Operator, OperatorKind, UnaryExpression};
 
-        let checker = TypeChecker::new();
+        let mut checker = TypeChecker::new();
 
         // Test !42 (should fail - can't apply logical not to integer)
         let operand = Box::new(Expression::IntegerLiteral(IntegerLiteral {
@@ -686,80 +721,278 @@ mod tests {
 
     #[test]
     fn test_check_unary_expression_numeric_negation() {
-        use ast::{Expression, IntegerLiteral, Location, Operator, OperatorKind, UnaryExpression};
+        use parser;
 
-        let checker = TypeChecker::new();
+        let mut checker = TypeChecker::new();
 
         // Test -42 (should succeed and return i32)
-        let operand = Box::new(Expression::IntegerLiteral(IntegerLiteral {
-            value: "42",
-            location: Location {
-                start: 1,
-                end: 3,
-                context: (),
-            },
-        }));
+        let source = r#"
+            fn test() -> i32 {
+                -42
+            }
+        "#;
 
-        let unary_expr = UnaryExpression {
-            operator: Operator {
-                operator: OperatorKind::Subtract,
-                location: Location {
-                    start: 0,
-                    end: 1,
-                    context: (),
-                },
-            },
-            operand,
-            location: Location {
-                start: 0,
-                end: 3,
-                context: (),
-            },
-        };
+        let parse_result = parser::parse(source);
+        assert!(
+            parse_result.output().is_some(),
+            "Parser should support numeric negation"
+        );
 
-        let result = checker.check_unary_expression(&unary_expr);
-        assert!(result.is_ok());
-        assert_eq!(result.unwrap(), Type::I32);
+        let program = parse_result.output().unwrap();
+        let function = &program.functions[0];
+
+        let result = checker.check_function_definition(function);
+        assert!(result.is_ok()); // Should succeed because -42 is valid i32
     }
 
     #[test]
     fn test_check_unary_expression_logical_not_with_bool() {
-        let checker = TypeChecker::new();
+        let mut checker = TypeChecker::new();
 
         // Create a manual test with comparison that returns bool
-        use ast::{BinaryExpression, Expression, IntegerLiteral, Location, Operator, OperatorKind, UnaryExpression};
+        use ast::{
+            BinaryExpression, Expression, IntegerLiteral, Location, Operator, OperatorKind,
+            UnaryExpression,
+        };
 
         // Create 1 == 2 (which is bool)
         let left = Box::new(Expression::IntegerLiteral(IntegerLiteral {
             value: "1",
-            location: Location { start: 0, end: 1, context: () },
+            location: Location {
+                start: 0,
+                end: 1,
+                context: (),
+            },
         }));
         let right = Box::new(Expression::IntegerLiteral(IntegerLiteral {
             value: "2",
-            location: Location { start: 5, end: 6, context: () },
+            location: Location {
+                start: 5,
+                end: 6,
+                context: (),
+            },
         }));
         let comparison = Box::new(Expression::BinaryExpression(BinaryExpression {
             left,
             operator: Operator {
                 operator: OperatorKind::Equal,
-                location: Location { start: 2, end: 4, context: () },
+                location: Location {
+                    start: 2,
+                    end: 4,
+                    context: (),
+                },
             },
             right,
-            location: Location { start: 0, end: 6, context: () },
+            location: Location {
+                start: 0,
+                end: 6,
+                context: (),
+            },
         }));
 
         // Apply logical not to the comparison: !(1 == 2)
         let unary_expr = UnaryExpression {
             operator: Operator {
                 operator: OperatorKind::LogicalNot,
-                location: Location { start: 0, end: 1, context: () },
+                location: Location {
+                    start: 0,
+                    end: 1,
+                    context: (),
+                },
             },
             operand: comparison,
-            location: Location { start: 0, end: 7, context: () },
+            location: Location {
+                start: 0,
+                end: 7,
+                context: (),
+            },
         };
 
         let result = checker.check_unary_expression(&unary_expr);
         assert!(result.is_ok());
         assert_eq!(result.unwrap(), Type::Bool);
+    }
+
+    #[test]
+    fn test_check_assignment_expression_success() {
+        use ast::{AssignmentExpression, Expression, Identifier, IntegerLiteral, Location};
+
+        let mut checker = TypeChecker::new();
+
+        // First, add a mutable variable to the environment
+        checker.environment.add_variable(
+            "x".to_string(),
+            crate::env::VariableInfo {
+                var_type: Type::I32,
+                mutable: true,
+                initialized: true,
+            },
+        );
+
+        // Test x = 42 (should succeed)
+        let assignment_expr = AssignmentExpression {
+            name: Identifier {
+                name: "x",
+                location: Location {
+                    start: 0,
+                    end: 1,
+                    context: (),
+                },
+            },
+            value: Box::new(Expression::IntegerLiteral(IntegerLiteral {
+                value: "42",
+                location: Location {
+                    start: 4,
+                    end: 6,
+                    context: (),
+                },
+            })),
+            location: Location {
+                start: 0,
+                end: 6,
+                context: (),
+            },
+        };
+
+        let result = checker.check_assignment_expression(&assignment_expr);
+        assert!(result.is_ok());
+        assert_eq!(result.unwrap(), Type::I32);
+    }
+
+    #[test]
+    fn test_check_assignment_expression_immutable_variable() {
+        use ast::{AssignmentExpression, Expression, Identifier, IntegerLiteral, Location};
+
+        let mut checker = TypeChecker::new();
+
+        // Add an immutable variable to the environment
+        checker.environment.add_variable(
+            "x".to_string(),
+            crate::env::VariableInfo {
+                var_type: Type::I32,
+                mutable: false,
+                initialized: true,
+            },
+        );
+
+        // Test x = 42 (should fail - immutable variable)
+        let assignment_expr = AssignmentExpression {
+            name: Identifier {
+                name: "x",
+                location: Location {
+                    start: 0,
+                    end: 1,
+                    context: (),
+                },
+            },
+            value: Box::new(Expression::IntegerLiteral(IntegerLiteral {
+                value: "42",
+                location: Location {
+                    start: 4,
+                    end: 6,
+                    context: (),
+                },
+            })),
+            location: Location {
+                start: 0,
+                end: 6,
+                context: (),
+            },
+        };
+
+        let result = checker.check_assignment_expression(&assignment_expr);
+        assert!(result.is_err());
+        assert!(matches!(
+            result.unwrap_err(),
+            TypeCheckError::AssignmentToImmutable { .. }
+        ));
+    }
+
+    #[test]
+    fn test_check_assignment_expression_undefined_variable() {
+        use ast::{AssignmentExpression, Expression, Identifier, IntegerLiteral, Location};
+
+        let mut checker = TypeChecker::new();
+
+        // Test y = 42 (should fail - undefined variable)
+        let assignment_expr = AssignmentExpression {
+            name: Identifier {
+                name: "y",
+                location: Location {
+                    start: 0,
+                    end: 1,
+                    context: (),
+                },
+            },
+            value: Box::new(Expression::IntegerLiteral(IntegerLiteral {
+                value: "42",
+                location: Location {
+                    start: 4,
+                    end: 6,
+                    context: (),
+                },
+            })),
+            location: Location {
+                start: 0,
+                end: 6,
+                context: (),
+            },
+        };
+
+        let result = checker.check_assignment_expression(&assignment_expr);
+        assert!(result.is_err());
+        assert!(matches!(
+            result.unwrap_err(),
+            TypeCheckError::UndefinedIdentifier { .. }
+        ));
+    }
+
+    #[test]
+    fn test_check_assignment_expression_type_mismatch() {
+        use ast::{AssignmentExpression, Expression, Identifier, IntegerLiteral, Location};
+
+        let mut checker = TypeChecker::new();
+
+        // Add a mutable i64 variable to the environment
+        checker.environment.add_variable(
+            "x".to_string(),
+            crate::env::VariableInfo {
+                var_type: Type::I64,
+                mutable: true,
+                initialized: true,
+            },
+        );
+
+        // Test x = 42 (should fail - type mismatch: i64 vs i32)
+        let assignment_expr = AssignmentExpression {
+            name: Identifier {
+                name: "x",
+                location: Location {
+                    start: 0,
+                    end: 1,
+                    context: (),
+                },
+            },
+            value: Box::new(Expression::IntegerLiteral(IntegerLiteral {
+                value: "42",
+                location: Location {
+                    start: 4,
+                    end: 6,
+                    context: (),
+                },
+            })),
+            location: Location {
+                start: 0,
+                end: 6,
+                context: (),
+            },
+        };
+
+        let result = checker.check_assignment_expression(&assignment_expr);
+        assert!(result.is_err());
+        assert!(matches!(
+            result.unwrap_err(),
+            TypeCheckError::TypeMismatch { .. }
+        ));
     }
 }
