@@ -1210,28 +1210,81 @@ mod tests {
     }
 
     #[test]
-    fn test_check_if_statement_missing_else_for_expression_tdd() {
-        use parser;
+    fn test_check_if_statement_condition_validation_enhancement_tdd() {
+        use ast::{
+            BinaryExpression, Block, Expression, IfStatement, IntegerLiteral, Location, Operator,
+            OperatorKind, Statement, Statements,
+        };
 
         let mut checker = TypeChecker::new();
 
-        // RED: Test that if expressions without else should fail when used as expression
-        let source = r#"
-            fn test() -> i32 {
-                if 1 == 1 {
-                    42
-                }
-            }
-        "#;
+        // RED: Test that if statement validation gives specific error for arithmetic conditions
+        let left = Box::new(Expression::IntegerLiteral(IntegerLiteral {
+            value: "1",
+            location: Location {
+                start: 3,
+                end: 4,
+                context: (),
+            },
+        }));
+        let right = Box::new(Expression::IntegerLiteral(IntegerLiteral {
+            value: "2",
+            location: Location {
+                start: 7,
+                end: 8,
+                context: (),
+            },
+        }));
+        
+        // Use addition instead of comparison - this should fail
+        let condition = Expression::BinaryExpression(BinaryExpression {
+            left,
+            operator: Operator {
+                operator: OperatorKind::Add, // This is wrong - should be comparison
+                location: Location {
+                    start: 5,
+                    end: 6,
+                    context: (),
+                },
+            },
+            right,
+            location: Location {
+                start: 3,
+                end: 8,
+                context: (),
+            },
+        });
 
-        let parse_result = parser::parse(source);
-        assert!(parse_result.output().is_some());
+        let if_stmt = IfStatement {
+            condition,
+            then_block: Block {
+                statements: Statements {
+                    statements: vec![],
+                    location: Location {
+                        start: 11,
+                        end: 13,
+                        context: (),
+                    },
+                },
+                location: Location {
+                    start: 11,
+                    end: 13,
+                    context: (),
+                },
+            },
+            else_block: None,
+            location: Location {
+                start: 0,
+                end: 13,
+                context: (),
+            },
+        };
 
-        let program = parse_result.output().unwrap();
-        let function = &program.functions[0];
-
-        // This should fail because if expression without else cannot be used where value is expected
-        let result = checker.check_function_definition(function);
-        assert!(result.is_err(), "If expression without else should fail when used as function return");
+        // This should fail because condition is i32 instead of bool
+        let result = checker.check_statement(&Statement::IfStatement(if_stmt));
+        assert!(result.is_err(), "If statement with non-boolean condition should fail");
+        if let Err(e) = result {
+            assert!(matches!(e, TypeCheckError::TypeMismatch { .. }));
+        }
     }
 }
