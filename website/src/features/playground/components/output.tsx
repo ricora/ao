@@ -1,4 +1,4 @@
-import { Tabs } from "@/components/ui"
+import { Tab, TabList, TabPanel, Tabs } from "@/components/ui/tabs"
 import MonacoEditor from "@monaco-editor/react"
 import { type FC, memo } from "react"
 
@@ -34,16 +34,16 @@ export type OutputProps = {
 export const Output: FC<OutputProps> = memo(({ output }) => {
   return (
     <Tabs className="h-full flex-1 gap-0 border-x-0">
-      <Tabs.List className="px-4 pt-2">
-        <Tabs.Tab id="output">Output</Tabs.Tab>
-        <Tabs.Tab id="ast">AST</Tabs.Tab>
-      </Tabs.List>
-      <Tabs.Panel className="h-full" id="output">
+      <TabList className="px-4 pt-2">
+        <Tab id="output">Output</Tab>
+        <Tab id="ast">AST</Tab>
+      </TabList>
+      <TabPanel className="h-full" id="output">
         <Editor language="plaintext" value={output?.output ?? ""} />
-      </Tabs.Panel>
-      <Tabs.Panel className="h-full" id="ast">
+      </TabPanel>
+      <TabPanel className="h-full" id="ast">
         <Editor language="json" value={JSON.stringify(output?.ast, null, 2)} />
-      </Tabs.Panel>
+      </TabPanel>
     </Tabs>
   )
 })

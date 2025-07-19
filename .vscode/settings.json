@@ -2,6 +2,9 @@
   "tailwindCSS.experimental.classRegex": [
     ["([\"'`][^\"'`]*.*?[\"'`])", "[\"'`]([^\"'`]*).*?[\"'`]"]
   ],
+  "files.associations": {
+    "*.css": "tailwindcss"
+  },
   "rust-analyzer.check.overrideCommand": [
     "cargo",
     "component",
@@ -12,5 +15,17 @@
   ],
   "evenBetterToml.schema.associations": {
     "Makefile.toml": "https://json.schemastore.org/cargo-make.json"
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[javascriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
   }
 }

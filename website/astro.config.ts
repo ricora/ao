@@ -1,6 +1,6 @@
 import react from "@astrojs/react"
 import starlight from "@astrojs/starlight"
-import tailwind from "@astrojs/tailwind"
+import tailwindcss from "@tailwindcss/vite";
 import { defineConfig } from "astro/config"
 import tsconfigPaths from "vite-tsconfig-paths"
 
@@ -9,7 +9,7 @@ export default defineConfig({
   base: "/ao",
   integrations: [
     starlight({
-      customCss: ["./src/tailwind.css"],
+      customCss: ["./src/globals.css"],
       sidebar: [
         {
           items: [{ label: "Introduction", slug: "guides/introduction" }],
@@ -22,13 +22,12 @@ export default defineConfig({
       title: "Ao Language",
     }),
     react(),
-    tailwind({ applyBaseStyles: false }),
   ],
   site: "https://ricora.github.io",
   vite: {
     optimizeDeps: {
       exclude: ["@bytecodealliance/jco/component", "@rollup/browser"],
     },
-    plugins: [tsconfigPaths()],
+    plugins: [tsconfigPaths(), tailwindcss()],
   },
 })
