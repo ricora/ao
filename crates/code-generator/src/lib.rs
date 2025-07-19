@@ -327,9 +327,11 @@ impl<'a> CodeGenerator<'a> {
     }
 
     fn generate_type(&self, ast_type: &'a ast::Type) -> core::ValType<'a> {
-        match ast_type.name {
+        match ast_type.kind {
             ast::TypeKind::I32 => core::ValType::I32,
             ast::TypeKind::I64 => core::ValType::I64,
+            ast::TypeKind::Bool => core::ValType::I32, // Boolean can be represented as i32
+            ast::TypeKind::Unit => core::ValType::I32, // Unit can also be represented as i32 (= 0)
         }
     }
 }

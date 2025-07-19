@@ -265,6 +265,8 @@ pub struct FunctionCall<'a> {
 pub enum TypeKind {
     I32,
     I64,
+    Bool,
+    Unit,
 }
 
 impl std::fmt::Display for TypeKind {
@@ -272,6 +274,8 @@ impl std::fmt::Display for TypeKind {
         match self {
             TypeKind::I32 => write!(f, "i32"),
             TypeKind::I64 => write!(f, "i64"),
+            TypeKind::Bool => write!(f, "bool"),
+            TypeKind::Unit => write!(f, "()"),
         }
     }
 }
@@ -283,6 +287,8 @@ impl std::str::FromStr for TypeKind {
         match s {
             "i32" => Ok(TypeKind::I32),
             "i64" => Ok(TypeKind::I64),
+            "bool" => Ok(TypeKind::Bool),
+            "()" => Ok(TypeKind::Unit),
             _ => Err("Invalid type"),
         }
     }
@@ -290,6 +296,6 @@ impl std::str::FromStr for TypeKind {
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct Type {
-    pub name: TypeKind,
+    pub kind: TypeKind,
     pub location: Location,
 }

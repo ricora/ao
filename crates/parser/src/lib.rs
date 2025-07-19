@@ -15,10 +15,12 @@ where
 
     let r#type = select! {
         Token::Identifier(ident) if ident == "i32" => ast::TypeKind::I32,
-        Token::Identifier(ident) if ident == "i64" => ast::TypeKind::I64
+        Token::Identifier(ident) if ident == "i64" => ast::TypeKind::I64,
+        Token::Identifier(ident) if ident == "bool" => ast::TypeKind::Bool,
+        Token::Identifier(ident) if ident == "()" => ast::TypeKind::Unit
     }
     .map_with(|kind, e: &mut MapExtra<'_, '_, I, E<'_>>| ast::Type {
-        name: kind,
+        kind,
         location: ast::Location::from(e.span()),
     })
     .boxed();

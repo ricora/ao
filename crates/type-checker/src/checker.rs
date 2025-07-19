@@ -1,5 +1,6 @@
-use crate::env::{FunctionInfo, Type, TypeEnvironment, VariableInfo};
+use crate::env::{FunctionInfo, TypeEnvironment, VariableInfo};
 use crate::error::TypeCheckError;
+use ast::TypeKind;
 
 pub struct TypeChecker {
     pub environment: TypeEnvironment,
@@ -13,15 +14,15 @@ impl TypeChecker {
         environment.add_function(
             "print_char".to_string(),
             FunctionInfo {
-                parameters: vec![Type::I32],
-                return_type: Type::I32,
+                parameters: vec![TypeKind::I32],
+                return_type: TypeKind::I32,
             },
         );
         environment.add_function(
             "print_int".to_string(),
             FunctionInfo {
-                parameters: vec![Type::I32],
-                return_type: Type::I32,
+                parameters: vec![TypeKind::I32],
+                return_type: TypeKind::I32,
             },
         );
 
@@ -31,15 +32,15 @@ impl TypeChecker {
     pub fn check_integer_literal(
         &self,
         _literal: &ast::IntegerLiteral,
-    ) -> Result<Type, TypeCheckError> {
+    ) -> Result<TypeKind, TypeCheckError> {
         // Integer literals default to i32 according to spec
-        Ok(Type::I32)
+        Ok(TypeKind::I32)
     }
 
     pub fn check_identifier_expression(
         &self,
         identifier: &ast::Identifier,
-    ) -> Result<Type, TypeCheckError> {
+    ) -> Result<TypeKind, TypeCheckError> {
         match self.environment.get_variable(identifier.name) {
             Some(var_info) => {
                 if !var_info.initialized {
@@ -67,7 +68,7 @@ impl TypeChecker {
     pub fn check_function_call(
         &mut self,
         function_call: &ast::FunctionCall,
-    ) -> Result<Type, TypeCheckError> {
+    ) -> Result<TypeKind, TypeCheckError> {
         // Lookup function in environment
         let func_info = match self.environment.get_function(function_call.name.name) {
             Some(info) => info.clone(),
@@ -100,7 +101,7 @@ impl TypeChecker {
         Ok(func_info.return_type)
     }
 
-    pub fn check_expression(&mut self, expr: &ast::Expression) -> Result<Type, TypeCheckError> {
+    pub fn check_expression(&mut self, expr: &ast::Expression) -> Result<TypeKind, TypeCheckError> {
         match expr {
             ast::Expression::IntegerLiteral(literal) => self.check_integer_literal(literal),
             ast::Expression::BinaryExpression(binary) => self.check_binary_expression(binary),
@@ -116,14 +117,14 @@ impl TypeChecker {
     pub fn check_unary_expression(
         &mut self,
         unary: &ast::UnaryExpression,
-    ) -> Result<Type, TypeCheckError> {
+    ) -> Result<TypeKind, TypeCheckError> {
         let operand_type = self.check_expression(&unary.operand)?;
 
         use ast::OperatorKind;
         match unary.operator.operator {
             // Numeric negation: operand numeric type → same type
             OperatorKind::Subtract => {
-                if matches!(operand_type, Type::I32 | Type::I64) {
+                if matches!(operand_type, TypeKind::I32 | TypeKind::I64) {
                     Ok(operand_type)
                 } else {
                     Err(TypeCheckError::TypeMismatch {
@@ -135,8 +136,8 @@ impl TypeChecker {
             }
             // Logical not: operand bool → bool
             OperatorKind::LogicalNot => {
-                if operand_type == Type::Bool {
-                    Ok(Type::Bool)
+                if operand_type == TypeKind::Bool {
+                    Ok(TypeKind::Bool)
                 } else {
                     Err(TypeCheckError::TypeMismatch {
                         expected: "bool".to_string(),
@@ -156,7 +157,7 @@ impl TypeChecker {
     pub fn check_assignment_expression(
         &mut self,
         assignment: &ast::AssignmentExpression,
-    ) -> Result<Type, TypeCheckError> {
+    ) -> Result<TypeKind, TypeCheckError> {
         // Check if the variable exists
         let var_info = match self.environment.get_variable(assignment.name.name) {
             Some(info) => info.clone(),
@@ -195,7 +196,7 @@ impl TypeChecker {
     pub fn check_binary_expression(
         &mut self,
         binary: &ast::BinaryExpression,
-    ) -> Result<Type, TypeCheckError> {
+    ) -> Result<TypeKind, TypeCheckError> {
         let left_type = self.check_expression(&binary.left)?;
         let right_type = self.check_expression(&binary.right)?;
 
@@ -206,7 +207,7 @@ impl TypeChecker {
             | OperatorKind::Subtract
             | OperatorKind::Multiply
             | OperatorKind::Divide => {
-                if left_type == right_type && matches!(left_type, Type::I32 | Type::I64) {
+                if left_type == right_type && matches!(left_type, TypeKind::I32 | TypeKind::I64) {
                     Ok(left_type)
                 } else {
                     Err(TypeCheckError::TypeMismatch {
@@ -224,7 +225,7 @@ impl TypeChecker {
             | OperatorKind::Equal
             | OperatorKind::NotEqual => {
                 if left_type == right_type {
-                    Ok(Type::Bool)
+                    Ok(TypeKind::Bool)
                 } else {
                     Err(TypeCheckError::TypeMismatch {
                         expected: left_type.to_string(),
@@ -235,12 +236,12 @@ impl TypeChecker {
             }
             // Logical operators: operands bool → bool
             OperatorKind::LogicalAnd | OperatorKind::LogicalOr => {
-                if left_type == Type::Bool && right_type == Type::Bool {
-                    Ok(Type::Bool)
+                if left_type == TypeKind::Bool && right_type == TypeKind::Bool {
+                    Ok(TypeKind::Bool)
                 } else {
                     Err(TypeCheckError::TypeMismatch {
                         expected: "bool".to_string(),
-                        found: if left_type != Type::Bool {
+                        found: if left_type != TypeKind::Bool {
                             left_type.to_string()
                         } else {
                             right_type.to_string()
@@ -260,7 +261,7 @@ impl TypeChecker {
         &mut self,
         var_def: &ast::VariableDefinition,
     ) -> Result<(), TypeCheckError> {
-        let declared_type = Type::from(var_def.variable_type.name.clone());
+        let declared_type = var_def.variable_type.kind.clone();
 
         let initialized = if let Some(value_expr) = &var_def.value {
             // Check if the value expression type matches the declared type
@@ -304,10 +305,10 @@ impl TypeChecker {
     pub fn check_if_statement(
         &mut self,
         if_stmt: &ast::IfStatement,
-    ) -> Result<Type, TypeCheckError> {
+    ) -> Result<TypeKind, TypeCheckError> {
         // Validate condition type - must be boolean
         let condition_type = self.check_expression(&if_stmt.condition)?;
-        if condition_type != Type::Bool {
+        if condition_type != TypeKind::Bool {
             return Err(TypeCheckError::TypeMismatch {
                 expected: "bool".to_string(),
                 found: condition_type.to_string(),
@@ -324,29 +325,32 @@ impl TypeChecker {
         }
 
         // If statements always evaluate to Unit type
-        Ok(Type::Unit)
+        Ok(TypeKind::Unit)
     }
 
-    pub fn check_statement(&mut self, statement: &ast::Statement) -> Result<Type, TypeCheckError> {
+    pub fn check_statement(
+        &mut self,
+        statement: &ast::Statement,
+    ) -> Result<TypeKind, TypeCheckError> {
         match statement {
             ast::Statement::VariableDefinition(var_def) => {
                 self.check_variable_definition(var_def)?;
-                Ok(Type::Unit)
+                Ok(TypeKind::Unit)
             }
             ast::Statement::ExpressionStatement(expr_stmt) => {
                 self.check_expression(&expr_stmt.expression)?;
-                Ok(Type::Unit)
+                Ok(TypeKind::Unit)
             }
             ast::Statement::IfStatement(if_stmt) => self.check_if_statement(if_stmt),
             ast::Statement::Expression(expr) => self.check_expression(expr),
         }
     }
 
-    pub fn check_block(&mut self, block: &ast::Block) -> Result<Type, TypeCheckError> {
+    pub fn check_block(&mut self, block: &ast::Block) -> Result<TypeKind, TypeCheckError> {
         let statements = &block.statements.statements;
 
         if statements.is_empty() {
-            return Ok(Type::Unit);
+            return Ok(TypeKind::Unit);
         }
 
         // Enter new scope for this block
@@ -380,7 +384,7 @@ impl TypeChecker {
         &mut self,
         func_def: &ast::FunctionDefinition,
     ) -> Result<(), TypeCheckError> {
-        let return_type = Type::from(func_def.return_type.name.clone());
+        let return_type = func_def.return_type.kind.clone();
 
         // Check for duplicate function definition
         if self.environment.get_function(func_def.name.name).is_some() {
@@ -391,11 +395,11 @@ impl TypeChecker {
         }
 
         // Collect parameter types
-        let param_types: Vec<Type> = func_def
+        let param_types: Vec<TypeKind> = func_def
             .parameters
             .parameters
             .iter()
-            .map(|param| Type::from(param.parameter_type.name.clone()))
+            .map(|param| param.parameter_type.kind.clone())
             .collect();
 
         // Add function to environment
@@ -480,7 +484,7 @@ mod tests {
         };
 
         let result = checker.check_integer_literal(&literal);
-        assert_eq!(result.unwrap(), Type::I32);
+        assert_eq!(result.unwrap(), TypeKind::I32);
     }
 
     #[test]
@@ -526,7 +530,7 @@ mod tests {
         };
 
         let result = checker.check_binary_expression(&binary_expr);
-        assert_eq!(result.unwrap(), Type::I32);
+        assert_eq!(result.unwrap(), TypeKind::I32);
     }
 
     #[test]
@@ -551,7 +555,7 @@ mod tests {
 
             // Check that variable was added to environment
             let var_info = checker.environment.get_variable("x").unwrap();
-            assert_eq!(var_info.var_type, Type::I32);
+            assert_eq!(var_info.var_type, TypeKind::I32);
             assert!(!var_info.mutable);
             assert!(var_info.initialized);
         } else {
@@ -578,8 +582,8 @@ mod tests {
 
         // Check that function was added to environment
         let func_info = checker.environment.get_function("add").unwrap();
-        assert_eq!(func_info.parameters, vec![Type::I32, Type::I32]);
-        assert_eq!(func_info.return_type, Type::I32);
+        assert_eq!(func_info.parameters, vec![TypeKind::I32, TypeKind::I32]);
+        assert_eq!(func_info.return_type, TypeKind::I32);
     }
 
     #[test]
@@ -634,8 +638,8 @@ mod tests {
 
         // Verify function was registered
         let func_info = checker.environment.get_function("add").unwrap();
-        assert_eq!(func_info.parameters, vec![Type::I32, Type::I32]);
-        assert_eq!(func_info.return_type, Type::I32);
+        assert_eq!(func_info.parameters, vec![TypeKind::I32, TypeKind::I32]);
+        assert_eq!(func_info.return_type, TypeKind::I32);
     }
 
     #[test]
@@ -704,11 +708,11 @@ mod tests {
         if let ast::Statement::VariableDefinition(_) = &statements[0] {
             let result = checker.check_statement(&statements[0]);
             assert!(result.is_ok());
-            assert_eq!(result.unwrap(), Type::Unit);
+            assert_eq!(result.unwrap(), TypeKind::Unit);
 
             // Check that variable was added to environment
             let var_info = checker.environment.get_variable("x").unwrap();
-            assert_eq!(var_info.var_type, Type::I32);
+            assert_eq!(var_info.var_type, TypeKind::I32);
         } else {
             panic!("Expected variable definition statement");
         }
@@ -737,7 +741,7 @@ mod tests {
         if let ast::Statement::ExpressionStatement(_) = &statements[1] {
             let result = checker.check_statement(&statements[1]);
             assert!(result.is_ok());
-            assert_eq!(result.unwrap(), Type::Unit);
+            assert_eq!(result.unwrap(), TypeKind::Unit);
         } else {
             panic!("Expected expression statement");
         }
@@ -766,7 +770,7 @@ mod tests {
         if let ast::Statement::Expression(_) = &statements[1] {
             let result = checker.check_statement(&statements[1]);
             assert!(result.is_ok());
-            assert_eq!(result.unwrap(), Type::I32);
+            assert_eq!(result.unwrap(), TypeKind::I32);
         } else {
             panic!("Expected expression statement");
         }
@@ -900,7 +904,7 @@ mod tests {
 
         let result = checker.check_unary_expression(&unary_expr);
         assert!(result.is_ok());
-        assert_eq!(result.unwrap(), Type::Bool);
+        assert_eq!(result.unwrap(), TypeKind::Bool);
     }
 
     #[test]
@@ -913,7 +917,7 @@ mod tests {
         checker.environment.add_variable(
             "x".to_string(),
             crate::env::VariableInfo {
-                var_type: Type::I32,
+                var_type: TypeKind::I32,
                 mutable: true,
                 initialized: true,
             },
@@ -946,7 +950,7 @@ mod tests {
 
         let result = checker.check_assignment_expression(&assignment_expr);
         assert!(result.is_ok());
-        assert_eq!(result.unwrap(), Type::I32);
+        assert_eq!(result.unwrap(), TypeKind::I32);
     }
 
     #[test]
@@ -959,7 +963,7 @@ mod tests {
         checker.environment.add_variable(
             "x".to_string(),
             crate::env::VariableInfo {
-                var_type: Type::I32,
+                var_type: TypeKind::I32,
                 mutable: false,
                 initialized: true,
             },
@@ -1047,7 +1051,7 @@ mod tests {
         checker.environment.add_variable(
             "x".to_string(),
             crate::env::VariableInfo {
-                var_type: Type::I64,
+                var_type: TypeKind::I64,
                 mutable: true,
                 initialized: true,
             },
@@ -1242,7 +1246,7 @@ mod tests {
         // Test that check_if_statement returns Unit type
         let result = checker.check_statement(&Statement::IfStatement(if_stmt));
         assert!(result.is_ok());
-        assert_eq!(result.unwrap(), Type::Unit);
+        assert_eq!(result.unwrap(), TypeKind::Unit);
     }
 
     #[test]

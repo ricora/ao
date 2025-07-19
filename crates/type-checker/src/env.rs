@@ -1,45 +1,17 @@
 use ast::TypeKind;
 use std::collections::HashMap;
 
-#[derive(Debug, Clone, PartialEq)]
-pub enum Type {
-    I32,
-    I64,
-    Bool,
-    Unit,
-}
-
-impl From<TypeKind> for Type {
-    fn from(type_kind: TypeKind) -> Self {
-        match type_kind {
-            TypeKind::I32 => Type::I32,
-            TypeKind::I64 => Type::I64,
-        }
-    }
-}
-
-impl std::fmt::Display for Type {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            Type::I32 => write!(f, "i32"),
-            Type::I64 => write!(f, "i64"),
-            Type::Bool => write!(f, "bool"),
-            Type::Unit => write!(f, "()"),
-        }
-    }
-}
-
 #[derive(Debug, Clone)]
 pub struct VariableInfo {
-    pub var_type: Type,
+    pub var_type: TypeKind,
     pub mutable: bool,
     pub initialized: bool,
 }
 
 #[derive(Debug, Clone)]
 pub struct FunctionInfo {
-    pub parameters: Vec<Type>,
-    pub return_type: Type,
+    pub parameters: Vec<TypeKind>,
+    pub return_type: TypeKind,
 }
 
 #[derive(Debug, Clone)]
@@ -124,14 +96,14 @@ mod tests {
         env.add_variable(
             "x".to_string(),
             VariableInfo {
-                var_type: Type::I32,
+                var_type: TypeKind::I32,
                 mutable: false,
                 initialized: true,
             },
         );
 
         let var_info = env.get_variable("x").unwrap();
-        assert_eq!(var_info.var_type, Type::I32);
+        assert_eq!(var_info.var_type, TypeKind::I32);
         assert!(!var_info.mutable);
         assert!(var_info.initialized);
     }
@@ -145,7 +117,7 @@ mod tests {
         env.add_variable(
             "x".to_string(),
             VariableInfo {
-                var_type: Type::I32,
+                var_type: TypeKind::I32,
                 mutable: false,
                 initialized: true,
             },
@@ -156,7 +128,7 @@ mod tests {
         env.add_variable(
             "y".to_string(),
             VariableInfo {
-                var_type: Type::I64,
+                var_type: TypeKind::I64,
                 mutable: false,
                 initialized: true,
             },
@@ -184,7 +156,7 @@ mod tests {
         env.add_variable(
             "global".to_string(),
             VariableInfo {
-                var_type: Type::I32,
+                var_type: TypeKind::I32,
                 mutable: false,
                 initialized: true,
             },
@@ -195,7 +167,7 @@ mod tests {
         env.add_variable(
             "level1".to_string(),
             VariableInfo {
-                var_type: Type::I64,
+                var_type: TypeKind::I64,
                 mutable: false,
                 initialized: true,
             },
@@ -206,7 +178,7 @@ mod tests {
         env.add_variable(
             "level2".to_string(),
             VariableInfo {
-                var_type: Type::Bool,
+                var_type: TypeKind::Bool,
                 mutable: false,
                 initialized: true,
             },
@@ -238,21 +210,21 @@ mod tests {
         env.add_variable(
             "x".to_string(),
             VariableInfo {
-                var_type: Type::I32,
+                var_type: TypeKind::I32,
                 mutable: false,
                 initialized: true,
             },
         );
 
         // Verify outer variable
-        assert_eq!(env.get_variable("x").unwrap().var_type, Type::I32);
+        assert_eq!(env.get_variable("x").unwrap().var_type, TypeKind::I32);
 
         // Enter inner scope and shadow 'x'
         env.push_scope();
         env.add_variable(
             "x".to_string(),
             VariableInfo {
-                var_type: Type::I64,
+                var_type: TypeKind::I64,
                 mutable: true,
                 initialized: true,
             },
@@ -260,7 +232,7 @@ mod tests {
 
         // Should see inner variable (shadowing)
         let var_info = env.get_variable("x").unwrap();
-        assert_eq!(var_info.var_type, Type::I64);
+        assert_eq!(var_info.var_type, TypeKind::I64);
         assert!(var_info.mutable);
 
         // Exit inner scope
@@ -268,7 +240,7 @@ mod tests {
 
         // Should see outer variable again
         let var_info = env.get_variable("x").unwrap();
-        assert_eq!(var_info.var_type, Type::I32);
+        assert_eq!(var_info.var_type, TypeKind::I32);
         assert!(!var_info.mutable);
     }
 
@@ -279,14 +251,14 @@ mod tests {
         env.add_function(
             "test_func".to_string(),
             FunctionInfo {
-                parameters: vec![Type::I32, Type::I64],
-                return_type: Type::Bool,
+                parameters: vec![TypeKind::I32, TypeKind::I64],
+                return_type: TypeKind::Bool,
             },
         );
 
         let func_info = env.get_function("test_func").unwrap();
-        assert_eq!(func_info.parameters, vec![Type::I32, Type::I64]);
-        assert_eq!(func_info.return_type, Type::Bool);
+        assert_eq!(func_info.parameters, vec![TypeKind::I32, TypeKind::I64]);
+        assert_eq!(func_info.return_type, TypeKind::Bool);
 
         assert!(env.get_function("nonexistent").is_none());
     }
@@ -299,7 +271,7 @@ mod tests {
         env.add_variable(
             "global".to_string(),
             VariableInfo {
-                var_type: Type::I32,
+                var_type: TypeKind::I32,
                 mutable: false,
                 initialized: true,
             },
@@ -317,7 +289,7 @@ mod tests {
         env.add_variable(
             "local".to_string(),
             VariableInfo {
-                var_type: Type::I64,
+                var_type: TypeKind::I64,
                 mutable: false,
                 initialized: true,
             },
