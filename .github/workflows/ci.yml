@@ -19,6 +19,7 @@ jobs:
       - rust-machete
       - npm-format
       - npm-lint
+      - npm-typecheck
       - npm-build
     permissions: {}
     if: always()
