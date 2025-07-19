@@ -247,7 +247,7 @@ impl TypeChecker {
         &mut self,
         if_stmt: &ast::IfStatement,
     ) -> Result<Type, TypeCheckError> {
-        // Check that the condition is of type bool
+        // Validate condition type - must be boolean
         let condition_type = self.check_expression(&if_stmt.condition)?;
         if condition_type != Type::Bool {
             return Err(TypeCheckError::TypeMismatch {
@@ -257,15 +257,15 @@ impl TypeChecker {
             });
         }
 
-        // Check the then block
+        // Check then branch - this creates a new scope
         self.check_block(&if_stmt.then_block)?;
 
-        // Check the else block if it exists
+        // Check else branch if present - this also creates a new scope
         if let Some(else_block) = &if_stmt.else_block {
             self.check_block(else_block)?;
         }
 
-        // According to the specification, if statements have type Unit
+        // If statements always evaluate to Unit type
         Ok(Type::Unit)
     }
 
