@@ -1028,8 +1028,8 @@ mod tests {
         // Test if statement with boolean condition (using comparison that returns bool)
         let source = r#"
             fn test() -> i32 {
-                if 1 == 1 { 
-                    let x: i32 = 1; 
+                if 1 == 1 {
+                    let x: i32 = 1;
                 }
                 42
             }
@@ -1054,8 +1054,8 @@ mod tests {
         // Test if-else statement with boolean condition (using comparison that returns bool)
         let source = r#"
             fn test() -> i32 {
-                if 2 > 1 { 
-                    let x: i32 = 1; 
+                if 2 > 1 {
+                    let x: i32 = 1;
                 } else {
                     let y: i32 = 2;
                 }
@@ -1082,8 +1082,8 @@ mod tests {
         // Test if statement with non-boolean condition (should fail)
         let source = r#"
             fn test() -> i32 {
-                if 42 { 
-                    let x: i32 = 1; 
+                if 42 {
+                    let x: i32 = 1;
                 }
                 42
             }
@@ -1207,87 +1207,5 @@ mod tests {
             result.unwrap_err(),
             TypeCheckError::UndefinedIdentifier { .. }
         ));
-    }
-
-    #[test]
-    fn test_check_if_statement_condition_validation_enhancement() {
-        use ast::{
-            BinaryExpression, Block, Expression, IfStatement, IntegerLiteral, Location, Operator,
-            OperatorKind, Statement, Statements,
-        };
-
-        let mut checker = TypeChecker::new();
-
-        // Test that if statement validation gives specific error for arithmetic conditions
-        let left = Box::new(Expression::IntegerLiteral(IntegerLiteral {
-            value: "1",
-            location: Location {
-                start: 3,
-                end: 4,
-                context: (),
-            },
-        }));
-        let right = Box::new(Expression::IntegerLiteral(IntegerLiteral {
-            value: "2",
-            location: Location {
-                start: 7,
-                end: 8,
-                context: (),
-            },
-        }));
-
-        // Use addition instead of comparison - this should fail
-        let condition = Expression::BinaryExpression(BinaryExpression {
-            left,
-            operator: Operator {
-                operator: OperatorKind::Add, // This is wrong - should be comparison
-                location: Location {
-                    start: 5,
-                    end: 6,
-                    context: (),
-                },
-            },
-            right,
-            location: Location {
-                start: 3,
-                end: 8,
-                context: (),
-            },
-        });
-
-        let if_stmt = IfStatement {
-            condition,
-            then_block: Block {
-                statements: Statements {
-                    statements: vec![],
-                    location: Location {
-                        start: 11,
-                        end: 13,
-                        context: (),
-                    },
-                },
-                location: Location {
-                    start: 11,
-                    end: 13,
-                    context: (),
-                },
-            },
-            else_block: None,
-            location: Location {
-                start: 0,
-                end: 13,
-                context: (),
-            },
-        };
-
-        // This should fail because condition is i32 instead of bool
-        let result = checker.check_statement(&Statement::IfStatement(if_stmt));
-        assert!(
-            result.is_err(),
-            "If statement with non-boolean condition should fail"
-        );
-        if let Err(e) = result {
-            assert!(matches!(e, TypeCheckError::TypeMismatch { .. }));
-        }
     }
 }

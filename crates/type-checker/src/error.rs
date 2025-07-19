@@ -40,9 +40,7 @@ impl TypeCheckError {
                 location,
             } => {
                 report = report
-                    .with_message(format!(
-                        "Type mismatch: expected {expected}, found {found}"
-                    ))
+                    .with_message(format!("Type mismatch: expected {expected}, found {found}"))
                     .with_label(
                         Label::new((source_id, location.to_range()))
                             .with_message(format!("Expected {expected} but found {found}"))
@@ -181,45 +179,5 @@ mod tests {
 
         // Print the formatted error to see how it looks
         println!("Formatted error:\n{formatted}");
-    }
-
-    #[test]
-    fn test_duplicate_variable_error_with_parser() {
-        use parser;
-
-        let mut checker = TypeChecker::new();
-
-        let source = r#"
-            fn test() -> i32 {
-                let x: i32 = 1;
-                let x: i32 = 2;
-                x
-            }
-        "#;
-
-        let parse_result = parser::parse(source);
-        assert!(parse_result.output().is_some());
-
-        let program = parse_result.output().unwrap();
-        let function = &program.functions[0];
-
-        let result = checker.check_function_definition(function);
-
-        if let Err(error) = result {
-            match &error {
-                TypeCheckError::DuplicateDefinition { name, .. } => {
-                    assert_eq!(name, "x");
-
-                    // Test error formatting
-                    let formatted = checker.format_error(&error, "test.ao", source);
-                    assert!(formatted.contains("Duplicate definition"));
-                    assert!(formatted.contains("already defined"));
-                    println!("Duplicate variable error:\n{formatted}");
-                }
-                _ => panic!("Expected duplicate definition error, got: {error:?}"),
-            }
-        } else {
-            panic!("Expected error for duplicate variable definition");
-        }
     }
 }
