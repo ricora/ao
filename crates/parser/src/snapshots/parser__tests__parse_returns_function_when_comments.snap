@@ -1,0 +1,45 @@
+---
+source: crates/parser/src/lib.rs
+expression: ast
+---
+functions:
+  - name:
+      name: main
+      location:
+        start: 21
+        end: 25
+        context: ~
+    parameters:
+      parameters: []
+      location:
+        start: 37
+        end: 26
+        context: ~
+    return_type:
+      name: I32
+      location:
+        start: 42
+        end: 45
+        context: ~
+    body:
+      statements:
+        statements:
+          - Expression:
+              IntegerLiteral:
+                value: "0"
+                location:
+                  start: 78
+                  end: 79
+                  context: ~
+        location:
+          start: 78
+          end: 79
+          context: ~
+      location:
+        start: 78
+        end: 79
+        context: ~
+    location:
+      start: 18
+      end: 93
+      context: ~

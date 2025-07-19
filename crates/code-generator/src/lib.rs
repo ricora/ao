@@ -27,13 +27,13 @@ type CoreParameters<'a> = Box<
 >;
 
 pub struct CodeGenerator<'a> {
-    ast: ast::Program,
+    ast: ast::Program<'a>,
     buffer: ParseBuffer<'a>,
     span: Span,
 }
 
-impl CodeGenerator<'_> {
-    pub fn new(ast: ast::Program) -> Result<Self> {
+impl<'a> CodeGenerator<'a> {
+    pub fn new(ast: ast::Program<'a>) -> Result<Self> {
         let buffer = ParseBuffer::new(TEMPLATE)?;
         Ok(Self {
             ast,
@@ -90,7 +90,7 @@ impl CodeGenerator<'_> {
             .collect()
     }
 
-    fn generate_function<'a>(&self, function: &'a ast::FunctionDefinition) -> core::Func<'a> {
+    fn generate_function(&self, function: &'a ast::FunctionDefinition) -> core::Func<'a> {
         core::Func {
             span: self.span,
             id: Some(self.generate_identifier(&function.name)),
@@ -112,7 +112,7 @@ impl CodeGenerator<'_> {
         }
     }
 
-    fn generate_locals<'a>(&self, body: &'a ast::Block) -> Box<[wast::core::Local<'a>]> {
+    fn generate_locals(&self, body: &'a ast::Block) -> Box<[wast::core::Local<'a>]> {
         body.statements
             .statements
             .iter()
@@ -130,7 +130,7 @@ impl CodeGenerator<'_> {
             .collect()
     }
 
-    fn generate_body<'a>(&self, body: &'a ast::Block) -> core::Expression<'a> {
+    fn generate_body(&self, body: &'a ast::Block) -> core::Expression<'a> {
         core::Expression {
             branch_hints: Box::new([]),
             instr_spans: None,
@@ -138,7 +138,7 @@ impl CodeGenerator<'_> {
         }
     }
 
-    fn generate_instructions<'a>(&self, body: &'a ast::Block) -> Box<[core::Instruction<'a>]> {
+    fn generate_instructions(&self, body: &'a ast::Block) -> Box<[core::Instruction<'a>]> {
         body.statements
             .statements
             .iter()
@@ -198,10 +198,7 @@ impl CodeGenerator<'_> {
             .collect()
     }
 
-    fn generate_expression<'a>(
-        &self,
-        expression: &'a ast::Expression,
-    ) -> Vec<core::Instruction<'a>> {
+    fn generate_expression(&self, expression: &'a ast::Expression) -> Vec<core::Instruction<'a>> {
         match expression {
             ast::Expression::BinaryExpression(expr) => {
                 let lhs = self.generate_expression(&expr.left);
@@ -277,32 +274,6 @@ impl CodeGenerator<'_> {
                 };
                 instructions
             }
-            ast::Expression::IfElseExpression(expr) => {
-                let condition = self.generate_expression(&expr.condition);
-                let then_block = self.generate_instructions(&expr.then_block);
-                let else_block = self.generate_instructions(&expr.else_block);
-                let return_type = self.generate_type(&expr.return_type);
-
-                let mut instructions =
-                    Vec::with_capacity(condition.len() + then_block.len() + else_block.len() + 3);
-                instructions.extend(condition);
-                instructions.push(core::Instruction::If(Box::new(core::BlockType {
-                    label: None,
-                    label_name: None,
-                    ty: core::TypeUse {
-                        index: None,
-                        inline: Some(core::FunctionType {
-                            params: Box::new([]),
-                            results: Box::new([return_type]),
-                        }),
-                    },
-                })));
-                instructions.extend(then_block);
-                instructions.push(core::Instruction::Else(None));
-                instructions.extend(else_block);
-                instructions.push(core::Instruction::End(None));
-                instructions
-            }
             ast::Expression::AssignmentExpression(expr) => {
                 let value = self.generate_expression(&expr.value);
                 let mut instuctions = Vec::with_capacity(value.len() + 2);
@@ -337,7 +308,7 @@ impl CodeGenerator<'_> {
         }
     }
 
-    fn generate_parameters<'a>(&self, parameters: &'a ast::Parameters) -> CoreParameters<'a> {
+    fn generate_parameters(&self, parameters: &'a ast::Parameters) -> CoreParameters<'a> {
         parameters
             .parameters
             .iter()
@@ -351,11 +322,11 @@ impl CodeGenerator<'_> {
             .collect()
     }
 
-    fn generate_identifier<'a>(&self, identifier: &'a ast::Identifier) -> wast::token::Id<'a> {
-        wast::token::Id::new(&identifier.name, self.span)
+    fn generate_identifier(&self, identifier: &'a ast::Identifier) -> wast::token::Id<'a> {
+        wast::token::Id::new(identifier.name, self.span)
     }
 
-    fn generate_type<'a>(&self, ast_type: &'a ast::Type) -> core::ValType<'a> {
+    fn generate_type(&self, ast_type: &'a ast::Type) -> core::ValType<'a> {
         match ast_type.name {
             ast::TypeKind::I32 => core::ValType::I32,
             ast::TypeKind::I64 => core::ValType::I64,
@@ -367,33 +338,38 @@ impl CodeGenerator<'_> {
 mod tests {
     use super::*;
     use ::core::str;
-    use anyhow::Context;
     use indoc::indoc;
     use pretty_assertions::assert_eq;
     use wasmtime::{
-        component::{Component, Linker, Val},
+        component::{Component, Linker},
         Config, Engine, Store,
     };
-    use wasmtime_wasi::{pipe::MemoryOutputPipe, ResourceTable, WasiCtx, WasiCtxBuilder, WasiView};
+    use wasmtime_wasi::{
+        p2::{pipe::MemoryOutputPipe, IoView, WasiCtx, WasiCtxBuilder, WasiView},
+        ResourceTable,
+    };
 
     struct State {
         ctx: WasiCtx,
         table: ResourceTable,
     }
 
-    impl WasiView for State {
-        fn ctx(&mut self) -> &mut WasiCtx {
-            &mut self.ctx
-        }
-
+    impl IoView for State {
         fn table(&mut self) -> &mut ResourceTable {
             &mut self.table
         }
     }
 
+    impl WasiView for State {
+        fn ctx(&mut self) -> &mut WasiCtx {
+            &mut self.ctx
+        }
+    }
+
     fn compile(source: &str) -> Result<Vec<u8>> {
-        let tokens = tokenizer::tokenize(source.to_string());
-        let ast = parser::parse(tokens);
+        let ast = parser::parse(source)
+            .into_result()
+            .expect("Failed to parse source code into AST"); // TODO: Implement error handling
         let mut generator = CodeGenerator::new(ast)?;
         let mut wat = generator.generate()?;
         let wasm = wat.encode()?;
@@ -413,13 +389,13 @@ mod tests {
         let engine = Engine::new(&config)?;
 
         let mut linker = Linker::<State>::new(&engine);
-        wasmtime_wasi::add_to_linker_sync(&mut linker)?;
+        wasmtime_wasi::p2::add_to_linker_sync(&mut linker)?;
 
-        let stdout_steram = MemoryOutputPipe::new(1024);
+        let stdout_stream = MemoryOutputPipe::new(1024);
         let stderr_stream = MemoryOutputPipe::new(1024);
 
         let mut builder = WasiCtxBuilder::new();
-        builder.stdout(stdout_steram.clone());
+        builder.stdout(stdout_stream.clone());
         builder.stderr(stderr_stream.clone());
         let wasi_ctx = builder.build();
 
@@ -434,26 +410,22 @@ mod tests {
         let wasm = compile(source)?;
         let component = Component::from_binary(&engine, &wasm)?;
 
-        let instance = linker.instantiate(&mut store, &component)?;
-
-        let main_index = instance
-            .get_export(&mut store, None, "wasi:cli/run@0.2.2")
-            .context(
-                "failed to find the index of the exported instance named 'wasi:cli/run@0.2.2'",
-            )?;
-        let run_index = instance
-            .get_export(&mut store, Some(&main_index), "run")
-            .context(
-            "failed to find the index of the exported function named 'run' in the 'wasi:cli/run@0.2.2' instance",
-        )?;
-        let run = instance.get_func(&mut store, run_index).context(
-            "failed to find the exported function named 'run' in the 'wasi:cli/run@0.2.2' instance",
+        let command = wasmtime_wasi::p2::bindings::sync::Command::instantiate(
+            &mut store, &component, &linker,
         )?;
 
-        let mut results = [Val::Result(Ok(None))];
-        run.call(&mut store, &[], &mut results)?;
+        let result = command.wasi_cli_run().call_run(&mut store)?;
+        match result {
+            Ok(_) => {
+                // Normal termination
+            }
+            Err(()) => {
+                // Error handling
+                return Err(anyhow::anyhow!("Component execution failed"));
+            }
+        }
 
-        let stdout_bytes = stdout_steram.contents();
+        let stdout_bytes = stdout_stream.contents();
         let stdout_str = str::from_utf8(&stdout_bytes)?;
 
         let stderr_bytes = stderr_stream.contents();
@@ -569,22 +541,6 @@ mod tests {
         "};
         let stdout = run(source).unwrap().stdout;
         assert_eq!(stdout, "3");
-    }
-
-    #[test]
-    fn if_expression() {
-        let source = indoc! {"
-            fn main() -> i32 {
-                print_int(if 1 { 1 } else { 2 } as i32);
-                print_char(32); // ' '
-                print_int(if 0 { 3 } else { 4 } as i32);
-                print_char(32); // ' '
-                print_int(if 0 { 5 } else if 1 { 6 } else { 7 } as i32);
-                0
-            }
-        "};
-        let stdout = run(source).unwrap().stdout;
-        assert_eq!(stdout, "1 4 6");
     }
 
     #[test]

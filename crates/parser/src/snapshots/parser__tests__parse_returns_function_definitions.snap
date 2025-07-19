@@ -1,0 +1,85 @@
+---
+source: crates/parser/src/lib.rs
+expression: ast
+---
+functions:
+  - name:
+      name: foo
+      location:
+        start: 3
+        end: 6
+        context: ~
+    parameters:
+      parameters: []
+      location:
+        start: 7
+        end: 7
+        context: ~
+    return_type:
+      name: I64
+      location:
+        start: 12
+        end: 15
+        context: ~
+    body:
+      statements:
+        statements:
+          - Expression:
+              IntegerLiteral:
+                value: "0"
+                location:
+                  start: 18
+                  end: 19
+                  context: ~
+        location:
+          start: 18
+          end: 19
+          context: ~
+      location:
+        start: 18
+        end: 19
+        context: ~
+    location:
+      start: 0
+      end: 21
+      context: ~
+  - name:
+      name: bar
+      location:
+        start: 25
+        end: 28
+        context: ~
+    parameters:
+      parameters: []
+      location:
+        start: 29
+        end: 29
+        context: ~
+    return_type:
+      name: I32
+      location:
+        start: 34
+        end: 37
+        context: ~
+    body:
+      statements:
+        statements:
+          - Expression:
+              IntegerLiteral:
+                value: "1"
+                location:
+                  start: 40
+                  end: 41
+                  context: ~
+        location:
+          start: 40
+          end: 41
+          context: ~
+      location:
+        start: 40
+        end: 41
+        context: ~
+    location:
+      start: 22
+      end: 43
+      context: ~

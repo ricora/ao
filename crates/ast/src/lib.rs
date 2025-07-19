@@ -1,88 +1,136 @@
 use serde::{Deserialize, Serialize};
-use tokenizer::position::Position;
 
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-pub struct Program {
-    pub functions: Vec<FunctionDefinition>,
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct Location<T = usize, C = ()> {
+    /// The start position of the location in the source code
+    pub start: T,
+    /// The end position of the location in the source code
+    pub end: T,
+    /// Additional context for the location, if any
+    pub context: C,
+}
+
+impl From<chumsky::span::SimpleSpan> for Location {
+    fn from(span: chumsky::span::SimpleSpan) -> Self {
+        Location {
+            start: span.start,
+            end: span.end,
+            context: span.context,
+        }
+    }
+}
+
+impl Location {
+    pub fn to_range(&self) -> std::ops::Range<usize> {
+        self.start..self.end
+    }
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-pub struct FunctionDefinition {
-    pub name: Identifier,
-    pub parameters: Parameters,
+pub struct Program<'a> {
+    #[serde(borrow)]
+    pub functions: Vec<FunctionDefinition<'a>>,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct FunctionDefinition<'a> {
+    #[serde(borrow)]
+    pub name: Identifier<'a>,
+    #[serde(borrow)]
+    pub parameters: Parameters<'a>,
     pub return_type: Type,
-    pub body: Block,
+    #[serde(borrow)]
+    pub body: Block<'a>,
     pub location: Location,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-pub struct Parameters {
-    pub parameters: Vec<Parameter>,
+pub struct Parameters<'a> {
+    #[serde(borrow)]
+    pub parameters: Vec<Parameter<'a>>,
     pub location: Location,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-pub struct Parameter {
-    pub name: Identifier,
+pub struct Parameter<'a> {
+    #[serde(borrow)]
+    pub name: Identifier<'a>,
     pub parameter_type: Type,
     pub location: Location,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-pub struct Block {
-    pub statements: Statements,
+pub struct Block<'a> {
+    #[serde(borrow)]
+    pub statements: Statements<'a>,
     pub location: Location,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-pub struct Statements {
-    pub statements: Vec<Statement>,
+pub struct Statements<'a> {
+    #[serde(borrow)]
+    pub statements: Vec<Statement<'a>>,
     pub location: Location,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-pub enum Statement {
-    ExpressionStatement(ExpressionStatement),
-    VariableDefinition(VariableDefinition),
-    IfStatement(IfStatement),
-    Expression(Expression),
+pub enum Statement<'a> {
+    #[serde(borrow)]
+    ExpressionStatement(ExpressionStatement<'a>),
+    #[serde(borrow)]
+    VariableDefinition(VariableDefinition<'a>),
+    #[serde(borrow)]
+    IfStatement(IfStatement<'a>),
+    #[serde(borrow)]
+    Expression(Expression<'a>),
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-pub struct ExpressionStatement {
-    pub expression: Expression,
+pub struct ExpressionStatement<'a> {
+    #[serde(borrow)]
+    pub expression: Expression<'a>,
     pub location: Location,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-pub struct VariableDefinition {
-    pub name: Identifier,
+pub struct VariableDefinition<'a> {
+    #[serde(borrow)]
+    pub name: Identifier<'a>,
     pub mutable: bool,
     pub variable_type: Type,
-    pub value: Option<Expression>,
+    #[serde(borrow)]
+    pub value: Option<Expression<'a>>,
     pub location: Location,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-pub struct IfStatement {
-    pub condition: Expression,
-    pub then_block: Block,
-    pub else_block: Option<Block>,
+pub struct IfStatement<'a> {
+    #[serde(borrow)]
+    pub condition: Expression<'a>,
+    #[serde(borrow)]
+    pub then_block: Block<'a>,
+    #[serde(borrow)]
+    pub else_block: Option<Block<'a>>,
     pub location: Location,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-pub enum Expression {
-    BinaryExpression(BinaryExpression),
-    UnaryExpression(UnaryExpression),
-    AssignmentExpression(AssignmentExpression),
-    IfElseExpression(IfElseExpression),
-    Identifier(Identifier),
-    IntegerLiteral(IntegerLiteral),
-    FunctionCall(FunctionCall),
+pub enum Expression<'a> {
+    #[serde(borrow)]
+    BinaryExpression(BinaryExpression<'a>),
+    #[serde(borrow)]
+    UnaryExpression(UnaryExpression<'a>),
+    #[serde(borrow)]
+    AssignmentExpression(AssignmentExpression<'a>),
+    #[serde(borrow)]
+    Identifier(Identifier<'a>),
+    #[serde(borrow)]
+    IntegerLiteral(IntegerLiteral<'a>),
+    #[serde(borrow)]
+    FunctionCall(FunctionCall<'a>),
 }
 
-impl Expression {
+impl<'a> Expression<'a> {
     pub fn location(&self) -> &Location {
         match self {
             Expression::BinaryExpression(binary_expression) => &binary_expression.location,
@@ -90,7 +138,6 @@ impl Expression {
             Expression::AssignmentExpression(assignment_expression) => {
                 &assignment_expression.location
             }
-            Expression::IfElseExpression(if_else_expression) => &if_else_expression.location,
             Expression::Identifier(identifier) => &identifier.location,
             Expression::IntegerLiteral(integer_literal) => &integer_literal.location,
             Expression::FunctionCall(function_call) => &function_call.location,
@@ -136,7 +183,7 @@ impl std::fmt::Display for OperatorKind {
 }
 
 impl std::str::FromStr for OperatorKind {
-    type Err = String;
+    type Err = &'static str;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
@@ -153,7 +200,7 @@ impl std::str::FromStr for OperatorKind {
             "&&" => Ok(OperatorKind::LogicalAnd),
             "||" => Ok(OperatorKind::LogicalOr),
             "!" => Ok(OperatorKind::LogicalNot),
-            _ => Err(format!("Invalid operator: {}", s)),
+            _ => Err("Invalid operator"),
         }
     }
 }
@@ -165,52 +212,52 @@ pub struct Operator {
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-pub struct BinaryExpression {
-    pub left: Box<Expression>,
+pub struct BinaryExpression<'a> {
+    #[serde(borrow)]
+    pub left: Box<Expression<'a>>,
     pub operator: Operator,
-    pub right: Box<Expression>,
+    #[serde(borrow)]
+    pub right: Box<Expression<'a>>,
     pub location: Location,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-pub struct UnaryExpression {
+pub struct UnaryExpression<'a> {
     pub operator: Operator,
-    pub operand: Box<Expression>,
+    #[serde(borrow)]
+    pub operand: Box<Expression<'a>>,
     pub location: Location,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-pub struct AssignmentExpression {
-    pub name: Identifier,
-    pub value: Box<Expression>,
+pub struct AssignmentExpression<'a> {
+    #[serde(borrow)]
+    pub name: Identifier<'a>,
+    #[serde(borrow)]
+    pub value: Box<Expression<'a>>,
     pub location: Location,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-pub struct IfElseExpression {
-    pub condition: Box<Expression>,
-    pub then_block: Block,
-    pub else_block: Block,
-    pub return_type: Type,
+pub struct Identifier<'a> {
+    #[serde(borrow)]
+    pub name: &'a str,
     pub location: Location,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-pub struct Identifier {
-    pub name: String,
+pub struct IntegerLiteral<'a> {
+    #[serde(borrow)]
+    pub value: &'a str,
     pub location: Location,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-pub struct IntegerLiteral {
-    pub value: String,
-    pub location: Location,
-}
-
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-pub struct FunctionCall {
-    pub name: Identifier,
-    pub arguments: Vec<Expression>,
+pub struct FunctionCall<'a> {
+    #[serde(borrow)]
+    pub name: Identifier<'a>,
+    #[serde(borrow)]
+    pub arguments: Vec<Expression<'a>>,
     pub location: Location,
 }
 
@@ -230,13 +277,13 @@ impl std::fmt::Display for TypeKind {
 }
 
 impl std::str::FromStr for TypeKind {
-    type Err = String;
+    type Err = &'static str;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
             "i32" => Ok(TypeKind::I32),
             "i64" => Ok(TypeKind::I64),
-            _ => Err(format!("Invalid type: {}", s)),
+            _ => Err("Invalid type"),
         }
     }
 }
@@ -245,10 +292,4 @@ impl std::str::FromStr for TypeKind {
 pub struct Type {
     pub name: TypeKind,
     pub location: Location,
-}
-
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-pub struct Location {
-    pub start: Position,
-    pub end: Position,
 }

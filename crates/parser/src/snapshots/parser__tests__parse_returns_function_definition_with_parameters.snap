@@ -1,0 +1,96 @@
+---
+source: crates/parser/src/lib.rs
+expression: ast
+---
+functions:
+  - name:
+      name: add
+      location:
+        start: 3
+        end: 6
+        context: ~
+    parameters:
+      parameters:
+        - name:
+            name: x
+            location:
+              start: 7
+              end: 8
+              context: ~
+          parameter_type:
+            name: I64
+            location:
+              start: 10
+              end: 13
+              context: ~
+          location:
+            start: 7
+            end: 13
+            context: ~
+        - name:
+            name: y
+            location:
+              start: 15
+              end: 16
+              context: ~
+          parameter_type:
+            name: I64
+            location:
+              start: 18
+              end: 21
+              context: ~
+          location:
+            start: 15
+            end: 21
+            context: ~
+      location:
+        start: 7
+        end: 21
+        context: ~
+    return_type:
+      name: I64
+      location:
+        start: 26
+        end: 29
+        context: ~
+    body:
+      statements:
+        statements:
+          - Expression:
+              BinaryExpression:
+                left:
+                  Identifier:
+                    name: x
+                    location:
+                      start: 36
+                      end: 37
+                      context: ~
+                operator:
+                  operator: Add
+                  location:
+                    start: 0
+                    end: 0
+                    context: ~
+                right:
+                  Identifier:
+                    name: y
+                    location:
+                      start: 40
+                      end: 41
+                      context: ~
+                location:
+                  start: 0
+                  end: 0
+                  context: ~
+        location:
+          start: 36
+          end: 41
+          context: ~
+      location:
+        start: 36
+        end: 41
+        context: ~
+    location:
+      start: 0
+      end: 43
+      context: ~

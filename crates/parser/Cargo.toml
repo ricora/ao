@@ -5,8 +5,10 @@ edition = "2021"
 
 [dependencies]
 ast = { workspace = true }
-tokenizer = { workspace = true }
+chumsky = { workspace = true }
+logos = { workspace = true }
 
 [dev-dependencies]
 indoc = { workspace = true }
 pretty_assertions = { workspace = true }
+insta = { workspace = true }

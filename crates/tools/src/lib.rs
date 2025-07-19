@@ -5,7 +5,6 @@ use anyhow::Context;
 use bindings::Guest;
 use code_generator::CodeGenerator;
 use parser::parse;
-use tokenizer::tokenize;
 
 #[derive(Debug, thiserror::Error)]
 enum Error {
@@ -25,8 +24,7 @@ struct Component;
 
 impl Guest for Component {
     fn compile(source: String) -> Result<bindings::Output, bindings::Error> {
-        let tokens = tokenize(source);
-        let ast = parse(tokens.clone());
+        let ast = parse(&source).unwrap();
         let mut generator =
             CodeGenerator::new(ast.clone()).with_context(|| "Failed to create code generator")?;
         let mut wat = generator
@@ -34,7 +32,6 @@ impl Guest for Component {
             .with_context(|| "Failed to generate WAT")?;
         let wasm = wat.encode().with_context(|| "Failed to encode WAT")?;
         Ok(bindings::Output {
-            tokens: serde_json::to_string(&tokens).with_context(|| "Failed to serialize tokens")?,
             ast: serde_json::to_string(&ast).with_context(|| "Failed to serialize AST")?,
             wasm,
         })

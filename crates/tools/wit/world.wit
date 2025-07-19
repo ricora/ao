@@ -3,7 +3,6 @@ package component:tools;
 /// An example world for the component to target.
 world example {
     record output {
-        tokens: string,
         ast: string,
         wasm: list<u8>,
     }

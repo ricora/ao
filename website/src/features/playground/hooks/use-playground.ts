@@ -6,7 +6,6 @@ import { runCli, transpile } from "../lib/wasm"
 export type Output = {
   ast: unknown
   output: string
-  tokens: unknown
 }
 
 type WasiCliRun = {
@@ -20,7 +19,7 @@ export const usePlayground = () => {
   const [output, setOutput] = useState<Output | undefined>()
 
   const run = async () => {
-    const { ast, tokens, wasm } = compile(code)
+    const { ast, wasm } = compile(code)
     const { "wasi:cli/run@0.2.2": entrypoint } = await transpile<WasiCliRun>(
       wasm,
       "main",
@@ -29,7 +28,6 @@ export const usePlayground = () => {
     setOutput({
       ast: JSON.parse(ast),
       output,
-      tokens: JSON.parse(tokens),
     })
   }
 
