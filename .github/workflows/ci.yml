@@ -36,7 +36,7 @@ jobs:
       - name: Cache dependencies
         uses: Swatinem/rust-cache@9d47c6ad4b02e050fd481d890b2ea34778fd09d6 # v2.7.8
       - name: Install cargo-binstall
-        uses: cargo-bins/cargo-binstall@b9bf4400702f721d469eec4d280125f650c85638 # v1.12.2
+        uses: cargo-bins/cargo-binstall@8aac5aa2bf0dfaa2863eccad9f43c68fe40e5ec8 # v1.14.1
       - name: Install cargo-make
         run: cargo binstall cargo-make --force
       - name: Check formatting
@@ -52,7 +52,7 @@ jobs:
       - name: Cache dependencies
         uses: Swatinem/rust-cache@9d47c6ad4b02e050fd481d890b2ea34778fd09d6 # v2.7.8
       - name: Install cargo-binstall
-        uses: cargo-bins/cargo-binstall@b9bf4400702f721d469eec4d280125f650c85638 # v1.12.2
+        uses: cargo-bins/cargo-binstall@8aac5aa2bf0dfaa2863eccad9f43c68fe40e5ec8 # v1.14.1
       - name: Install cargo-make
         run: cargo binstall cargo-make --force
       - name: Check linting
@@ -81,7 +81,7 @@ jobs:
       - name: Cache dependencies
         uses: Swatinem/rust-cache@9d47c6ad4b02e050fd481d890b2ea34778fd09d6 # v2.7.8
       - name: Install cargo-binstall
-        uses: cargo-bins/cargo-binstall@b9bf4400702f721d469eec4d280125f650c85638 # v1.12.2
+        uses: cargo-bins/cargo-binstall@8aac5aa2bf0dfaa2863eccad9f43c68fe40e5ec8 # v1.14.1
       - name: Install cargo-make
         run: cargo binstall cargo-make --force
       - name: Install target
@@ -101,7 +101,7 @@ jobs:
       - name: Cache dependencies
         uses: Swatinem/rust-cache@9d47c6ad4b02e050fd481d890b2ea34778fd09d6 # v2.7.8
       - name: Install cargo-binstall
-        uses: cargo-bins/cargo-binstall@b9bf4400702f721d469eec4d280125f650c85638 # v1.12.2
+        uses: cargo-bins/cargo-binstall@8aac5aa2bf0dfaa2863eccad9f43c68fe40e5ec8 # v1.14.1
       - name: Install cargo-make
         run: cargo binstall cargo-make --force
       - name: Test
@@ -117,7 +117,7 @@ jobs:
       - name: Cache dependencies
         uses: Swatinem/rust-cache@9d47c6ad4b02e050fd481d890b2ea34778fd09d6 # v2.7.8
       - name: Install cargo-binstall
-        uses: cargo-bins/cargo-binstall@b9bf4400702f721d469eec4d280125f650c85638 # v1.12.2
+        uses: cargo-bins/cargo-binstall@8aac5aa2bf0dfaa2863eccad9f43c68fe40e5ec8 # v1.14.1
       - name: Install cargo-make
         run: cargo binstall cargo-make --force
       - name: Run machete
@@ -165,7 +165,7 @@ jobs:
       - name: Install Rust toolchain
         run: rustup toolchain install stable
       - name: Install cargo-binstall
-        uses: cargo-bins/cargo-binstall@b9bf4400702f721d469eec4d280125f650c85638 # v1.12.2
+        uses: cargo-bins/cargo-binstall@8aac5aa2bf0dfaa2863eccad9f43c68fe40e5ec8 # v1.14.1
       - name: Install cargo-component
         run: cargo binstall cargo-component --force
       - name: Install dependencies
