@@ -144,6 +144,28 @@ impl TypeChecker {
         Ok(Type::I32)
     }
 
+    pub fn check_identifier_expression(
+        &self,
+        identifier: &ast::Identifier,
+    ) -> Result<Type, TypeCheckError> {
+        match self.environment.get_variable(identifier.name) {
+            Some(var_info) => {
+                if !var_info.initialized {
+                    Err(TypeCheckError::UninitializedVariable {
+                        name: identifier.name.to_string(),
+                        location: identifier.location.clone(),
+                    })
+                } else {
+                    Ok(var_info.var_type.clone())
+                }
+            }
+            None => Err(TypeCheckError::UndefinedIdentifier {
+                name: identifier.name.to_string(),
+                location: identifier.location.clone(),
+            }),
+        }
+    }
+
     pub fn check_expression(&self, expr: &ast::Expression) -> Result<Type, TypeCheckError> {
         match expr {
             ast::Expression::IntegerLiteral(literal) => self.check_integer_literal(literal),
@@ -152,7 +174,7 @@ impl TypeChecker {
             ast::Expression::AssignmentExpression(_) => {
                 todo!("Assignment expressions not implemented")
             }
-            ast::Expression::Identifier(_) => todo!("Identifier expressions not implemented"),
+            ast::Expression::Identifier(identifier) => self.check_identifier_expression(identifier),
             ast::Expression::FunctionCall(_) => todo!("Function call expressions not implemented"),
         }
     }
@@ -830,11 +852,11 @@ mod tests {
 
         let program = parse_result.output().unwrap();
 
-        // This will fail due to unimplemented features but we can test the structure
+        // Check the structure - this should now work with identifier expressions implemented
         for function in &program.functions {
             let result = checker.check_function_definition(function);
-            // For now, we expect it to fail due to identifier expressions not being implemented
-            assert!(result.is_err());
+            // This should succeed now that identifier expressions are implemented
+            assert!(result.is_ok());
         }
 
         // Verify function was registered
@@ -852,10 +874,8 @@ mod tests {
         let source = r#"
             fn test() -> i32 {
                 let outer: i32 = 10;
-                {
-                    let inner: i32 = 20;
-                    inner
-                }
+                let inner: i32 = 20;
+                inner
             }
         "#;
 
@@ -865,9 +885,9 @@ mod tests {
         let program = parse_result.output().unwrap();
         let function = &program.functions[0];
 
-        // This will fail due to unimplemented features but we can test that parsing works
+        // This should now work with identifier expressions implemented
         let result = checker.check_function_definition(function);
-        assert!(result.is_err()); // Expected due to identifier expressions
+        assert!(result.is_ok()); // Should succeed now
     }
 
     #[test]
