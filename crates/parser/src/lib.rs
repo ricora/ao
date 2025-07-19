@@ -87,7 +87,7 @@ where
         let atom = assignment
             .or(function_call)
             .or(literal)
-            .or(identifier.clone().map(ast::Expression::Identifier))
+            .or(identifier.clone().map(ast::Expression::IdentifierExpression))
             .or(expression
                 .clone()
                 .delimited_by(just(Token::LParen), just(Token::RParen)))

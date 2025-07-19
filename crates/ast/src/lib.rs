@@ -27,108 +27,108 @@ impl Location {
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-pub struct Program<'a> {
+pub struct Program<'a, Ty = Option<Type>> {
     #[serde(borrow)]
-    pub functions: Vec<FunctionDefinition<'a>>,
+    pub functions: Vec<FunctionDefinition<'a, Ty>>,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-pub struct FunctionDefinition<'a> {
+pub struct FunctionDefinition<'a, Ty = Option<Type>> {
     #[serde(borrow)]
     pub name: Identifier<'a>,
     #[serde(borrow)]
-    pub parameters: Parameters<'a>,
-    pub return_type: Type,
+    pub parameters: Parameters<'a, Ty>,
+    pub return_type: Ty,
     #[serde(borrow)]
-    pub body: Block<'a>,
+    pub body: Block<'a, Ty>,
     pub location: Location,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-pub struct Parameters<'a> {
+pub struct Parameters<'a, Ty = Option<Type>> {
     #[serde(borrow)]
-    pub parameters: Vec<Parameter<'a>>,
+    pub parameters: Vec<Parameter<'a, Ty>>,
     pub location: Location,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-pub struct Parameter<'a> {
+pub struct Parameter<'a, Ty = Option<Type>> {
     #[serde(borrow)]
     pub name: Identifier<'a>,
-    pub parameter_type: Type,
+    pub parameter_type: Ty,
     pub location: Location,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-pub struct Block<'a> {
+pub struct Block<'a, Ty = Option<Type>> {
     #[serde(borrow)]
-    pub statements: Statements<'a>,
+    pub statements: Statements<'a, Ty>,
     pub location: Location,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-pub struct Statements<'a> {
+pub struct Statements<'a, Ty = Option<Type>> {
     #[serde(borrow)]
-    pub statements: Vec<Statement<'a>>,
+    pub statements: Vec<Statement<'a, Ty>>,
     pub location: Location,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-pub enum Statement<'a> {
+pub enum Statement<'a, Ty = Option<Type>> {
     #[serde(borrow)]
-    ExpressionStatement(ExpressionStatement<'a>),
+    ExpressionStatement(ExpressionStatement<'a, Ty>),
     #[serde(borrow)]
-    VariableDefinition(VariableDefinition<'a>),
+    VariableDefinition(VariableDefinition<'a, Ty>),
     #[serde(borrow)]
-    IfStatement(IfStatement<'a>),
+    IfStatement(IfStatement<'a, Ty>),
     #[serde(borrow)]
-    Expression(Expression<'a>),
+    Expression(Expression<'a, Ty>),
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-pub struct ExpressionStatement<'a> {
+pub struct ExpressionStatement<'a, Ty = Option<Type>> {
     #[serde(borrow)]
-    pub expression: Expression<'a>,
+    pub expression: Expression<'a, Ty>,
     pub location: Location,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-pub struct VariableDefinition<'a> {
+pub struct VariableDefinition<'a, Ty = Option<Type>> {
     #[serde(borrow)]
     pub name: Identifier<'a>,
     pub mutable: bool,
-    pub variable_type: Type,
+    pub variable_type: Ty,
     #[serde(borrow)]
-    pub value: Option<Expression<'a>>,
+    pub value: Option<Expression<'a, Ty>>,
     pub location: Location,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-pub struct IfStatement<'a> {
+pub struct IfStatement<'a, Ty = Option<Type>> {
     #[serde(borrow)]
-    pub condition: Expression<'a>,
+    pub condition: Expression<'a, Ty>,
     #[serde(borrow)]
-    pub then_block: Block<'a>,
+    pub then_block: Block<'a, Ty>,
     #[serde(borrow)]
-    pub else_block: Option<Block<'a>>,
+    pub else_block: Option<Block<'a, Ty>>,
     pub location: Location,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-pub enum Expression<'a> {
+pub enum Expression<'a, Ty = Option<Type>> {
     #[serde(borrow)]
-    BinaryExpression(BinaryExpression<'a>),
+    BinaryExpression(BinaryExpression<'a, Ty>),
     #[serde(borrow)]
-    UnaryExpression(UnaryExpression<'a>),
+    UnaryExpression(UnaryExpression<'a, Ty>),
     #[serde(borrow)]
-    AssignmentExpression(AssignmentExpression<'a>),
+    AssignmentExpression(AssignmentExpression<'a, Ty>),
     #[serde(borrow)]
-    Identifier(Identifier<'a>),
+    IdentifierExpression(IdentifierExpression<'a, Ty>),
     #[serde(borrow)]
-    IntegerLiteral(IntegerLiteral<'a>),
-    BooleanLiteral(BooleanLiteral),
+    IntegerLiteral(IntegerLiteral<'a, Ty>),
+    BooleanLiteral(BooleanLiteral<Ty>),
     #[serde(borrow)]
-    FunctionCall(FunctionCall<'a>),
+    FunctionCall(FunctionCall<'a, Ty>),
 }
 
 impl<'a> Expression<'a> {
@@ -139,7 +139,7 @@ impl<'a> Expression<'a> {
             Expression::AssignmentExpression(assignment_expression) => {
                 &assignment_expression.location
             }
-            Expression::Identifier(identifier) => &identifier.location,
+            Expression::IdentifierExpression(identifier) => &identifier.location,
             Expression::IntegerLiteral(integer_literal) => &integer_literal.location,
             Expression::BooleanLiteral(boolean_literal) => &boolean_literal.location,
             Expression::FunctionCall(function_call) => &function_call.location,
@@ -244,29 +244,39 @@ pub struct UnaryOperator {
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-pub struct BinaryExpression<'a> {
+pub struct BinaryExpression<'a, Ty = Option<Type>> {
     #[serde(borrow)]
-    pub left: Box<Expression<'a>>,
+    pub left: Box<Expression<'a, Ty>>,
     pub operator: BinaryOperator,
     #[serde(borrow)]
-    pub right: Box<Expression<'a>>,
+    pub right: Box<Expression<'a, Ty>>,
+    pub r#type: Ty,
     pub location: Location,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-pub struct UnaryExpression<'a> {
+pub struct UnaryExpression<'a, Ty = Option<Type>> {
     pub operator: UnaryOperator,
     #[serde(borrow)]
-    pub operand: Box<Expression<'a>>,
+    pub operand: Box<Expression<'a, Ty>>,
+    pub r#type: Ty,
     pub location: Location,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-pub struct AssignmentExpression<'a> {
+pub struct AssignmentExpression<'a, Ty = Option<Type>> {
     #[serde(borrow)]
     pub name: Identifier<'a>,
     #[serde(borrow)]
-    pub value: Box<Expression<'a>>,
+    pub value: Box<Expression<'a, Ty>>,
+    pub location: Location,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct IdentifierExpression<'a, Ty = Option<Type>> {
+    #[serde(borrow)]
+    pub identifier: Identifier<'a>,
+    pub r#type: Ty,
     pub location: Location,
 }
 
@@ -278,24 +288,27 @@ pub struct Identifier<'a> {
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-pub struct IntegerLiteral<'a> {
+pub struct IntegerLiteral<'a, Ty = Option<Type>> {
     #[serde(borrow)]
     pub value: &'a str,
+    pub r#type: Ty,
     pub location: Location,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-pub struct BooleanLiteral {
+pub struct BooleanLiteral<Ty = Option<Type>> {
     pub value: bool,
+    pub r#type: Ty,
     pub location: Location,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-pub struct FunctionCall<'a> {
+pub struct FunctionCall<'a, Ty = Option<Type>> {
     #[serde(borrow)]
     pub name: Identifier<'a>,
     #[serde(borrow)]
-    pub arguments: Vec<Expression<'a>>,
+    pub arguments: Vec<Expression<'a, Ty>>,
+    pub r#type: Ty,
     pub location: Location,
 }
 

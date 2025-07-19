@@ -120,7 +120,7 @@ impl TypeChecker {
             ast::Expression::AssignmentExpression(assignment) => {
                 self.check_assignment_expression(assignment)
             }
-            ast::Expression::Identifier(identifier) => self.check_identifier_expression(identifier),
+            ast::Expression::IdentifierExpression(identifier) => self.check_identifier_expression(identifier),
             ast::Expression::FunctionCall(function_call) => self.check_function_call(function_call),
         }
     }

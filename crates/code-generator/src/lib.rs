@@ -297,7 +297,7 @@ impl<'a> CodeGenerator<'a> {
                 )));
                 instructions
             }
-            ast::Expression::Identifier(identifier) => {
+            ast::Expression::IdentifierExpression(identifier) => {
                 vec![core::Instruction::LocalGet(wast::token::Index::Id(
                     self.generate_identifier(identifier),
                 ))]
