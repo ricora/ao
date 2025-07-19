@@ -164,49 +164,8 @@ impl TypeChecker {
         Ok(())
     }
 
-    pub fn check_block(&mut self, block: &ast::Block) -> Result<Type, TypeCheckError> {
-        let statements = &block.statements.statements;
-
-        if statements.is_empty() {
-            return Ok(Type::Unit);
-        }
-
-        // Enter new scope for this block
-        self.environment.push_scope();
-
-        // Check all statements except the last one
-        for statement in &statements[..statements.len() - 1] {
-            match statement {
-                ast::Statement::VariableDefinition(var_def) => {
-                    if let Err(e) = self.check_variable_definition(var_def) {
-                        self.environment.pop_scope();
-                        return Err(e);
-                    }
-                }
-                ast::Statement::ExpressionStatement(expr_stmt) => {
-                    if let Err(e) = self.check_expression(&expr_stmt.expression) {
-                        self.environment.pop_scope();
-                        return Err(e);
-                    }
-                }
-                ast::Statement::IfStatement(_) => {
-                    // TODO: Handle if statements
-                }
-                ast::Statement::Expression(expr) => {
-                    if let Err(e) = self.check_expression(expr) {
-                        self.environment.pop_scope();
-                        return Err(e);
-                    }
-                    return Err(TypeCheckError::ExpressionMustBeLastInBlock {
-                        location: expr.location().clone(),
-                    });
-                }
-            }
-        }
-
-        // The type of the block is the type of the last statement
-        let result = match statements.last().unwrap() {
-            ast::Statement::Expression(expr) => self.check_expression(expr),
+    pub fn check_statement(&mut self, statement: &ast::Statement) -> Result<Type, TypeCheckError> {
+        match statement {
             ast::Statement::VariableDefinition(var_def) => {
                 self.check_variable_definition(var_def)?;
                 Ok(Type::Unit)
@@ -219,7 +178,40 @@ impl TypeChecker {
                 // TODO: Handle if statements
                 Ok(Type::Unit)
             }
-        };
+            ast::Statement::Expression(expr) => {
+                self.check_expression(expr)
+            }
+        }
+    }
+
+    pub fn check_block(&mut self, block: &ast::Block) -> Result<Type, TypeCheckError> {
+        let statements = &block.statements.statements;
+
+        if statements.is_empty() {
+            return Ok(Type::Unit);
+        }
+
+        // Enter new scope for this block
+        self.environment.push_scope();
+
+        // Check all statements except the last one
+        for statement in &statements[..statements.len() - 1] {
+            if let ast::Statement::Expression(expr) = statement {
+                // Expression statements are only allowed as the last statement in a block
+                self.environment.pop_scope();
+                return Err(TypeCheckError::ExpressionMustBeLastInBlock {
+                    location: expr.location().clone(),
+                });
+            }
+            
+            if let Err(e) = self.check_statement(statement) {
+                self.environment.pop_scope();
+                return Err(e);
+            }
+        }
+
+        // The type of the block is the type of the last statement
+        let result = self.check_statement(statements.last().unwrap());
 
         // Exit scope
         self.environment.pop_scope();
@@ -525,5 +517,91 @@ mod tests {
 
         let result = checker.check_function_definition(function);
         assert!(result.is_err()); // Should fail due to type mismatch (i64 vs i32) or identifier issue
+    }
+
+    #[test]
+    fn test_check_statement_variable_definition() {
+        use parser;
+
+        let mut checker = TypeChecker::new();
+
+        let source = "fn main() -> i32 { let x: i32 = 42; x }";
+        let parse_result = parser::parse(source);
+        assert!(parse_result.output().is_some());
+
+        let program = parse_result.output().unwrap();
+        let function = &program.functions[0];
+        let statements = &function.body.statements.statements;
+
+        // Test variable definition statement
+        if let ast::Statement::VariableDefinition(_) = &statements[0] {
+            let result = checker.check_statement(&statements[0]);
+            assert!(result.is_ok());
+            assert_eq!(result.unwrap(), Type::Unit);
+
+            // Check that variable was added to environment
+            let var_info = checker.environment.get_variable("x").unwrap();
+            assert_eq!(var_info.var_type, Type::I32);
+        } else {
+            panic!("Expected variable definition statement");
+        }
+    }
+
+    #[test]
+    fn test_check_statement_expression_statement() {
+        use parser;
+
+        let mut checker = TypeChecker::new();
+
+        let source = "fn main() -> i32 { let x: i32 = 42; x; }";
+        let parse_result = parser::parse(source);
+        assert!(parse_result.output().is_some());
+
+        let program = parse_result.output().unwrap();
+        let function = &program.functions[0];
+        let statements = &function.body.statements.statements;
+
+        // Add the variable first
+        if let ast::Statement::VariableDefinition(var_def) = &statements[0] {
+            checker.check_variable_definition(var_def).unwrap();
+        }
+
+        // Test expression statement (x;)
+        if let ast::Statement::ExpressionStatement(_) = &statements[1] {
+            let result = checker.check_statement(&statements[1]);
+            assert!(result.is_ok());
+            assert_eq!(result.unwrap(), Type::Unit);
+        } else {
+            panic!("Expected expression statement");
+        }
+    }
+
+    #[test]
+    fn test_check_statement_expression() {
+        use parser;
+
+        let mut checker = TypeChecker::new();
+
+        let source = "fn main() -> i32 { let x: i32 = 42; x }";
+        let parse_result = parser::parse(source);
+        assert!(parse_result.output().is_some());
+
+        let program = parse_result.output().unwrap();
+        let function = &program.functions[0];
+        let statements = &function.body.statements.statements;
+
+        // Add the variable first
+        if let ast::Statement::VariableDefinition(var_def) = &statements[0] {
+            checker.check_variable_definition(var_def).unwrap();
+        }
+
+        // Test expression statement (final x)
+        if let ast::Statement::Expression(_) = &statements[1] {
+            let result = checker.check_statement(&statements[1]);
+            assert!(result.is_ok());
+            assert_eq!(result.unwrap(), Type::I32);
+        } else {
+            panic!("Expected expression statement");
+        }
     }
 }
