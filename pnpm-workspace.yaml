@@ -1,2 +1,6 @@
 packages:
   - website
+onlyBuiltDependencies:
+  - '@tailwindcss/oxide'
+  - esbuild
+  - sharp

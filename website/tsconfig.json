@@ -1,11 +1,11 @@
 {
   "extends": "astro/tsconfigs/strict",
   "compilerOptions": {
+    "skipLibCheck": true,
     "jsx": "react-jsx",
     "jsxImportSource": "react",
     "paths": {
-      "@/*": ["./src/*"],
-      "ui": ["./src/components/ui/index.ts"]
+      "@/*": ["./src/*"]
     }
   }
 }

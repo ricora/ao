@@ -1,8 +1,0 @@
-{
-  "$schema": "https://getjustd.com",
-  "ui": "src/components/ui",
-  "classes": "src/lib/utils",
-  "theme": "Zinc",
-  "css": "src/tailwind.css",
-  "alias": "@"
-}

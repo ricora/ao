@@ -1,133 +1,128 @@
-import * as React from "react"
+"use client"
+
 import {
   Button as ButtonPrimitive,
   type ButtonProps as ButtonPrimitiveProps,
+  composeRenderProps,
 } from "react-aria-components"
-import { tv } from "tailwind-variants"
+import { tv, type VariantProps } from "tailwind-variants"
 
-import { cr, focusButtonStyles } from "./primitive"
-
-const buttonStyles = tv(
-  {
-    base: [
-      "kbt32x relative isolate box-border inline-flex items-center justify-center gap-x-2 border font-medium no-underline before:absolute after:absolute",
-      "hover:cursor-pointer forced-colors:[--button-icon:ButtonText] forced-colors:hover:[--button-icon:ButtonText]",
-      "[&>[data-slot=icon]]:-mx-0.5 [&>[data-slot=icon]]:my-1 [&>[data-slot=icon]]:size-4 [&>[data-slot=icon]]:shrink-0 [&>[data-slot=icon]]:text-[--button-icon]",
-    ],
-    defaultVariants: {
-      appearance: "solid",
-      intent: "primary",
-      shape: "square",
-      size: "medium",
+const buttonStyles = tv({
+  base: [
+    "[--btn-icon-active:var(--btn-fg)] [--btn-outline:var(--btn-bg)] [--btn-ring:var(--btn-bg)]/20",
+    "pressed:bg-(--btn-overlay) bg-(--btn-bg) text-(--btn-fg) ring-(--btn-ring) outline-(--btn-outline) hover:bg-(--btn-overlay)",
+    "inset-ring-fg/15 relative isolate inline-flex items-center justify-center font-medium inset-ring",
+    "focus-visible:ring-offset-bg focus:outline-0 focus-visible:ring-2 focus-visible:ring-offset-3 focus-visible:outline focus-visible:outline-offset-2",
+    "pressed:*:data-[slot=icon]:text-(--btn-icon-active) *:data-[slot=icon]:-mx-0.5 *:data-[slot=icon]:my-0.5 *:data-[slot=icon]:shrink-0 *:data-[slot=icon]:self-center *:data-[slot=icon]:text-(--btn-icon) hover:*:data-[slot=icon]:text-(--btn-icon-active)/90 focus-visible:*:data-[slot=icon]:text-(--btn-icon-active)/80 sm:*:data-[slot=icon]:my-1 forced-colors:[--btn-icon:ButtonText] forced-colors:hover:[--btn-icon:ButtonText]",
+    "*:data-[slot=loader]:-mx-0.5 *:data-[slot=loader]:my-0.5 *:data-[slot=loader]:shrink-0 *:data-[slot=loader]:self-center *:data-[slot=loader]:text-(--btn-icon) sm:*:data-[slot=loader]:my-1",
+  ],
+  compoundVariants: [
+    {
+      className: "rounded-md *:data-[slot=icon]:size-3.5",
+      size: ["xs", "sq-xs"],
     },
-    extend: focusButtonStyles,
-    variants: {
-      appearance: {
-        outline: [
-          "border-border text-fg [--button-icon:theme(colors.muted.fg)]",
-          "hover:bg-secondary/90 hover:[--button-icon:theme(colors.fg)]",
-          "active:bg-secondary/90 active:[--button-icon:theme(colors.fg)]",
-        ],
-        plain: [
-          "border-transparent text-fg [--button-icon:theme(colors.muted.fg)]",
-          "pressed:bg-secondary/90",
-          "active:bg-secondary/90 active:[--button-icon:theme(colors.fg)]",
-          "hover:bg-secondary/90 hover:[--button-icon:theme(colors.fg)]",
-        ],
-        solid: [
-          "border-transparent bg-[--button-border]",
-          "before:inset-0 before:-z-10 before:bg-[--button-bg] before:shadow before:data-[disabled]:shadow-none",
-          "after:inset-0 after:-z-10 after:shadow-[shadow:inset_0_1px_theme(colors.white/15%)] after:active:bg-[--button-hover-overlay] after:data-[disabled]:shadow-none after:hover:bg-[--button-hover-overlay]",
-          "dark:border-white/5 dark:bg-[--button-bg] dark:before:hidden dark:after:-inset-px",
-        ],
-      },
-      intent: {
-        danger: [
-          "text-white [--button-bg:theme(colors.danger.DEFAULT)] [--button-border:theme(colors.danger.DEFAULT)] [--button-hover-overlay:theme(colors.white/10%)]",
-          "[--button-icon:theme(colors.white/60%)] active:[--button-icon:theme(colors.white/80%)] hover:[--button-icon:theme(colors.white/80%)]",
-        ],
-        primary: [
-          "text-primary-fg [--button-bg:theme(colors.primary.DEFAULT)] [--button-border:theme(colors.primary.DEFAULT)] [--button-hover-overlay:theme(colors.white/10%)]",
-          "[--button-icon:theme(colors.primary.fg/60%)] active:[--button-icon:theme(colors.primary.fg/80%)] hover:[--button-icon:theme(colors.primary.fg/80%)]",
-        ],
-        secondary: [
-          "text-secondary-fg [--button-bg:theme(colors.secondary.DEFAULT)] [--button-border:theme(colors.secondary.fg/10%)] [--button-hover-overlay:theme(colors.secondary.fg/2.5%)] data-[active]:[--button-border:theme(colors.secondary.fg/15%)] hover:[--button-border:theme(colors.secondary.fg/15%)] dark:[--button-bg:theme(colors.secondary.DEFAULT)]",
-          "[--button-icon:theme(colors.muted.fg)] active:[--button-icon:theme(colors.fg)] hover:[--button-icon:theme(colors.fg)]",
-        ],
-        warning: [
-          "text-warning-fg [--button-bg:theme(colors.warning.DEFAULT)] [--button-border:theme(colors.warning.DEFAULT)] [--button-hover-overlay:theme(colors.white/10%)]",
-          "[--button-icon:theme(colors.warning.fg/60%)] active:[--button-icon:theme(colors.warning.fg/80%)] hover:[--button-icon:theme(colors.warning.fg/80%)]",
-        ],
-      },
-      isDisabled: {
-        false: "forced-colors:disabled:text-[GrayText]",
-        true: "cursor-default opacity-60 forced-colors:disabled:text-[GrayText]",
-      },
-      isPending: {
-        true: "cursor-default",
-      },
-      shape: {
-        circle:
-          "rounded-[9999px] before:rounded-[9998px] after:rounded-[9998px] dark:after:rounded-[9999px]",
-        square:
-          "rounded-lg before:rounded-[calc(theme(borderRadius.lg)-1px)] after:rounded-[calc(theme(borderRadius.lg)-1px)] dark:after:rounded-lg",
-      },
-      size: {
-        "extra-small":
-          "h-8 px-[calc(theme(spacing.3)-1px)] py-[calc(theme(spacing.1)-1px)] text-xs/4 lg:text-[0.800rem]/4",
-        large:
-          "h-10 px-[calc(theme(spacing.4)-1px)] py-[calc(theme(spacing[2.5])-1px)] text-base sm:h-11 sm:px-[calc(theme(spacing.5)-1px)] lg:text-base/7 [&>[data-slot=icon]]:mx-[-3px] sm:[&>[data-slot=icon]]:size-5",
-        medium:
-          "h-10 px-[calc(theme(spacing.4)-1px)] py-[calc(theme(spacing.2)-1px)] text-base lg:text-sm/6",
-        small:
-          "h-9 px-[calc(theme(spacing.4)-1px)] py-[calc(theme(spacing[1.5])-1px)] text-sm/5 lg:text-sm/5",
-        "square-petite": "size-9 shrink-0 [&_[data-slot=icon]]:text-current",
-      },
+  ],
+  defaultVariants: {
+    intent: "primary",
+    isCircle: false,
+    size: "md",
+  },
+  variants: {
+    intent: {
+      danger:
+        "[--btn-bg:var(--color-danger)] [--btn-fg:var(--color-danger-fg)] [--btn-icon:color-mix(in_oklab,var(--danger-fg)_60%,var(--danger))] [--btn-overlay:var(--color-danger)]/85",
+      outline:
+        "inset-ring-border [--btn-bg:transparent] [--btn-icon:var(--color-muted-fg)] [--btn-outline:var(--color-ring)] [--btn-overlay:var(--color-muted)] [--btn-ring:var(--color-ring)]/20",
+      plain:
+        "inset-ring-transparent [--btn-bg:transparent] [--btn-icon:var(--color-muted-fg)] [--btn-outline:var(--color-ring)] [--btn-overlay:var(--color-muted)] [--btn-ring:var(--color-ring)]/20",
+      primary:
+        "[--btn-bg:var(--color-primary)] [--btn-fg:var(--color-primary-fg)] [--btn-icon:color-mix(in_oklab,var(--primary-fg)_60%,var(--primary))] [--btn-overlay:var(--color-primary)]/85",
+      secondary:
+        "[--btn-bg:var(--color-secondary)] [--btn-fg:var(--color-secondary-fg)] [--btn-icon:var(--color-muted-fg)] [--btn-outline:var(--color-secondary-fg)] [--btn-overlay:var(--color-secondary)]/85 [--btn-ring:var(--color-muted-fg)]/20",
+      warning:
+        "[--btn-bg:var(--color-warning)] [--btn-fg:var(--color-warning-fg)] [--btn-icon:color-mix(in_oklab,var(--warning-fg)_60%,var(--warning))] [--btn-overlay:var(--color-warning)]/85",
+    },
+    isCircle: {
+      false: "rounded-lg",
+      true: "rounded-full",
+    },
+
+    isDisabled: {
+      true: "opacity-50 inset-ring-0 forced-colors:text-[GrayText]",
+    },
+    isPending: {
+      true: "opacity-50",
+    },
+    size: {
+      lg: [
+        "gap-x-2 px-4 py-2.5 sm:px-3.5 sm:py-2 sm:text-sm/6",
+        "*:data-[slot=icon]:size-5 sm:*:data-[slot=icon]:size-4.5",
+        "*:data-[slot=loader]:size-5 sm:*:data-[slot=loader]:size-4.5",
+      ],
+      md: [
+        "gap-x-2 px-3.5 py-2 sm:px-3 sm:py-1.5 sm:text-sm/6",
+        "*:data-[slot=icon]:size-5 sm:*:data-[slot=icon]:size-4",
+        "*:data-[slot=loader]:size-5 sm:*:data-[slot=loader]:size-4",
+      ],
+      sm: [
+        "gap-x-1.5 px-3 py-2 sm:px-2.5 sm:py-1.5 sm:text-sm/5",
+        "*:data-[slot=icon]:size-4.5 sm:*:data-[slot=icon]:size-4",
+        "*:data-[slot=loader]:size-4.5 sm:*:data-[slot=loader]:size-4",
+      ],
+      "sq-lg":
+        "size-11 *:data-[slot=icon]:size-5 *:data-[slot=loader]:size-5 sm:size-10 sm:*:data-[slot=icon]:size-4.5 sm:*:data-[slot=loader]:size-4.5",
+      "sq-md":
+        "size-10 *:data-[slot=icon]:size-5 *:data-[slot=loader]:size-5 sm:size-9 sm:*:data-[slot=icon]:size-4 sm:*:data-[slot=loader]:size-4",
+      "sq-sm":
+        "size-9 *:data-[slot=icon]:size-4.5 *:data-[slot=loader]:size-4.5 sm:size-8 sm:*:data-[slot=icon]:size-4 sm:*:data-[slot=loader]:size-4",
+      "sq-xs":
+        "size-8 *:data-[slot=icon]:size-3.5 *:data-[slot=loader]:size-3.5 sm:size-7 sm:*:data-[slot=icon]:size-3 sm:*:data-[slot=loader]:size-3",
+      xs: [
+        "gap-x-1 px-2.5 py-1.5 text-sm sm:px-2 sm:py-[--spacing(1.4)] sm:text-xs/4",
+        "*:data-[slot=icon]:size-3.5 sm:*:data-[slot=icon]:size-3",
+        "*:data-[slot=loader]:size-3.5 sm:*:data-[slot=loader]:size-3",
+      ],
     },
   },
-  {
-    responsiveVariants: ["sm", "lg"],
-  },
-)
+})
 
-type ButtonProps = ButtonPrimitiveProps & {
-  appearance?: "outline" | "plain" | "solid"
-  intent?: "danger" | "primary" | "secondary" | "warning"
-  shape?: "circle" | "square"
-  size?: "extra-small" | "large" | "medium" | "small" | "square-petite"
+type ButtonProps = ButtonPrimitiveProps &
+  VariantProps<typeof buttonStyles> & {
+    ref?: React.Ref<HTMLButtonElement>
+  }
+
+const Button = ({
+  className,
+  intent,
+  isCircle,
+  ref,
+  size,
+  ...props
+}: ButtonProps) => {
+  return (
+    <ButtonPrimitive
+      ref={ref}
+      {...props}
+      className={composeRenderProps(className, (className, renderProps) =>
+        buttonStyles({
+          ...renderProps,
+          className,
+          intent,
+          isCircle,
+          size,
+        }),
+      )}
+    >
+      {(values) => (
+        <>
+          {typeof props.children === "function"
+            ? props.children(values)
+            : props.children}
+        </>
+      )}
+    </ButtonPrimitive>
+  )
 }
 
-const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ appearance, className, intent, shape, size, ...props }, ref) => {
-    return (
-      <ButtonPrimitive
-        ref={ref}
-        {...props}
-        className={cr(className, (className, renderProps) =>
-          buttonStyles({
-            ...renderProps,
-            appearance,
-            className,
-            intent,
-            shape,
-            size,
-          }),
-        )}
-      >
-        {(values) => (
-          <>
-            {typeof props.children === "function"
-              ? props.children(values)
-              : props.children}
-          </>
-        )}
-      </ButtonPrimitive>
-    )
-  },
-)
-
-Button.displayName = "Button"
-
-export { Button, type ButtonProps, buttonStyles }
-
-export { Button as ButtonPrimitive } from "react-aria-components"
+export type { ButtonProps }
+export { Button, buttonStyles }
