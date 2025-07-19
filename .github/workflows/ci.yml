@@ -160,9 +160,17 @@ jobs:
         uses: jdx/mise-action@bfb9fa0b029db830a8c570757cee683df207a6c5 # v2.4.0
         with:
           version: 2025.7.12
+      - name: Cache dependencies
+        uses: Swatinem/rust-cache@9d47c6ad4b02e050fd481d890b2ea34778fd09d6 # v2.7.8
+      - name: Install Rust toolchain
+        run: rustup toolchain install stable
+      - name: Install cargo-binstall
+        uses: cargo-bins/cargo-binstall@8aac5aa2bf0dfaa2863eccad9f43c68fe40e5ec8 # v1.14.1
+      - name: Install cargo-component
+        run: cargo binstall cargo-component --force
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-      - name: Check linting
+      - name: Check type checking
         run: pnpm run --filter "*" typecheck
 
   npm-build:
