@@ -46,12 +46,54 @@ impl TypeChecker {
         match expr {
             ast::Expression::IntegerLiteral(literal) => self.check_integer_literal(literal),
             ast::Expression::BinaryExpression(binary) => self.check_binary_expression(binary),
-            ast::Expression::UnaryExpression(_) => todo!("Unary expressions not implemented"),
+            ast::Expression::UnaryExpression(unary) => self.check_unary_expression(unary),
             ast::Expression::AssignmentExpression(_) => {
                 todo!("Assignment expressions not implemented")
             }
             ast::Expression::Identifier(identifier) => self.check_identifier_expression(identifier),
             ast::Expression::FunctionCall(_) => todo!("Function call expressions not implemented"),
+        }
+    }
+
+    pub fn check_unary_expression(
+        &self,
+        unary: &ast::UnaryExpression,
+    ) -> Result<Type, TypeCheckError> {
+        let operand_type = self.check_expression(&unary.operand)?;
+
+        use ast::OperatorKind;
+        match unary.operator.operator {
+            // Numeric negation: operand numeric type → same type
+            OperatorKind::Subtract => {
+                if matches!(operand_type, Type::I32 | Type::I64) {
+                    Ok(operand_type)
+                } else {
+                    Err(TypeCheckError::TypeMismatch {
+                        expected: "numeric type (i32 or i64)".to_string(),
+                        found: operand_type.to_string(),
+                        location: unary.location.clone(),
+                    })
+                }
+            }
+            // Logical not: operand bool → bool
+            OperatorKind::LogicalNot => {
+                if operand_type == Type::Bool {
+                    Ok(Type::Bool)
+                } else {
+                    Err(TypeCheckError::TypeMismatch {
+                        expected: "bool".to_string(),
+                        found: operand_type.to_string(),
+                        location: unary.location.clone(),
+                    })
+                }
+            }
+            // Other operators are not valid for unary expressions
+            _ => {
+                Err(TypeCheckError::InvalidOperator {
+                    operator: unary.operator.operator.to_string(),
+                    location: unary.operator.location.clone(),
+                })
+            }
         }
     }
 
@@ -603,5 +645,121 @@ mod tests {
         } else {
             panic!("Expected expression statement");
         }
+    }
+
+    #[test]
+    fn test_check_unary_expression_logical_not() {
+        use ast::{Expression, IntegerLiteral, Location, Operator, OperatorKind, UnaryExpression};
+
+        let checker = TypeChecker::new();
+
+        // Test !42 (should fail - can't apply logical not to integer)
+        let operand = Box::new(Expression::IntegerLiteral(IntegerLiteral {
+            value: "42",
+            location: Location {
+                start: 1,
+                end: 3,
+                context: (),
+            },
+        }));
+
+        let unary_expr = UnaryExpression {
+            operator: Operator {
+                operator: OperatorKind::LogicalNot,
+                location: Location {
+                    start: 0,
+                    end: 1,
+                    context: (),
+                },
+            },
+            operand,
+            location: Location {
+                start: 0,
+                end: 3,
+                context: (),
+            },
+        };
+
+        let result = checker.check_unary_expression(&unary_expr);
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn test_check_unary_expression_numeric_negation() {
+        use ast::{Expression, IntegerLiteral, Location, Operator, OperatorKind, UnaryExpression};
+
+        let checker = TypeChecker::new();
+
+        // Test -42 (should succeed and return i32)
+        let operand = Box::new(Expression::IntegerLiteral(IntegerLiteral {
+            value: "42",
+            location: Location {
+                start: 1,
+                end: 3,
+                context: (),
+            },
+        }));
+
+        let unary_expr = UnaryExpression {
+            operator: Operator {
+                operator: OperatorKind::Subtract,
+                location: Location {
+                    start: 0,
+                    end: 1,
+                    context: (),
+                },
+            },
+            operand,
+            location: Location {
+                start: 0,
+                end: 3,
+                context: (),
+            },
+        };
+
+        let result = checker.check_unary_expression(&unary_expr);
+        assert!(result.is_ok());
+        assert_eq!(result.unwrap(), Type::I32);
+    }
+
+    #[test]
+    fn test_check_unary_expression_logical_not_with_bool() {
+        let checker = TypeChecker::new();
+
+        // Create a manual test with comparison that returns bool
+        use ast::{BinaryExpression, Expression, IntegerLiteral, Location, Operator, OperatorKind, UnaryExpression};
+
+        // Create 1 == 2 (which is bool)
+        let left = Box::new(Expression::IntegerLiteral(IntegerLiteral {
+            value: "1",
+            location: Location { start: 0, end: 1, context: () },
+        }));
+        let right = Box::new(Expression::IntegerLiteral(IntegerLiteral {
+            value: "2",
+            location: Location { start: 5, end: 6, context: () },
+        }));
+        let comparison = Box::new(Expression::BinaryExpression(BinaryExpression {
+            left,
+            operator: Operator {
+                operator: OperatorKind::Equal,
+                location: Location { start: 2, end: 4, context: () },
+            },
+            right,
+            location: Location { start: 0, end: 6, context: () },
+        }));
+
+        // Apply logical not to the comparison: !(1 == 2)
+        let unary_expr = UnaryExpression {
+            operator: Operator {
+                operator: OperatorKind::LogicalNot,
+                location: Location { start: 0, end: 1, context: () },
+            },
+            operand: comparison,
+            location: Location { start: 0, end: 7, context: () },
+        };
+
+        let result = checker.check_unary_expression(&unary_expr);
+        assert!(result.is_ok());
+        assert_eq!(result.unwrap(), Type::Bool);
     }
 }

@@ -22,6 +22,8 @@ pub enum TypeCheckError {
     DuplicateDefinition { name: String, location: Location },
     #[error("Expression must be last in block")]
     ExpressionMustBeLastInBlock { location: Location },
+    #[error("Invalid operator: {operator}")]
+    InvalidOperator { operator: String, location: Location },
 }
 
 impl TypeCheckError {
@@ -98,6 +100,15 @@ impl TypeCheckError {
                             .with_message(
                                 "An expression statement must be the last statement in a block",
                             )
+                            .with_color(Color::Red),
+                    );
+            }
+            TypeCheckError::InvalidOperator { operator, location } => {
+                report = report
+                    .with_message(format!("Invalid operator: {}", operator))
+                    .with_label(
+                        Label::new((source_id, location.to_range()))
+                            .with_message(format!("Operator '{}' is not valid in this context", operator))
                             .with_color(Color::Red),
                     );
             }
