@@ -42,11 +42,17 @@ impl TypeChecker {
         }
     }
 
+    /// Validates a function call expression by checking:
+    /// 1. The function exists in the current environment
+    /// 2. The number of arguments matches the function's parameter count
+    /// 3. Each argument's type matches the corresponding parameter type
+    ///
+    /// Returns the function's return type on success.
     pub fn check_function_call(
         &mut self,
         function_call: &ast::FunctionCall,
     ) -> Result<Type, TypeCheckError> {
-        // Check if function exists
+        // Lookup function in environment
         let func_info = match self.environment.get_function(function_call.name.name) {
             Some(info) => info.clone(),
             None => {
@@ -57,14 +63,14 @@ impl TypeChecker {
             }
         };
 
-        // Check argument count
+        // Validate argument count matches parameter count
         if function_call.arguments.len() != func_info.parameters.len() {
             return Err(TypeCheckError::FunctionCallArgumentMismatch {
                 location: function_call.location.clone(),
             });
         }
 
-        // Check argument types
+        // Validate each argument type matches corresponding parameter type
         for (arg_expr, expected_type) in function_call.arguments.iter().zip(&func_info.parameters) {
             let arg_type = self.check_expression(arg_expr)?;
             if arg_type != *expected_type {
@@ -74,7 +80,7 @@ impl TypeChecker {
             }
         }
 
-        // Return the function's return type
+        // Function call is valid - return the function's return type
         Ok(func_info.return_type)
     }
 
@@ -1261,12 +1267,130 @@ mod tests {
         assert!(parse_result.output().is_some());
 
         let program = parse_result.output().unwrap();
-        
+
         // Register the add function first
         let add_func = &program.functions[0];
         checker.check_function_definition(add_func).unwrap();
-        
+
         // Now check the main function with function call
+        let main_func = &program.functions[1];
+        let result = checker.check_function_definition(main_func);
+        assert!(result.is_ok());
+    }
+
+    #[test]
+    fn test_check_function_call_wrong_argument_count() {
+        use parser;
+
+        let mut checker = TypeChecker::new();
+
+        // Define function that takes 2 parameters but call with 1
+        let source = r#"
+            fn add(x: i32, y: i32) -> i32 { x + y }
+            fn main() -> i32 { add(1) }
+        "#;
+
+        let parse_result = parser::parse(source);
+        assert!(parse_result.output().is_some());
+
+        let program = parse_result.output().unwrap();
+
+        // Register the add function first
+        let add_func = &program.functions[0];
+        checker.check_function_definition(add_func).unwrap();
+
+        // This should fail due to wrong argument count
+        let main_func = &program.functions[1];
+        let result = checker.check_function_definition(main_func);
+        assert!(result.is_err());
+        assert!(matches!(
+            result.unwrap_err(),
+            TypeCheckError::FunctionCallArgumentMismatch { .. }
+        ));
+    }
+
+    #[test]
+    fn test_check_function_call_wrong_argument_types() {
+        use parser;
+
+        let mut checker = TypeChecker::new();
+
+        // Define function that takes i32 but call with wrong type
+        let source = r#"
+            fn square(x: i64) -> i64 { x }
+            fn main() -> i64 { square(42) }
+        "#;
+
+        let parse_result = parser::parse(source);
+        assert!(parse_result.output().is_some());
+
+        let program = parse_result.output().unwrap();
+
+        // Register the square function first
+        let square_func = &program.functions[0];
+        checker.check_function_definition(square_func).unwrap();
+
+        // This should fail due to wrong argument type (42 is i32, but function expects i64)
+        let main_func = &program.functions[1];
+        let result = checker.check_function_definition(main_func);
+        assert!(result.is_err());
+        assert!(matches!(
+            result.unwrap_err(),
+            TypeCheckError::FunctionCallArgumentMismatch { .. }
+        ));
+    }
+
+    #[test]
+    fn test_check_function_call_undefined_function() {
+        use parser;
+
+        let mut checker = TypeChecker::new();
+
+        // Call undefined function
+        let source = r#"
+            fn main() -> i32 { undefined_function(1, 2) }
+        "#;
+
+        let parse_result = parser::parse(source);
+        assert!(parse_result.output().is_some());
+
+        let program = parse_result.output().unwrap();
+
+        // This should fail due to undefined function
+        let main_func = &program.functions[0];
+        let result = checker.check_function_definition(main_func);
+        assert!(result.is_err());
+        assert!(matches!(
+            result.unwrap_err(),
+            TypeCheckError::UndefinedIdentifier { .. }
+        ));
+    }
+
+    #[test]
+    fn test_check_function_call_return_type() {
+        use parser;
+
+        let mut checker = TypeChecker::new();
+
+        // Test that function call returns correct type
+        let source = r#"
+            fn get_bool() -> i32 { 1 }
+            fn main() -> i32 { 
+                let x: i32 = get_bool();
+                x
+            }
+        "#;
+
+        let parse_result = parser::parse(source);
+        assert!(parse_result.output().is_some());
+
+        let program = parse_result.output().unwrap();
+
+        // Register the get_bool function first
+        let get_bool_func = &program.functions[0];
+        checker.check_function_definition(get_bool_func).unwrap();
+
+        // This should succeed because function returns i32 which matches variable type
         let main_func = &program.functions[1];
         let result = checker.check_function_definition(main_func);
         assert!(result.is_ok());
