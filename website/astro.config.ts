@@ -1,6 +1,6 @@
 import react from "@astrojs/react"
 import starlight from "@astrojs/starlight"
-import tailwindcss from "@tailwindcss/vite";
+import tailwindcss from "@tailwindcss/vite"
 import { defineConfig } from "astro/config"
 import tsconfigPaths from "vite-tsconfig-paths"
 
@@ -16,9 +16,13 @@ export default defineConfig({
           label: "Guides",
         },
       ],
-      social: {
-        github: "https://github.com/ricora/ao",
-      },
+      social: [
+        {
+          href: "https://github.com/ricora/ao",
+          icon: "github",
+          label: "GitHub",
+        },
+      ],
       title: "Ao Language",
     }),
     react(),
