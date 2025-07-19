@@ -98,12 +98,12 @@ where
             .repeated()
             .foldr(atom, |op, expr| {
                 let op_kind = match op {
-                    Token::Sub => ast::BinaryOperatorKind::Subtract,
-                    Token::Not => ast::BinaryOperatorKind::LogicalNot,
+                    Token::Sub => ast::UnaryOperatorKind::Negate,
+                    Token::Not => ast::UnaryOperatorKind::Not,
                     _ => unreachable!(),
                 };
                 ast::Expression::UnaryExpression(ast::UnaryExpression {
-                    operator: ast::BinaryOperator {
+                    operator: ast::UnaryOperator {
                         operator: op_kind,
                         location: ast::Location {
                             start: 0,

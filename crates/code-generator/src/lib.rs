@@ -250,27 +250,28 @@ impl<'a> CodeGenerator<'a> {
                     }
                     ast::BinaryOperatorKind::LogicalAnd => instructions.push(core::Instruction::I32And),
                     ast::BinaryOperatorKind::LogicalOr => instructions.push(core::Instruction::I32Or),
-                    _ => {}
                 };
                 instructions
             }
             ast::Expression::UnaryExpression(expr) => {
                 let operand = self.generate_expression(&expr.operand);
-                let mut instructions = Vec::with_capacity(operand.len() + 1);
-
-                // calculate operand
-                if expr.operator.operator == ast::BinaryOperatorKind::LogicalNot {
-                    // convert operand to boolean
-                    instructions.extend(operand);
-                    instructions.push(core::Instruction::I32Const(0));
-                    instructions.push(core::Instruction::I32Ne);
-                } else {
-                    instructions.extend(operand);
-                }
+                let mut instructions = Vec::with_capacity(operand.len() + 3);
 
                 // apply operator
-                if expr.operator.operator == ast::BinaryOperatorKind::LogicalNot {
-                    instructions.push(core::Instruction::I32Eqz)
+                match expr.operator.operator {
+                    ast::UnaryOperatorKind::Not => {
+                        // convert operand to boolean, then negate
+                        instructions.extend(operand);
+                        instructions.push(core::Instruction::I32Const(0));
+                        instructions.push(core::Instruction::I32Ne);
+                        instructions.push(core::Instruction::I32Eqz);
+                    }
+                    ast::UnaryOperatorKind::Negate => {
+                        // For negation, we can use i32.const 0 followed by operand then i32.sub
+                        instructions.push(core::Instruction::I32Const(0));
+                        instructions.extend(operand);
+                        instructions.push(core::Instruction::I32Sub);
+                    }
                 };
                 instructions
             }

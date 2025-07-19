@@ -131,10 +131,10 @@ impl TypeChecker {
     ) -> Result<TypeKind, TypeCheckError> {
         let operand_type = self.check_expression(&unary.operand)?;
 
-        use ast::BinaryOperatorKind;
+        use ast::UnaryOperatorKind;
         match unary.operator.operator {
             // Numeric negation: operand numeric type → same type
-            BinaryOperatorKind::Subtract => {
+            UnaryOperatorKind::Negate => {
                 if matches!(operand_type, TypeKind::I32 | TypeKind::I64) {
                     Ok(operand_type)
                 } else {
@@ -146,7 +146,7 @@ impl TypeChecker {
                 }
             }
             // Logical not: operand bool → bool
-            BinaryOperatorKind::LogicalNot => {
+            UnaryOperatorKind::Not => {
                 if operand_type == TypeKind::Bool {
                     Ok(TypeKind::Bool)
                 } else {
@@ -157,11 +157,6 @@ impl TypeChecker {
                     })
                 }
             }
-            // Other operators are not valid for unary expressions
-            _ => Err(TypeCheckError::InvalidOperator {
-                operator: unary.operator.operator.to_string(),
-                location: unary.operator.location.clone(),
-            }),
         }
     }
 
@@ -260,10 +255,6 @@ impl TypeChecker {
                         location: binary.location.clone(),
                     })
                 }
-            }
-            BinaryOperatorKind::LogicalNot => {
-                // This should be handled in unary expressions
-                unreachable!("LogicalNot should be handled in unary expressions")
             }
         }
     }
@@ -789,7 +780,7 @@ mod tests {
 
     #[test]
     fn test_check_unary_expression_logical_not() {
-        use ast::{Expression, IntegerLiteral, Location, BinaryOperator, BinaryOperatorKind, UnaryExpression};
+        use ast::{Expression, IntegerLiteral, Location, UnaryOperator, UnaryOperatorKind, UnaryExpression};
 
         let mut checker = TypeChecker::new();
 
@@ -804,8 +795,8 @@ mod tests {
         }));
 
         let unary_expr = UnaryExpression {
-            operator: BinaryOperator {
-                operator: BinaryOperatorKind::LogicalNot,
+            operator: UnaryOperator {
+                operator: UnaryOperatorKind::Not,
                 location: Location {
                     start: 0,
                     end: 1,
@@ -857,7 +848,7 @@ mod tests {
         // Create a manual test with comparison that returns bool
         use ast::{
             BinaryExpression, Expression, IntegerLiteral, Location, BinaryOperator, BinaryOperatorKind,
-            UnaryExpression,
+            UnaryExpression, UnaryOperator, UnaryOperatorKind,
         };
 
         // Create 1 == 2 (which is bool)
@@ -897,8 +888,8 @@ mod tests {
 
         // Apply logical not to the comparison: !(1 == 2)
         let unary_expr = UnaryExpression {
-            operator: BinaryOperator {
-                operator: BinaryOperatorKind::LogicalNot,
+            operator: UnaryOperator {
+                operator: UnaryOperatorKind::Not,
                 location: Location {
                     start: 0,
                     end: 1,
