@@ -111,3 +111,100 @@ impl TypeCheckError {
         String::from_utf8(result).unwrap()
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::TypeChecker;
+
+    #[test]
+    fn test_error_formatting() {
+        let checker = TypeChecker::new();
+        let error = TypeCheckError::TypeMismatch {
+            expected: "i32".to_string(),
+            found: "i64".to_string(),
+            location: ast::Location {
+                start: 10,
+                end: 15,
+                context: (),
+            },
+        };
+
+        let source = "let x: i32 = 42i64;";
+        let formatted = checker.format_error(&error, "test.ao", source);
+
+        // Just verify that the error formatting doesn't panic and contains key information
+        assert!(formatted.contains("Type mismatch"));
+        assert!(formatted.contains("i32"));
+        assert!(formatted.contains("i64"));
+    }
+
+    #[test]
+    fn test_error_reporting_with_real_source() {
+        let checker = TypeChecker::new();
+
+        let source = "let x: i32 = 42i64;"; // Type mismatch error
+
+        // Create a type error with realistic source locations
+        let error = TypeCheckError::TypeMismatch {
+            expected: "i32".to_string(),
+            found: "i64".to_string(),
+            location: ast::Location {
+                start: 13,
+                end: 18,
+                context: (),
+            }, // "42i64" position
+        };
+
+        let formatted = checker.format_error(&error, "test.ao", source);
+
+        // Verify the error message contains the expected information
+        assert!(formatted.contains("Type mismatch"));
+        assert!(formatted.contains("i32"));
+        assert!(formatted.contains("i64"));
+        assert!(formatted.contains("test.ao"));
+
+        // Print the formatted error to see how it looks
+        println!("Formatted error:\n{}", formatted);
+    }
+
+    #[test]
+    fn test_duplicate_variable_error_with_parser() {
+        use parser;
+
+        let mut checker = TypeChecker::new();
+
+        let source = r#"
+            fn test() -> i32 {
+                let x: i32 = 1;
+                let x: i32 = 2;
+                x
+            }
+        "#;
+
+        let parse_result = parser::parse(source);
+        assert!(parse_result.output().is_some());
+
+        let program = parse_result.output().unwrap();
+        let function = &program.functions[0];
+
+        let result = checker.check_function_definition(function);
+
+        if let Err(error) = result {
+            match &error {
+                TypeCheckError::DuplicateDefinition { name, .. } => {
+                    assert_eq!(name, "x");
+
+                    // Test error formatting
+                    let formatted = checker.format_error(&error, "test.ao", source);
+                    assert!(formatted.contains("Duplicate definition"));
+                    assert!(formatted.contains("already defined"));
+                    println!("Duplicate variable error:\n{}", formatted);
+                }
+                _ => panic!("Expected duplicate definition error, got: {:?}", error),
+            }
+        } else {
+            panic!("Expected error for duplicate variable definition");
+        }
+    }
+}

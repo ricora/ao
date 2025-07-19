@@ -106,3 +106,227 @@ impl Default for TypeEnvironment {
         Self::new()
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_type_environment_creation() {
+        let env = TypeEnvironment::new();
+        assert_eq!(env.variable_scopes.len(), 1); // Should have global scope
+        assert!(env.functions.is_empty());
+    }
+
+    #[test]
+    fn test_add_variable_to_environment() {
+        let mut env = TypeEnvironment::new();
+        env.add_variable(
+            "x".to_string(),
+            VariableInfo {
+                var_type: Type::I32,
+                mutable: false,
+                initialized: true,
+            },
+        );
+
+        let var_info = env.get_variable("x").unwrap();
+        assert_eq!(var_info.var_type, Type::I32);
+        assert!(!var_info.mutable);
+        assert!(var_info.initialized);
+    }
+
+    #[test]
+    fn test_block_scoping() {
+        let mut env = TypeEnvironment::new();
+
+        // Add variable 'x' in outer scope
+        env.push_scope();
+        env.add_variable(
+            "x".to_string(),
+            VariableInfo {
+                var_type: Type::I32,
+                mutable: false,
+                initialized: true,
+            },
+        );
+
+        // Enter inner scope
+        env.push_scope();
+        env.add_variable(
+            "y".to_string(),
+            VariableInfo {
+                var_type: Type::I64,
+                mutable: false,
+                initialized: true,
+            },
+        );
+
+        // Both variables should be accessible
+        assert!(env.get_variable("x").is_some());
+        assert!(env.get_variable("y").is_some());
+
+        // Exit inner scope
+        env.pop_scope();
+
+        // Only outer variable should be accessible
+        assert!(env.get_variable("x").is_some());
+        assert!(env.get_variable("y").is_none());
+
+        env.pop_scope();
+    }
+
+    #[test]
+    fn test_nested_block_scopes() {
+        let mut env = TypeEnvironment::new();
+
+        // Global scope
+        env.add_variable(
+            "global".to_string(),
+            VariableInfo {
+                var_type: Type::I32,
+                mutable: false,
+                initialized: true,
+            },
+        );
+
+        // Level 1 scope
+        env.push_scope();
+        env.add_variable(
+            "level1".to_string(),
+            VariableInfo {
+                var_type: Type::I64,
+                mutable: false,
+                initialized: true,
+            },
+        );
+
+        // Level 2 scope
+        env.push_scope();
+        env.add_variable(
+            "level2".to_string(),
+            VariableInfo {
+                var_type: Type::Bool,
+                mutable: false,
+                initialized: true,
+            },
+        );
+
+        // All variables should be accessible from deepest scope
+        assert!(env.get_variable("global").is_some());
+        assert!(env.get_variable("level1").is_some());
+        assert!(env.get_variable("level2").is_some());
+
+        // Pop level 2
+        env.pop_scope();
+        assert!(env.get_variable("global").is_some());
+        assert!(env.get_variable("level1").is_some());
+        assert!(env.get_variable("level2").is_none());
+
+        // Pop level 1
+        env.pop_scope();
+        assert!(env.get_variable("global").is_some());
+        assert!(env.get_variable("level1").is_none());
+        assert!(env.get_variable("level2").is_none());
+    }
+
+    #[test]
+    fn test_variable_shadowing() {
+        let mut env = TypeEnvironment::new();
+
+        // Add variable 'x' in outer scope
+        env.add_variable(
+            "x".to_string(),
+            VariableInfo {
+                var_type: Type::I32,
+                mutable: false,
+                initialized: true,
+            },
+        );
+
+        // Verify outer variable
+        assert_eq!(
+            env.get_variable("x").unwrap().var_type,
+            Type::I32
+        );
+
+        // Enter inner scope and shadow 'x'
+        env.push_scope();
+        env.add_variable(
+            "x".to_string(),
+            VariableInfo {
+                var_type: Type::I64,
+                mutable: true,
+                initialized: true,
+            },
+        );
+
+        // Should see inner variable (shadowing)
+        let var_info = env.get_variable("x").unwrap();
+        assert_eq!(var_info.var_type, Type::I64);
+        assert!(var_info.mutable);
+
+        // Exit inner scope
+        env.pop_scope();
+
+        // Should see outer variable again
+        let var_info = env.get_variable("x").unwrap();
+        assert_eq!(var_info.var_type, Type::I32);
+        assert!(!var_info.mutable);
+    }
+
+    #[test]
+    fn test_function_management() {
+        let mut env = TypeEnvironment::new();
+
+        env.add_function(
+            "test_func".to_string(),
+            FunctionInfo {
+                parameters: vec![Type::I32, Type::I64],
+                return_type: Type::Bool,
+            },
+        );
+
+        let func_info = env.get_function("test_func").unwrap();
+        assert_eq!(func_info.parameters, vec![Type::I32, Type::I64]);
+        assert_eq!(func_info.return_type, Type::Bool);
+
+        assert!(env.get_function("nonexistent").is_none());
+    }
+
+    #[test]
+    fn test_variable_exists_in_current_scope() {
+        let mut env = TypeEnvironment::new();
+
+        // Add to global scope
+        env.add_variable(
+            "global".to_string(),
+            VariableInfo {
+                var_type: Type::I32,
+                mutable: false,
+                initialized: true,
+            },
+        );
+
+        assert!(env.variable_exists_in_current_scope("global"));
+
+        // Push new scope
+        env.push_scope();
+        
+        // Global variable should not exist in current scope
+        assert!(!env.variable_exists_in_current_scope("global"));
+
+        // Add to current scope
+        env.add_variable(
+            "local".to_string(),
+            VariableInfo {
+                var_type: Type::I64,
+                mutable: false,
+                initialized: true,
+            },
+        );
+
+        assert!(env.variable_exists_in_current_scope("local"));
+        assert!(!env.variable_exists_in_current_scope("global"));
+    }
+}
