@@ -87,6 +87,7 @@ cargo run -- --command "fn main() -> i32 { 42 }"
 - `src/main.rs` - CLI entry point
 - `crates/ast/src/lib.rs` - AST node definitions
 - `crates/parser/src/lib.rs` - Main parser implementation
+- `crates/parser/src/grammar.bnf` - BNF grammar for the Ao language
 - `crates/code-generator/src/lib.rs` - WASM code generation
 - `crates/code-generator/src/template.wat` - WASM component template
 - `website/src/features/playground/` - Web-based language playground

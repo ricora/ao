@@ -1,0 +1,38 @@
+program = function_definition*
+function_definition = "fn" identifier parameters "->" type block
+parameters = "(" parameter ("," parameter)* ")"
+parameter = identifier ":" type
+block = "{" statement* expression? "}"
+block_without_expression = "{" statement* "}"
+block_with_expression = "{" statement* expression "}"
+statement =
+    variable_definition_statement
+  | if_statement
+  | expression_statement
+variable_definition_statement =
+    "let" identifier ":" type "=" expression ";"     (* immutable *)
+  | "var" identifier ":" type ("=" expression)? ";"  (* mutable *)
+if_statement = "if" expression block_without_expression ("else" if_statement | block_without_expression)?
+expression_statement = expression ";"
+
+expression = logical_expression
+logical_expression = comparison_expression (("&&" | "||") comparison_expression)*
+comparison_expression = add_expression (("<" | "<=" | ">" | ">=" | "==" | "!=") add_expression)*
+add_expression = mul_expression (("+" | "-") mul_expression)*
+mul_expression = unary_expression (("*" | "/") unary_expression)*
+unary_expression =
+    "-" unary_expression
+  | "!" unary_expression
+  | primary_expression
+primary_expression =
+    literal
+  | assignment_expression
+  | function_call
+  | identifier
+  | "(" expression ")"
+assignment_expression = identifier "=" expression
+function_call = identifier "(" expression* ")"
+
+literal = INTEGER
+identifier = IDENTIFIER
+type = "i32" | "i64"
