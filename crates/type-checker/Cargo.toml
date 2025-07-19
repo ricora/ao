@@ -4,3 +4,9 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
+ast = { path = "../ast" }
+thiserror = "2.0"
+ariadne = "0.4"
+
+[dev-dependencies]
+parser = { path = "../parser" }
