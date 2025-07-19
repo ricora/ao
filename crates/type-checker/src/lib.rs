@@ -4,5 +4,5 @@ pub mod error;
 
 // Re-export main types for convenience
 pub use checker::TypeChecker;
-pub use env::{Type, TypeEnvironment, VariableInfo, FunctionInfo};
+pub use env::{FunctionInfo, Type, TypeEnvironment, VariableInfo};
 pub use error::TypeCheckError;

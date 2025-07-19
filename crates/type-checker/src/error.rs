@@ -23,7 +23,10 @@ pub enum TypeCheckError {
     #[error("Expression must be last in block")]
     ExpressionMustBeLastInBlock { location: Location },
     #[error("Invalid operator: {operator}")]
-    InvalidOperator { operator: String, location: Location },
+    InvalidOperator {
+        operator: String,
+        location: Location,
+    },
 }
 
 impl TypeCheckError {
@@ -38,39 +41,38 @@ impl TypeCheckError {
             } => {
                 report = report
                     .with_message(format!(
-                        "Type mismatch: expected {}, found {}",
-                        expected, found
+                        "Type mismatch: expected {expected}, found {found}"
                     ))
                     .with_label(
                         Label::new((source_id, location.to_range()))
-                            .with_message(format!("Expected {} but found {}", expected, found))
+                            .with_message(format!("Expected {expected} but found {found}"))
                             .with_color(Color::Red),
                     );
             }
             TypeCheckError::UndefinedIdentifier { name, location } => {
                 report = report
-                    .with_message(format!("Undefined identifier: {}", name))
+                    .with_message(format!("Undefined identifier: {name}"))
                     .with_label(
                         Label::new((source_id, location.to_range()))
-                            .with_message(format!("'{}' is not defined", name))
+                            .with_message(format!("'{name}' is not defined"))
                             .with_color(Color::Red),
                     );
             }
             TypeCheckError::UninitializedVariable { name, location } => {
                 report = report
-                    .with_message(format!("Use of uninitialized variable: {}", name))
+                    .with_message(format!("Use of uninitialized variable: {name}"))
                     .with_label(
                         Label::new((source_id, location.to_range()))
-                            .with_message(format!("'{}' used before being initialized", name))
+                            .with_message(format!("'{name}' used before being initialized"))
                             .with_color(Color::Red),
                     );
             }
             TypeCheckError::AssignmentToImmutable { name, location } => {
                 report = report
-                    .with_message(format!("Assignment to immutable variable: {}", name))
+                    .with_message(format!("Assignment to immutable variable: {name}"))
                     .with_label(
                         Label::new((source_id, location.to_range()))
-                            .with_message(format!("'{}' is immutable and cannot be assigned", name))
+                            .with_message(format!("'{name}' is immutable and cannot be assigned"))
                             .with_color(Color::Red),
                     );
             }
@@ -85,10 +87,10 @@ impl TypeCheckError {
             }
             TypeCheckError::DuplicateDefinition { name, location } => {
                 report = report
-                    .with_message(format!("Duplicate definition: {}", name))
+                    .with_message(format!("Duplicate definition: {name}"))
                     .with_label(
                         Label::new((source_id, location.to_range()))
-                            .with_message(format!("'{}' is already defined", name))
+                            .with_message(format!("'{name}' is already defined"))
                             .with_color(Color::Red),
                     );
             }
@@ -105,10 +107,12 @@ impl TypeCheckError {
             }
             TypeCheckError::InvalidOperator { operator, location } => {
                 report = report
-                    .with_message(format!("Invalid operator: {}", operator))
+                    .with_message(format!("Invalid operator: {operator}"))
                     .with_label(
                         Label::new((source_id, location.to_range()))
-                            .with_message(format!("Operator '{}' is not valid in this context", operator))
+                            .with_message(format!(
+                                "Operator '{operator}' is not valid in this context"
+                            ))
                             .with_color(Color::Red),
                     );
             }
@@ -176,7 +180,7 @@ mod tests {
         assert!(formatted.contains("test.ao"));
 
         // Print the formatted error to see how it looks
-        println!("Formatted error:\n{}", formatted);
+        println!("Formatted error:\n{formatted}");
     }
 
     #[test]
@@ -210,9 +214,9 @@ mod tests {
                     let formatted = checker.format_error(&error, "test.ao", source);
                     assert!(formatted.contains("Duplicate definition"));
                     assert!(formatted.contains("already defined"));
-                    println!("Duplicate variable error:\n{}", formatted);
+                    println!("Duplicate variable error:\n{formatted}");
                 }
-                _ => panic!("Expected duplicate definition error, got: {:?}", error),
+                _ => panic!("Expected duplicate definition error, got: {error:?}"),
             }
         } else {
             panic!("Expected error for duplicate variable definition");

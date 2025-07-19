@@ -1,5 +1,5 @@
-use std::collections::HashMap;
 use ast::TypeKind;
+use std::collections::HashMap;
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum Type {
@@ -245,10 +245,7 @@ mod tests {
         );
 
         // Verify outer variable
-        assert_eq!(
-            env.get_variable("x").unwrap().var_type,
-            Type::I32
-        );
+        assert_eq!(env.get_variable("x").unwrap().var_type, Type::I32);
 
         // Enter inner scope and shadow 'x'
         env.push_scope();
@@ -312,7 +309,7 @@ mod tests {
 
         // Push new scope
         env.push_scope();
-        
+
         // Global variable should not exist in current scope
         assert!(!env.variable_exists_in_current_scope("global"));
 

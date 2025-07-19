@@ -479,7 +479,7 @@ mod tests {
 
         // Extract the variable definition from the parsed AST
         if let ast::Statement::VariableDefinition(var_def) = &statements[0] {
-            let result = checker.check_variable_definition(&var_def);
+            let result = checker.check_variable_definition(var_def);
             assert!(result.is_ok());
 
             // Check that variable was added to environment
@@ -1235,7 +1235,7 @@ mod tests {
                 context: (),
             },
         }));
-        
+
         // Use addition instead of comparison - this should fail
         let condition = Expression::BinaryExpression(BinaryExpression {
             left,
@@ -1282,7 +1282,10 @@ mod tests {
 
         // This should fail because condition is i32 instead of bool
         let result = checker.check_statement(&Statement::IfStatement(if_stmt));
-        assert!(result.is_err(), "If statement with non-boolean condition should fail");
+        assert!(
+            result.is_err(),
+            "If statement with non-boolean condition should fail"
+        );
         if let Err(e) = result {
             assert!(matches!(e, TypeCheckError::TypeMismatch { .. }));
         }
