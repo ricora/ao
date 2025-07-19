@@ -42,6 +42,42 @@ impl TypeChecker {
         }
     }
 
+    pub fn check_function_call(
+        &mut self,
+        function_call: &ast::FunctionCall,
+    ) -> Result<Type, TypeCheckError> {
+        // Check if function exists
+        let func_info = match self.environment.get_function(function_call.name.name) {
+            Some(info) => info.clone(),
+            None => {
+                return Err(TypeCheckError::UndefinedIdentifier {
+                    name: function_call.name.name.to_string(),
+                    location: function_call.name.location.clone(),
+                });
+            }
+        };
+
+        // Check argument count
+        if function_call.arguments.len() != func_info.parameters.len() {
+            return Err(TypeCheckError::FunctionCallArgumentMismatch {
+                location: function_call.location.clone(),
+            });
+        }
+
+        // Check argument types
+        for (arg_expr, expected_type) in function_call.arguments.iter().zip(&func_info.parameters) {
+            let arg_type = self.check_expression(arg_expr)?;
+            if arg_type != *expected_type {
+                return Err(TypeCheckError::FunctionCallArgumentMismatch {
+                    location: function_call.location.clone(),
+                });
+            }
+        }
+
+        // Return the function's return type
+        Ok(func_info.return_type)
+    }
+
     pub fn check_expression(&mut self, expr: &ast::Expression) -> Result<Type, TypeCheckError> {
         match expr {
             ast::Expression::IntegerLiteral(literal) => self.check_integer_literal(literal),
@@ -51,7 +87,7 @@ impl TypeChecker {
                 self.check_assignment_expression(assignment)
             }
             ast::Expression::Identifier(identifier) => self.check_identifier_expression(identifier),
-            ast::Expression::FunctionCall(_) => todo!("Function call expressions not implemented"),
+            ast::Expression::FunctionCall(function_call) => self.check_function_call(function_call),
         }
     }
 
