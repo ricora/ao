@@ -131,10 +131,10 @@ impl TypeChecker {
     ) -> Result<TypeKind, TypeCheckError> {
         let operand_type = self.check_expression(&unary.operand)?;
 
-        use ast::OperatorKind;
+        use ast::BinaryOperatorKind;
         match unary.operator.operator {
             // Numeric negation: operand numeric type → same type
-            OperatorKind::Subtract => {
+            BinaryOperatorKind::Subtract => {
                 if matches!(operand_type, TypeKind::I32 | TypeKind::I64) {
                     Ok(operand_type)
                 } else {
@@ -146,7 +146,7 @@ impl TypeChecker {
                 }
             }
             // Logical not: operand bool → bool
-            OperatorKind::LogicalNot => {
+            BinaryOperatorKind::LogicalNot => {
                 if operand_type == TypeKind::Bool {
                     Ok(TypeKind::Bool)
                 } else {
@@ -211,13 +211,13 @@ impl TypeChecker {
         let left_type = self.check_expression(&binary.left)?;
         let right_type = self.check_expression(&binary.right)?;
 
-        use ast::OperatorKind;
+        use ast::BinaryOperatorKind;
         match binary.operator.operator {
             // Arithmetic operators: operands same numeric type → same type
-            OperatorKind::Add
-            | OperatorKind::Subtract
-            | OperatorKind::Multiply
-            | OperatorKind::Divide => {
+            BinaryOperatorKind::Add
+            | BinaryOperatorKind::Subtract
+            | BinaryOperatorKind::Multiply
+            | BinaryOperatorKind::Divide => {
                 if left_type == right_type && matches!(left_type, TypeKind::I32 | TypeKind::I64) {
                     Ok(left_type)
                 } else {
@@ -229,12 +229,12 @@ impl TypeChecker {
                 }
             }
             // Comparison operators: operands same type → bool
-            OperatorKind::LessThan
-            | OperatorKind::LessThanOrEqual
-            | OperatorKind::GreaterThan
-            | OperatorKind::GreaterThanOrEqual
-            | OperatorKind::Equal
-            | OperatorKind::NotEqual => {
+            BinaryOperatorKind::LessThan
+            | BinaryOperatorKind::LessThanOrEqual
+            | BinaryOperatorKind::GreaterThan
+            | BinaryOperatorKind::GreaterThanOrEqual
+            | BinaryOperatorKind::Equal
+            | BinaryOperatorKind::NotEqual => {
                 if left_type == right_type {
                     Ok(TypeKind::Bool)
                 } else {
@@ -246,7 +246,7 @@ impl TypeChecker {
                 }
             }
             // Logical operators: operands bool → bool
-            OperatorKind::LogicalAnd | OperatorKind::LogicalOr => {
+            BinaryOperatorKind::LogicalAnd | BinaryOperatorKind::LogicalOr => {
                 if left_type == TypeKind::Bool && right_type == TypeKind::Bool {
                     Ok(TypeKind::Bool)
                 } else {
@@ -261,7 +261,7 @@ impl TypeChecker {
                     })
                 }
             }
-            OperatorKind::LogicalNot => {
+            BinaryOperatorKind::LogicalNot => {
                 // This should be handled in unary expressions
                 unreachable!("LogicalNot should be handled in unary expressions")
             }
@@ -500,7 +500,7 @@ mod tests {
 
     #[test]
     fn test_check_binary_expression_arithmetic() {
-        use ast::{BinaryExpression, Expression, IntegerLiteral, Location, Operator, OperatorKind};
+        use ast::{BinaryExpression, Expression, IntegerLiteral, Location, BinaryOperator, BinaryOperatorKind};
 
         let mut checker = TypeChecker::new();
 
@@ -524,8 +524,8 @@ mod tests {
 
         let binary_expr = BinaryExpression {
             left,
-            operator: Operator {
-                operator: OperatorKind::Add,
+            operator: BinaryOperator {
+                operator: BinaryOperatorKind::Add,
                 location: Location {
                     start: 2,
                     end: 3,
@@ -789,7 +789,7 @@ mod tests {
 
     #[test]
     fn test_check_unary_expression_logical_not() {
-        use ast::{Expression, IntegerLiteral, Location, Operator, OperatorKind, UnaryExpression};
+        use ast::{Expression, IntegerLiteral, Location, BinaryOperator, BinaryOperatorKind, UnaryExpression};
 
         let mut checker = TypeChecker::new();
 
@@ -804,8 +804,8 @@ mod tests {
         }));
 
         let unary_expr = UnaryExpression {
-            operator: Operator {
-                operator: OperatorKind::LogicalNot,
+            operator: BinaryOperator {
+                operator: BinaryOperatorKind::LogicalNot,
                 location: Location {
                     start: 0,
                     end: 1,
@@ -856,7 +856,7 @@ mod tests {
 
         // Create a manual test with comparison that returns bool
         use ast::{
-            BinaryExpression, Expression, IntegerLiteral, Location, Operator, OperatorKind,
+            BinaryExpression, Expression, IntegerLiteral, Location, BinaryOperator, BinaryOperatorKind,
             UnaryExpression,
         };
 
@@ -879,8 +879,8 @@ mod tests {
         }));
         let comparison = Box::new(Expression::BinaryExpression(BinaryExpression {
             left,
-            operator: Operator {
-                operator: OperatorKind::Equal,
+            operator: BinaryOperator {
+                operator: BinaryOperatorKind::Equal,
                 location: Location {
                     start: 2,
                     end: 4,
@@ -897,8 +897,8 @@ mod tests {
 
         // Apply logical not to the comparison: !(1 == 2)
         let unary_expr = UnaryExpression {
-            operator: Operator {
-                operator: OperatorKind::LogicalNot,
+            operator: BinaryOperator {
+                operator: BinaryOperatorKind::LogicalNot,
                 location: Location {
                     start: 0,
                     end: 1,
@@ -1188,8 +1188,8 @@ mod tests {
     #[test]
     fn test_check_if_statement_returns_unit() {
         use ast::{
-            BinaryExpression, Block, Expression, IfStatement, IntegerLiteral, Location, Operator,
-            OperatorKind, Statement, Statements,
+            BinaryExpression, Block, Expression, IfStatement, IntegerLiteral, Location, BinaryOperator,
+            BinaryOperatorKind, Statement, Statements,
         };
 
         let mut checker = TypeChecker::new();
@@ -1213,8 +1213,8 @@ mod tests {
         }));
         let condition = Expression::BinaryExpression(BinaryExpression {
             left,
-            operator: Operator {
-                operator: OperatorKind::Equal,
+            operator: BinaryOperator {
+                operator: BinaryOperatorKind::Equal,
                 location: Location {
                     start: 5,
                     end: 7,

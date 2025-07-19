@@ -207,8 +207,8 @@ impl<'a> CodeGenerator<'a> {
                 let mut instructions = Vec::with_capacity(
                     lhs.len()
                         + rhs.len()
-                        + if expr.operator.operator == ast::OperatorKind::LogicalAnd
-                            || expr.operator.operator == ast::OperatorKind::LogicalOr
+                        + if expr.operator.operator == ast::BinaryOperatorKind::LogicalAnd
+                            || expr.operator.operator == ast::BinaryOperatorKind::LogicalOr
                         {
                             5
                         } else {
@@ -217,8 +217,8 @@ impl<'a> CodeGenerator<'a> {
                 );
 
                 // calculate lhs and rhs
-                if expr.operator.operator == ast::OperatorKind::LogicalAnd
-                    || expr.operator.operator == ast::OperatorKind::LogicalOr
+                if expr.operator.operator == ast::BinaryOperatorKind::LogicalAnd
+                    || expr.operator.operator == ast::BinaryOperatorKind::LogicalOr
                 {
                     // convert lhs and rhs to boolean
                     instructions.extend(lhs);
@@ -234,22 +234,22 @@ impl<'a> CodeGenerator<'a> {
 
                 // apply operator
                 match expr.operator.operator {
-                    ast::OperatorKind::Add => instructions.push(core::Instruction::I32Add),
-                    ast::OperatorKind::Subtract => instructions.push(core::Instruction::I32Sub),
-                    ast::OperatorKind::Multiply => instructions.push(core::Instruction::I32Mul),
-                    ast::OperatorKind::Divide => instructions.push(core::Instruction::I32DivS),
-                    ast::OperatorKind::Equal => instructions.push(core::Instruction::I32Eq),
-                    ast::OperatorKind::NotEqual => instructions.push(core::Instruction::I32Ne),
-                    ast::OperatorKind::LessThan => instructions.push(core::Instruction::I32LtS),
-                    ast::OperatorKind::LessThanOrEqual => {
+                    ast::BinaryOperatorKind::Add => instructions.push(core::Instruction::I32Add),
+                    ast::BinaryOperatorKind::Subtract => instructions.push(core::Instruction::I32Sub),
+                    ast::BinaryOperatorKind::Multiply => instructions.push(core::Instruction::I32Mul),
+                    ast::BinaryOperatorKind::Divide => instructions.push(core::Instruction::I32DivS),
+                    ast::BinaryOperatorKind::Equal => instructions.push(core::Instruction::I32Eq),
+                    ast::BinaryOperatorKind::NotEqual => instructions.push(core::Instruction::I32Ne),
+                    ast::BinaryOperatorKind::LessThan => instructions.push(core::Instruction::I32LtS),
+                    ast::BinaryOperatorKind::LessThanOrEqual => {
                         instructions.push(core::Instruction::I32LeS)
                     }
-                    ast::OperatorKind::GreaterThan => instructions.push(core::Instruction::I32GtS),
-                    ast::OperatorKind::GreaterThanOrEqual => {
+                    ast::BinaryOperatorKind::GreaterThan => instructions.push(core::Instruction::I32GtS),
+                    ast::BinaryOperatorKind::GreaterThanOrEqual => {
                         instructions.push(core::Instruction::I32GeS)
                     }
-                    ast::OperatorKind::LogicalAnd => instructions.push(core::Instruction::I32And),
-                    ast::OperatorKind::LogicalOr => instructions.push(core::Instruction::I32Or),
+                    ast::BinaryOperatorKind::LogicalAnd => instructions.push(core::Instruction::I32And),
+                    ast::BinaryOperatorKind::LogicalOr => instructions.push(core::Instruction::I32Or),
                     _ => {}
                 };
                 instructions
@@ -259,7 +259,7 @@ impl<'a> CodeGenerator<'a> {
                 let mut instructions = Vec::with_capacity(operand.len() + 1);
 
                 // calculate operand
-                if expr.operator.operator == ast::OperatorKind::LogicalNot {
+                if expr.operator.operator == ast::BinaryOperatorKind::LogicalNot {
                     // convert operand to boolean
                     instructions.extend(operand);
                     instructions.push(core::Instruction::I32Const(0));
@@ -269,7 +269,7 @@ impl<'a> CodeGenerator<'a> {
                 }
 
                 // apply operator
-                if expr.operator.operator == ast::OperatorKind::LogicalNot {
+                if expr.operator.operator == ast::BinaryOperatorKind::LogicalNot {
                     instructions.push(core::Instruction::I32Eqz)
                 };
                 instructions

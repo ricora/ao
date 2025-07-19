@@ -148,7 +148,7 @@ impl<'a> Expression<'a> {
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-pub enum OperatorKind {
+pub enum BinaryOperatorKind {
     Add,
     Subtract,
     Multiply,
@@ -161,55 +161,85 @@ pub enum OperatorKind {
     NotEqual,
     LogicalAnd,
     LogicalOr,
-    LogicalNot,
 }
 
-impl std::fmt::Display for OperatorKind {
+impl std::fmt::Display for BinaryOperatorKind {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
-            OperatorKind::Add => write!(f, "+"),
-            OperatorKind::Subtract => write!(f, "-"),
-            OperatorKind::Multiply => write!(f, "*"),
-            OperatorKind::Divide => write!(f, "/"),
-            OperatorKind::LessThan => write!(f, "<"),
-            OperatorKind::LessThanOrEqual => write!(f, "<="),
-            OperatorKind::GreaterThan => write!(f, ">"),
-            OperatorKind::GreaterThanOrEqual => write!(f, ">="),
-            OperatorKind::Equal => write!(f, "=="),
-            OperatorKind::NotEqual => write!(f, "!="),
-            OperatorKind::LogicalAnd => write!(f, "&&"),
-            OperatorKind::LogicalOr => write!(f, "||"),
-            OperatorKind::LogicalNot => write!(f, "!"),
+            BinaryOperatorKind::Add => write!(f, "+"),
+            BinaryOperatorKind::Subtract => write!(f, "-"),
+            BinaryOperatorKind::Multiply => write!(f, "*"),
+            BinaryOperatorKind::Divide => write!(f, "/"),
+            BinaryOperatorKind::LessThan => write!(f, "<"),
+            BinaryOperatorKind::LessThanOrEqual => write!(f, "<="),
+            BinaryOperatorKind::GreaterThan => write!(f, ">"),
+            BinaryOperatorKind::GreaterThanOrEqual => write!(f, ">="),
+            BinaryOperatorKind::Equal => write!(f, "=="),
+            BinaryOperatorKind::NotEqual => write!(f, "!="),
+            BinaryOperatorKind::LogicalAnd => write!(f, "&&"),
+            BinaryOperatorKind::LogicalOr => write!(f, "||"),
         }
     }
 }
 
-impl std::str::FromStr for OperatorKind {
+impl std::str::FromStr for BinaryOperatorKind {
     type Err = &'static str;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
-            "+" => Ok(OperatorKind::Add),
-            "-" => Ok(OperatorKind::Subtract),
-            "*" => Ok(OperatorKind::Multiply),
-            "/" => Ok(OperatorKind::Divide),
-            "<" => Ok(OperatorKind::LessThan),
-            "<=" => Ok(OperatorKind::LessThanOrEqual),
-            ">" => Ok(OperatorKind::GreaterThan),
-            ">=" => Ok(OperatorKind::GreaterThanOrEqual),
-            "==" => Ok(OperatorKind::Equal),
-            "!=" => Ok(OperatorKind::NotEqual),
-            "&&" => Ok(OperatorKind::LogicalAnd),
-            "||" => Ok(OperatorKind::LogicalOr),
-            "!" => Ok(OperatorKind::LogicalNot),
+            "+" => Ok(BinaryOperatorKind::Add),
+            "-" => Ok(BinaryOperatorKind::Subtract),
+            "*" => Ok(BinaryOperatorKind::Multiply),
+            "/" => Ok(BinaryOperatorKind::Divide),
+            "<" => Ok(BinaryOperatorKind::LessThan),
+            "<=" => Ok(BinaryOperatorKind::LessThanOrEqual),
+            ">" => Ok(BinaryOperatorKind::GreaterThan),
+            ">=" => Ok(BinaryOperatorKind::GreaterThanOrEqual),
+            "==" => Ok(BinaryOperatorKind::Equal),
+            "!=" => Ok(BinaryOperatorKind::NotEqual),
+            "&&" => Ok(BinaryOperatorKind::LogicalAnd),
+            "||" => Ok(BinaryOperatorKind::LogicalOr),
             _ => Err("Invalid operator"),
         }
     }
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-pub struct Operator {
-    pub operator: OperatorKind,
+pub struct BinaryOperator {
+    pub operator: BinaryOperatorKind,
+    pub location: Location,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub enum UnaryOperatorKind {
+    Negate,
+    Not,
+}
+
+impl std::fmt::Display for UnaryOperatorKind {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        match self {
+            UnaryOperatorKind::Negate => write!(f, "-"),
+            UnaryOperatorKind::Not => write!(f, "!"),
+        }
+    }
+}
+
+impl std::str::FromStr for UnaryOperatorKind {
+    type Err = &'static str;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "-" => Ok(UnaryOperatorKind::Negate),
+            "!" => Ok(UnaryOperatorKind::Not),
+            _ => Err("Invalid unary operator"),
+        }
+    }
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct UnaryOperator {
+    pub operator: UnaryOperatorKind,
     pub location: Location,
 }
 
@@ -217,7 +247,7 @@ pub struct Operator {
 pub struct BinaryExpression<'a> {
     #[serde(borrow)]
     pub left: Box<Expression<'a>>,
-    pub operator: Operator,
+    pub operator: BinaryOperator,
     #[serde(borrow)]
     pub right: Box<Expression<'a>>,
     pub location: Location,
@@ -225,7 +255,7 @@ pub struct BinaryExpression<'a> {
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct UnaryExpression<'a> {
-    pub operator: Operator,
+    pub operator: UnaryOperator,
     #[serde(borrow)]
     pub operand: Box<Expression<'a>>,
     pub location: Location,

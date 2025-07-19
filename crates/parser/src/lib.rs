@@ -98,12 +98,12 @@ where
             .repeated()
             .foldr(atom, |op, expr| {
                 let op_kind = match op {
-                    Token::Sub => ast::OperatorKind::Subtract,
-                    Token::Not => ast::OperatorKind::LogicalNot,
+                    Token::Sub => ast::BinaryOperatorKind::Subtract,
+                    Token::Not => ast::BinaryOperatorKind::LogicalNot,
                     _ => unreachable!(),
                 };
                 ast::Expression::UnaryExpression(ast::UnaryExpression {
-                    operator: ast::Operator {
+                    operator: ast::BinaryOperator {
                         operator: op_kind,
                         location: ast::Location {
                             start: 0,
@@ -127,13 +127,13 @@ where
                 just(Token::Mul).or(just(Token::Div)).then(unary).repeated(),
                 |left, (op, right)| {
                     let op_kind = match op {
-                        Token::Mul => ast::OperatorKind::Multiply,
-                        Token::Div => ast::OperatorKind::Divide,
+                        Token::Mul => ast::BinaryOperatorKind::Multiply,
+                        Token::Div => ast::BinaryOperatorKind::Divide,
                         _ => unreachable!(),
                     };
                     ast::Expression::BinaryExpression(ast::BinaryExpression {
                         left: Box::new(left),
-                        operator: ast::Operator {
+                        operator: ast::BinaryOperator {
                             operator: op_kind,
                             location: ast::Location {
                                 start: 0,
@@ -158,13 +158,13 @@ where
                 just(Token::Add).or(just(Token::Sub)).then(mul).repeated(),
                 |left, (op, right)| {
                     let op_kind = match op {
-                        Token::Add => ast::OperatorKind::Add,
-                        Token::Sub => ast::OperatorKind::Subtract,
+                        Token::Add => ast::BinaryOperatorKind::Add,
+                        Token::Sub => ast::BinaryOperatorKind::Subtract,
                         _ => unreachable!(),
                     };
                     ast::Expression::BinaryExpression(ast::BinaryExpression {
                         left: Box::new(left),
-                        operator: ast::Operator {
+                        operator: ast::BinaryOperator {
                             operator: op_kind,
                             location: ast::Location {
                                 start: 0,
@@ -196,17 +196,17 @@ where
                     .repeated(),
                 |left, (op, right)| {
                     let op_kind = match op {
-                        Token::LessThan => ast::OperatorKind::LessThan,
-                        Token::LessThanOrEqual => ast::OperatorKind::LessThanOrEqual,
-                        Token::GreaterThan => ast::OperatorKind::GreaterThan,
-                        Token::GreaterThanOrEqual => ast::OperatorKind::GreaterThanOrEqual,
-                        Token::Equal => ast::OperatorKind::Equal,
-                        Token::NotEqual => ast::OperatorKind::NotEqual,
+                        Token::LessThan => ast::BinaryOperatorKind::LessThan,
+                        Token::LessThanOrEqual => ast::BinaryOperatorKind::LessThanOrEqual,
+                        Token::GreaterThan => ast::BinaryOperatorKind::GreaterThan,
+                        Token::GreaterThanOrEqual => ast::BinaryOperatorKind::GreaterThanOrEqual,
+                        Token::Equal => ast::BinaryOperatorKind::Equal,
+                        Token::NotEqual => ast::BinaryOperatorKind::NotEqual,
                         _ => unreachable!(),
                     };
                     ast::Expression::BinaryExpression(ast::BinaryExpression {
                         left: Box::new(left),
-                        operator: ast::Operator {
+                        operator: ast::BinaryOperator {
                             operator: op_kind,
                             location: ast::Location {
                                 start: 0,
@@ -234,13 +234,13 @@ where
                     .repeated(),
                 |left, (op, right)| {
                     let op_kind = match op {
-                        Token::And => ast::OperatorKind::LogicalAnd,
-                        Token::Or => ast::OperatorKind::LogicalOr,
+                        Token::And => ast::BinaryOperatorKind::LogicalAnd,
+                        Token::Or => ast::BinaryOperatorKind::LogicalOr,
                         _ => unreachable!(),
                     };
                     ast::Expression::BinaryExpression(ast::BinaryExpression {
                         left: Box::new(left),
-                        operator: ast::Operator {
+                        operator: ast::BinaryOperator {
                             operator: op_kind,
                             location: ast::Location {
                                 start: 0,
