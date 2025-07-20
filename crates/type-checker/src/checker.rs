@@ -2,7 +2,9 @@ use crate::env::{FunctionInfo, TypeEnvironment, VariableInfo};
 use crate::error::TypeCheckError;
 use ast::{TypeKind, Type};
 
-// Type alias for typed AST where all nodes have concrete types
+/// Type aliases for typed AST where all nodes have concrete types (not Option<Type>)
+/// These represent the result of successful type checking where every expression
+/// has been assigned a definite type.
 pub type TypedExpression<'a> = ast::Expression<'a, Type>;
 pub type TypedStatement<'a> = ast::Statement<'a, Type>;
 pub type TypedBlock<'a> = ast::Block<'a, Type>;
@@ -12,6 +14,14 @@ pub struct TypeChecker {
 }
 
 impl TypeChecker {
+    /// Helper function to create a Type with the given kind and location
+    fn create_type(kind: TypeKind, location: &ast::Location) -> Type {
+        Type { 
+            kind, 
+            location: location.clone() 
+        }
+    }
+
     pub fn new() -> Self {
         let mut environment = TypeEnvironment::new();
 
@@ -42,10 +52,7 @@ impl TypeChecker {
         let type_kind = TypeKind::I32;
         let typed_literal = ast::Expression::IntegerLiteral(ast::IntegerLiteral {
             value: literal.value,
-            r#type: Type {
-                kind: type_kind.clone(),
-                location: literal.location.clone(),
-            },
+            r#type: Self::create_type(type_kind.clone(), &literal.location),
             location: literal.location.clone(),
         });
         Ok((type_kind, typed_literal))
@@ -59,10 +66,7 @@ impl TypeChecker {
         let type_kind = TypeKind::Bool;
         let typed_literal = ast::Expression::BooleanLiteral(ast::BooleanLiteral {
             value: literal.value,
-            r#type: Type {
-                kind: type_kind.clone(),
-                location: literal.location.clone(),
-            },
+            r#type: Self::create_type(type_kind.clone(), &literal.location),
             location: literal.location.clone(),
         });
         Ok((type_kind, typed_literal))
@@ -83,10 +87,7 @@ impl TypeChecker {
                     let type_kind = var_info.var_type.clone();
                     let typed_identifier = ast::Expression::IdentifierExpression(ast::IdentifierExpression {
                         identifier: identifier.identifier.clone(),
-                        r#type: Type {
-                            kind: type_kind.clone(),
-                            location: identifier.location.clone(),
-                        },
+                        r#type: Self::create_type(type_kind.clone(), &identifier.location),
                         location: identifier.location.clone(),
                     });
                     Ok((type_kind, typed_identifier))
@@ -153,6 +154,11 @@ impl TypeChecker {
         Ok((type_kind, typed_function_call))
     }
 
+    /// Type checks an expression and returns both its type and a typed AST node.
+    /// 
+    /// Returns a tuple of (TypeKind, TypedExpression) where:
+    /// - TypeKind is the inferred/checked type of the expression
+    /// - TypedExpression is the same expression but with all type information filled in
     pub fn check_expression<'a>(&mut self, expr: &ast::Expression<'a>) -> Result<(TypeKind, TypedExpression<'a>), TypeCheckError> {
         match expr {
             ast::Expression::IntegerLiteral(literal) => self.check_integer_literal(literal),
