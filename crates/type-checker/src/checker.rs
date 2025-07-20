@@ -1,6 +1,11 @@
 use crate::env::{FunctionInfo, TypeEnvironment, VariableInfo};
 use crate::error::TypeCheckError;
-use ast::TypeKind;
+use ast::{TypeKind, Type};
+
+// Type alias for typed AST where all nodes have concrete types
+pub type TypedExpression<'a> = ast::Expression<'a, Type>;
+pub type TypedStatement<'a> = ast::Statement<'a, Type>;
+pub type TypedBlock<'a> = ast::Block<'a, Type>;
 
 pub struct TypeChecker {
     pub environment: TypeEnvironment,
@@ -1468,5 +1473,31 @@ mod tests {
         let main_func = &program.functions[1];
         let result = checker.check_function_definition(main_func);
         assert!(result.is_ok());
+    }
+
+    #[test]
+    fn test_check_expression_returns_typed_ast() {
+        use ast::{IntegerLiteral, Location};
+
+        let mut checker = TypeChecker::new();
+        let literal = ast::Expression::IntegerLiteral(IntegerLiteral {
+            value: "42",
+            location: Location {
+                start: 0,
+                end: 2,
+                context: (),
+            },
+            r#type: None,
+        });
+
+        // This should fail to compile because check_expression now returns (TypeKind, TypedExpression)
+        let result: (TypeKind, TypedExpression) = checker.check_expression(&literal).unwrap();
+        assert_eq!(result.0, TypeKind::I32);
+        // The typed expression should have a concrete type instead of None
+        if let ast::Expression::IntegerLiteral(typed_literal) = result.1 {
+            assert_eq!(typed_literal.r#type.kind, TypeKind::I32);
+        } else {
+            panic!("Expected IntegerLiteral");
+        }
     }
 }
