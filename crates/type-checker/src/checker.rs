@@ -2,9 +2,12 @@ use crate::env::{FunctionInfo, TypeEnvironment, VariableInfo};
 use crate::error::TypeCheckError;
 use ast::{Type, TypeKind};
 
-// Type aliases for typed AST where all nodes have concrete types (not Option<Type>)
-// These represent the result of successful type checking where every expression
-// has been assigned a definite type.
+/// Type aliases for typed AST where all nodes have concrete types (not Option<Type>)
+/// These represent the result of successful type checking where every expression
+/// has been assigned a definite type.
+///
+/// The type checker transforms untyped AST nodes (with Option<Type>) into typed AST nodes
+/// (with concrete Type values) through the check_* family of functions.
 pub type TypedExpression<'a> = ast::Expression<'a, Type>;
 pub type TypedStatement<'a> = ast::Statement<'a, Type>;
 pub type TypedBlock<'a> = ast::Block<'a, Type>;
@@ -474,7 +477,7 @@ impl TypeChecker {
         // Enter new scope for this block
         self.environment.push_scope();
 
-        let mut block_type = TypeKind::Unit;
+        let block_type;
 
         // Check all statements except the last one
         for statement in &statements[..statements.len() - 1] {
@@ -512,6 +515,15 @@ impl TypeChecker {
         }
     }
 
+    /// Type checks a function definition and returns a typed function definition.
+    /// 
+    /// This function validates:
+    /// - Function parameters have type annotations
+    /// - Return type is specified
+    /// - Function body type matches return type
+    /// - No duplicate function definitions
+    /// 
+    /// Returns a TypedFunctionDefinition with all type information filled in.
     pub fn check_function_definition<'a>(
         &mut self,
         func_def: &ast::FunctionDefinition<'a>,
@@ -609,6 +621,11 @@ impl TypeChecker {
         Ok(typed_function)
     }
 
+    /// Type checks an entire program and returns a typed program.
+    /// 
+    /// This function processes all function definitions in the program,
+    /// ensuring they are well-typed and returning a TypedProgram where
+    /// all type information has been resolved.
     pub fn check_program<'a>(&mut self, program: &ast::Program<'a>) -> Result<TypedProgram<'a>, TypeCheckError> {
         // Check each function definition and collect typed versions
         let mut typed_functions = Vec::with_capacity(program.functions.len());
