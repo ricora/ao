@@ -34,26 +34,44 @@ impl TypeChecker {
         Self { environment }
     }
 
-    pub fn check_integer_literal(
+    pub fn check_integer_literal<'a>(
         &self,
-        _literal: &ast::IntegerLiteral,
-    ) -> Result<TypeKind, TypeCheckError> {
+        literal: &ast::IntegerLiteral<'a>,
+    ) -> Result<(TypeKind, TypedExpression<'a>), TypeCheckError> {
         // Integer literals default to i32 according to spec
-        Ok(TypeKind::I32)
+        let type_kind = TypeKind::I32;
+        let typed_literal = ast::Expression::IntegerLiteral(ast::IntegerLiteral {
+            value: literal.value,
+            r#type: Type {
+                kind: type_kind.clone(),
+                location: literal.location.clone(),
+            },
+            location: literal.location.clone(),
+        });
+        Ok((type_kind, typed_literal))
     }
 
-    pub fn check_boolean_literal(
+    pub fn check_boolean_literal<'a>(
         &self,
-        _literal: &ast::BooleanLiteral,
-    ) -> Result<TypeKind, TypeCheckError> {
+        literal: &ast::BooleanLiteral,
+    ) -> Result<(TypeKind, TypedExpression<'a>), TypeCheckError> {
         // Boolean literals always have type Bool
-        Ok(TypeKind::Bool)
+        let type_kind = TypeKind::Bool;
+        let typed_literal = ast::Expression::BooleanLiteral(ast::BooleanLiteral {
+            value: literal.value,
+            r#type: Type {
+                kind: type_kind.clone(),
+                location: literal.location.clone(),
+            },
+            location: literal.location.clone(),
+        });
+        Ok((type_kind, typed_literal))
     }
 
-    pub fn check_identifier_expression(
+    pub fn check_identifier_expression<'a>(
         &self,
-        identifier: &ast::IdentifierExpression,
-    ) -> Result<TypeKind, TypeCheckError> {
+        identifier: &ast::IdentifierExpression<'a>,
+    ) -> Result<(TypeKind, TypedExpression<'a>), TypeCheckError> {
         match self.environment.get_variable(identifier.identifier.name) {
             Some(var_info) => {
                 if !var_info.initialized {
@@ -62,7 +80,16 @@ impl TypeChecker {
                         location: identifier.location.clone(),
                     })
                 } else {
-                    Ok(var_info.var_type.clone())
+                    let type_kind = var_info.var_type.clone();
+                    let typed_identifier = ast::Expression::IdentifierExpression(ast::IdentifierExpression {
+                        identifier: identifier.identifier.clone(),
+                        r#type: Type {
+                            kind: type_kind.clone(),
+                            location: identifier.location.clone(),
+                        },
+                        location: identifier.location.clone(),
+                    });
+                    Ok((type_kind, typed_identifier))
                 }
             }
             None => Err(TypeCheckError::UndefinedIdentifier {
@@ -78,10 +105,10 @@ impl TypeChecker {
     /// 3. Each argument's type matches the corresponding parameter type
     ///
     /// Returns the function's return type on success.
-    pub fn check_function_call(
+    pub fn check_function_call<'a>(
         &mut self,
-        function_call: &ast::FunctionCall,
-    ) -> Result<TypeKind, TypeCheckError> {
+        function_call: &ast::FunctionCall<'a>,
+    ) -> Result<(TypeKind, TypedExpression<'a>), TypeCheckError> {
         // Lookup function in environment
         let func_info = match self.environment.get_function(function_call.name.name) {
             Some(info) => info.clone(),
@@ -100,21 +127,33 @@ impl TypeChecker {
             });
         }
 
-        // Validate each argument type matches corresponding parameter type
+        // Validate each argument type matches corresponding parameter type and collect typed arguments
+        let mut typed_arguments = Vec::new();
         for (arg_expr, expected_type) in function_call.arguments.iter().zip(&func_info.parameters) {
-            let arg_type = self.check_expression(arg_expr)?;
+            let (arg_type, typed_arg) = self.check_expression(arg_expr)?;
             if arg_type != *expected_type {
                 return Err(TypeCheckError::FunctionCallArgumentMismatch {
                     location: function_call.location.clone(),
                 });
             }
+            typed_arguments.push(typed_arg);
         }
 
-        // Function call is valid - return the function's return type
-        Ok(func_info.return_type)
+        // Function call is valid - return the function's return type and typed AST
+        let type_kind = func_info.return_type;
+        let typed_function_call = ast::Expression::FunctionCall(ast::FunctionCall {
+            name: function_call.name.clone(),
+            arguments: typed_arguments,
+            r#type: Type {
+                kind: type_kind.clone(),
+                location: function_call.location.clone(),
+            },
+            location: function_call.location.clone(),
+        });
+        Ok((type_kind, typed_function_call))
     }
 
-    pub fn check_expression(&mut self, expr: &ast::Expression) -> Result<TypeKind, TypeCheckError> {
+    pub fn check_expression<'a>(&mut self, expr: &ast::Expression<'a>) -> Result<(TypeKind, TypedExpression<'a>), TypeCheckError> {
         match expr {
             ast::Expression::IntegerLiteral(literal) => self.check_integer_literal(literal),
             ast::Expression::BooleanLiteral(boolean_literal) => {
@@ -132,45 +171,57 @@ impl TypeChecker {
         }
     }
 
-    pub fn check_unary_expression(
+    pub fn check_unary_expression<'a>(
         &mut self,
-        unary: &ast::UnaryExpression,
-    ) -> Result<TypeKind, TypeCheckError> {
-        let operand_type = self.check_expression(&unary.operand)?;
+        unary: &ast::UnaryExpression<'a>,
+    ) -> Result<(TypeKind, TypedExpression<'a>), TypeCheckError> {
+        let (operand_type, typed_operand) = self.check_expression(&unary.operand)?;
 
         use ast::UnaryOperatorKind;
-        match unary.operator.operator {
+        let result_type = match unary.operator.operator {
             // Numeric negation: operand numeric type → same type
             UnaryOperatorKind::Negate => {
                 if matches!(operand_type, TypeKind::I32 | TypeKind::I64) {
-                    Ok(operand_type)
+                    operand_type
                 } else {
-                    Err(TypeCheckError::TypeMismatch {
+                    return Err(TypeCheckError::TypeMismatch {
                         expected: "numeric type (i32 or i64)".to_string(),
                         found: operand_type.to_string(),
                         location: unary.location.clone(),
-                    })
+                    });
                 }
             }
             // Logical not: operand bool → bool
             UnaryOperatorKind::Not => {
                 if operand_type == TypeKind::Bool {
-                    Ok(TypeKind::Bool)
+                    TypeKind::Bool
                 } else {
-                    Err(TypeCheckError::TypeMismatch {
+                    return Err(TypeCheckError::TypeMismatch {
                         expected: "bool".to_string(),
                         found: operand_type.to_string(),
                         location: unary.location.clone(),
-                    })
+                    });
                 }
             }
-        }
+        };
+
+        let typed_unary = ast::Expression::UnaryExpression(ast::UnaryExpression {
+            operator: unary.operator.clone(),
+            operand: Box::new(typed_operand),
+            r#type: Type {
+                kind: result_type.clone(),
+                location: unary.location.clone(),
+            },
+            location: unary.location.clone(),
+        });
+
+        Ok((result_type, typed_unary))
     }
 
-    pub fn check_assignment_expression(
+    pub fn check_assignment_expression<'a>(
         &mut self,
-        assignment: &ast::AssignmentExpression,
-    ) -> Result<TypeKind, TypeCheckError> {
+        assignment: &ast::AssignmentExpression<'a>,
+    ) -> Result<(TypeKind, TypedExpression<'a>), TypeCheckError> {
         // Check if the variable exists
         let var_info = match self.environment.get_variable(assignment.name.name) {
             Some(info) => info.clone(),
@@ -191,7 +242,7 @@ impl TypeChecker {
         }
 
         // Check the type of the value being assigned
-        let value_type = self.check_expression(&assignment.value)?;
+        let (value_type, typed_value) = self.check_expression(&assignment.value)?;
 
         // Check if the types match
         if value_type != var_info.var_type {
@@ -203,31 +254,37 @@ impl TypeChecker {
         }
 
         // Assignment expression returns the type of the assigned value
-        Ok(value_type)
+        let typed_assignment = ast::Expression::AssignmentExpression(ast::AssignmentExpression {
+            name: assignment.name.clone(),
+            value: Box::new(typed_value),
+            location: assignment.location.clone(),
+        });
+
+        Ok((value_type, typed_assignment))
     }
 
-    pub fn check_binary_expression(
+    pub fn check_binary_expression<'a>(
         &mut self,
-        binary: &ast::BinaryExpression,
-    ) -> Result<TypeKind, TypeCheckError> {
-        let left_type = self.check_expression(&binary.left)?;
-        let right_type = self.check_expression(&binary.right)?;
+        binary: &ast::BinaryExpression<'a>,
+    ) -> Result<(TypeKind, TypedExpression<'a>), TypeCheckError> {
+        let (left_type, typed_left) = self.check_expression(&binary.left)?;
+        let (right_type, typed_right) = self.check_expression(&binary.right)?;
 
         use ast::BinaryOperatorKind;
-        match binary.operator.operator {
+        let result_type = match binary.operator.operator {
             // Arithmetic operators: operands same numeric type → same type
             BinaryOperatorKind::Add
             | BinaryOperatorKind::Subtract
             | BinaryOperatorKind::Multiply
             | BinaryOperatorKind::Divide => {
                 if left_type == right_type && matches!(left_type, TypeKind::I32 | TypeKind::I64) {
-                    Ok(left_type)
+                    left_type
                 } else {
-                    Err(TypeCheckError::TypeMismatch {
+                    return Err(TypeCheckError::TypeMismatch {
                         expected: left_type.to_string(),
                         found: right_type.to_string(),
                         location: binary.location.clone(),
-                    })
+                    });
                 }
             }
             // Comparison operators: operands same type → bool
@@ -238,21 +295,21 @@ impl TypeChecker {
             | BinaryOperatorKind::Equal
             | BinaryOperatorKind::NotEqual => {
                 if left_type == right_type {
-                    Ok(TypeKind::Bool)
+                    TypeKind::Bool
                 } else {
-                    Err(TypeCheckError::TypeMismatch {
+                    return Err(TypeCheckError::TypeMismatch {
                         expected: left_type.to_string(),
                         found: right_type.to_string(),
                         location: binary.location.clone(),
-                    })
+                    });
                 }
             }
             // Logical operators: operands bool → bool
             BinaryOperatorKind::LogicalAnd | BinaryOperatorKind::LogicalOr => {
                 if left_type == TypeKind::Bool && right_type == TypeKind::Bool {
-                    Ok(TypeKind::Bool)
+                    TypeKind::Bool
                 } else {
-                    Err(TypeCheckError::TypeMismatch {
+                    return Err(TypeCheckError::TypeMismatch {
                         expected: "bool".to_string(),
                         found: if left_type != TypeKind::Bool {
                             left_type.to_string()
@@ -260,10 +317,23 @@ impl TypeChecker {
                             right_type.to_string()
                         },
                         location: binary.location.clone(),
-                    })
+                    });
                 }
             }
-        }
+        };
+
+        let typed_binary = ast::Expression::BinaryExpression(ast::BinaryExpression {
+            left: Box::new(typed_left),
+            operator: binary.operator.clone(),
+            right: Box::new(typed_right),
+            r#type: Type {
+                kind: result_type.clone(),
+                location: binary.location.clone(),
+            },
+            location: binary.location.clone(),
+        });
+
+        Ok((result_type, typed_binary))
     }
 
     pub fn check_variable_definition(
@@ -281,7 +351,7 @@ impl TypeChecker {
 
         let initialized = if let Some(value_expr) = &var_def.value {
             // Check if the value expression type matches the declared type
-            let value_type = self.check_expression(value_expr)?;
+            let (value_type, _typed_expr) = self.check_expression(value_expr)?;
             if value_type != declared_type {
                 return Err(TypeCheckError::TypeMismatch {
                     expected: declared_type.to_string(),
@@ -323,7 +393,7 @@ impl TypeChecker {
         if_stmt: &ast::IfStatement,
     ) -> Result<TypeKind, TypeCheckError> {
         // Validate condition type - must be boolean
-        let condition_type = self.check_expression(&if_stmt.condition)?;
+        let (condition_type, _typed_condition) = self.check_expression(&if_stmt.condition)?;
         if condition_type != TypeKind::Bool {
             return Err(TypeCheckError::TypeMismatch {
                 expected: "bool".to_string(),
@@ -354,11 +424,14 @@ impl TypeChecker {
                 Ok(TypeKind::Unit)
             }
             ast::Statement::ExpressionStatement(expr_stmt) => {
-                self.check_expression(&expr_stmt.expression)?;
+                let (_expr_type, _typed_expr) = self.check_expression(&expr_stmt.expression)?;
                 Ok(TypeKind::Unit)
             }
             ast::Statement::IfStatement(if_stmt) => self.check_if_statement(if_stmt),
-            ast::Statement::Expression(expr) => self.check_expression(expr),
+            ast::Statement::Expression(expr) => {
+                let (expr_type, _typed_expr) = self.check_expression(expr)?;
+                Ok(expr_type)
+            }
         }
     }
 
@@ -513,7 +586,7 @@ mod tests {
         };
 
         let result = checker.check_integer_literal(&literal);
-        assert_eq!(result.unwrap(), TypeKind::I32);
+        assert_eq!(result.unwrap().0, TypeKind::I32);
     }
 
     #[test]
@@ -565,7 +638,7 @@ mod tests {
         };
 
         let result = checker.check_binary_expression(&binary_expr);
-        assert_eq!(result.unwrap(), TypeKind::I32);
+        assert_eq!(result.unwrap().0, TypeKind::I32);
     }
 
     #[test]
@@ -947,7 +1020,7 @@ mod tests {
 
         let result = checker.check_unary_expression(&unary_expr);
         assert!(result.is_ok());
-        assert_eq!(result.unwrap(), TypeKind::Bool);
+        assert_eq!(result.unwrap().0, TypeKind::Bool);
     }
 
     #[test]
@@ -994,7 +1067,7 @@ mod tests {
 
         let result = checker.check_assignment_expression(&assignment_expr);
         assert!(result.is_ok());
-        assert_eq!(result.unwrap(), TypeKind::I32);
+        assert_eq!(result.unwrap().0, TypeKind::I32);
     }
 
     #[test]
