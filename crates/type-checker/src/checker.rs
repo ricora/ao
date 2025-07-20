@@ -2,12 +2,14 @@ use crate::env::{FunctionInfo, TypeEnvironment, VariableInfo};
 use crate::error::TypeCheckError;
 use ast::{Type, TypeKind};
 
-/// Type aliases for typed AST where all nodes have concrete types (not Option<Type>)
-/// These represent the result of successful type checking where every expression
-/// has been assigned a definite type.
+// Type aliases for typed AST where all nodes have concrete types (not Option<Type>)
+// These represent the result of successful type checking where every expression
+// has been assigned a definite type.
 pub type TypedExpression<'a> = ast::Expression<'a, Type>;
 pub type TypedStatement<'a> = ast::Statement<'a, Type>;
 pub type TypedBlock<'a> = ast::Block<'a, Type>;
+pub type TypedFunctionDefinition<'a> = ast::FunctionDefinition<'a, Type>;
+pub type TypedProgram<'a> = ast::Program<'a, Type>;
 
 pub struct TypeChecker {
     pub environment: TypeEnvironment,
@@ -130,7 +132,7 @@ impl TypeChecker {
         }
 
         // Validate each argument type matches corresponding parameter type and collect typed arguments
-        let mut typed_arguments = Vec::new();
+        let mut typed_arguments = Vec::with_capacity(function_call.arguments.len());
         for (arg_expr, expected_type) in function_call.arguments.iter().zip(&func_info.parameters) {
             let (arg_type, typed_arg) = self.check_expression(arg_expr)?;
             if arg_type != *expected_type {
@@ -1581,6 +1583,52 @@ mod tests {
             assert_eq!(typed_literal.r#type.kind, TypeKind::I32);
         } else {
             panic!("Expected IntegerLiteral");
+        }
+    }
+
+    #[test]
+    fn test_check_function_definition_returns_typed_ast() {
+        use parser;
+
+        let mut checker = TypeChecker::new();
+
+        let source = "fn add(x: i32, y: i32) -> i32 { x + y }";
+        let parse_result = parser::parse(source);
+        assert!(parse_result.output().is_some());
+
+        let program = parse_result.output().unwrap();
+        let func_def = &program.functions[0];
+
+        // This should fail to compile because check_function_definition now returns TypedFunctionDefinition
+        let result: TypedFunctionDefinition = checker.check_function_definition(func_def).unwrap();
+        
+        // The typed function should have all type information filled in
+        assert_eq!(result.return_type.kind, TypeKind::I32);
+    }
+
+    #[test]
+    fn test_check_program_returns_typed_ast() {
+        use parser;
+
+        let mut checker = TypeChecker::new();
+
+        let source = r#"
+            fn add(x: i32, y: i32) -> i32 { x + y }
+            fn main() -> i32 { add(1, 2) }
+        "#;
+        let parse_result = parser::parse(source);
+        assert!(parse_result.output().is_some());
+
+        let program = parse_result.output().unwrap();
+
+        // This should fail to compile because check_program now returns TypedProgram
+        let result: TypedProgram = checker.check_program(&program).unwrap();
+        
+        // The typed program should have all functions with type information
+        assert_eq!(result.functions.len(), 2);
+        for func in &result.functions {
+            // Each function should have concrete type information
+            assert_eq!(func.return_type.kind, TypeKind::I32);
         }
     }
 }
