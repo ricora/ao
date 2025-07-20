@@ -24,6 +24,20 @@ impl TypeChecker {
         }
     }
 
+    /// Convert an untyped block to a typed block by providing default types
+    /// This is a simplified implementation for the GREEN phase
+    fn convert_block_to_typed<'a>(block: &ast::Block<'a>) -> ast::Block<'a, Type> {
+        // For minimal GREEN implementation, create an empty typed block
+        // This is a simplification - a full implementation would convert all nested structures
+        ast::Block {
+            statements: ast::Statements {
+                statements: vec![], // Simplified: empty statements for now
+                location: block.statements.location.clone(),
+            },
+            location: block.location.clone(),
+        }
+    }
+
     pub fn new() -> Self {
         let mut environment = TypeEnvironment::new();
 
@@ -415,11 +429,11 @@ impl TypeChecker {
         }
 
         // Check then branch - this creates a new scope
-        self.check_block(&if_stmt.then_block)?;
+        let (_then_type, _typed_then_block) = self.check_block(&if_stmt.then_block)?;
 
         // Check else branch if present - this also creates a new scope
         if let Some(else_block) = &if_stmt.else_block {
-            self.check_block(else_block)?;
+            let (_else_type, _typed_else_block) = self.check_block(else_block)?;
         }
 
         // If statements always evaluate to Unit type
@@ -447,15 +461,20 @@ impl TypeChecker {
         }
     }
 
-    pub fn check_block(&mut self, block: &ast::Block) -> Result<TypeKind, TypeCheckError> {
+    /// Simplified implementation that creates a basic typed block
+    /// In a full implementation, this would need to also type-check statements and return typed statements
+    pub fn check_block<'a>(&mut self, block: &ast::Block<'a>) -> Result<(TypeKind, TypedBlock<'a>), TypeCheckError> {
         let statements = &block.statements.statements;
 
         if statements.is_empty() {
-            return Ok(TypeKind::Unit);
+            let typed_block = Self::convert_block_to_typed(block);
+            return Ok((TypeKind::Unit, typed_block));
         }
 
         // Enter new scope for this block
         self.environment.push_scope();
+
+        let mut block_type = TypeKind::Unit;
 
         // Check all statements except the last one
         for statement in &statements[..statements.len() - 1] {
@@ -475,16 +494,28 @@ impl TypeChecker {
 
         // The type of the block is the type of the last statement
         let result = self.check_statement(statements.last().unwrap());
-
+        
         // Exit scope
         self.environment.pop_scope();
-        result
+        
+        match result {
+            Ok(stmt_type) => {
+                block_type = stmt_type;
+                
+                // For simplicity, create a typed block using helper function
+                // This is a minimal implementation for GREEN phase
+                let typed_block = Self::convert_block_to_typed(block);
+                
+                Ok((block_type, typed_block))
+            }
+            Err(e) => Err(e)
+        }
     }
 
-    pub fn check_function_definition(
+    pub fn check_function_definition<'a>(
         &mut self,
-        func_def: &ast::FunctionDefinition,
-    ) -> Result<(), TypeCheckError> {
+        func_def: &ast::FunctionDefinition<'a>,
+    ) -> Result<TypedFunctionDefinition<'a>, TypeCheckError> {
         let return_type = match &func_def.return_type {
             Some(type_info) => type_info.kind.clone(),
             None => {
@@ -543,7 +574,7 @@ impl TypeChecker {
         }
 
         // Check function body type matches return type
-        let body_type = self.check_block(&func_def.body)?;
+        let (body_type, typed_body) = self.check_block(&func_def.body)?;
 
         // Exit function scope
         self.environment.pop_scope();
@@ -555,16 +586,43 @@ impl TypeChecker {
             });
         }
 
-        Ok(())
+        // Create typed function definition
+        let typed_parameters = ast::Parameters {
+            parameters: func_def.parameters.parameters.iter().map(|param| {
+                ast::Parameter {
+                    name: param.name.clone(),
+                    parameter_type: param.parameter_type.clone().unwrap(), // We know this exists from validation
+                    location: param.location.clone(),
+                }
+            }).collect(),
+            location: func_def.parameters.location.clone(),
+        };
+
+        let typed_function = ast::FunctionDefinition {
+            name: func_def.name.clone(),
+            parameters: typed_parameters,
+            return_type: func_def.return_type.clone().unwrap(), // We know this exists from validation
+            body: typed_body,
+            location: func_def.location.clone(),
+        };
+
+        Ok(typed_function)
     }
 
-    pub fn check_program(&mut self, program: &ast::Program) -> Result<(), TypeCheckError> {
-        // Check each function definition
+    pub fn check_program<'a>(&mut self, program: &ast::Program<'a>) -> Result<TypedProgram<'a>, TypeCheckError> {
+        // Check each function definition and collect typed versions
+        let mut typed_functions = Vec::with_capacity(program.functions.len());
+        
         for func_def in &program.functions {
-            self.check_function_definition(func_def)?;
+            let typed_func = self.check_function_definition(func_def)?;
+            typed_functions.push(typed_func);
         }
 
-        Ok(())
+        let typed_program = ast::Program {
+            functions: typed_functions,
+        };
+
+        Ok(typed_program)
     }
 
     pub fn format_error(&self, error: &TypeCheckError, source_id: &str, source: &str) -> String {
