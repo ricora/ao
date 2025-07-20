@@ -59,7 +59,7 @@
     "prettier-plugin-tailwindcss": "0.6.14",
     "tailwindcss": "4.1.11",
     "typescript": "5.8.3",
-    "typescript-eslint": "8.27.0",
+    "typescript-eslint": "8.37.0",
     "vite-tsconfig-paths": "5.1.4",
     "wireit": "0.14.9"
   },
