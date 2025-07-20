@@ -15,4 +15,5 @@ anyhow = { workspace = true }
 ast = { workspace = true }
 parser = { workspace = true }
 thiserror = { workspace = true }
+type-checker = { workspace = true }
 wast = { workspace = true }

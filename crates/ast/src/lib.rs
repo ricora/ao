@@ -350,3 +350,11 @@ pub struct Type {
     pub kind: TypeKind,
     pub location: Location,
 }
+
+pub type TypedExpression<'a> = Expression<'a, Type>;
+pub type TypedStatement<'a> = Statement<'a, Type>;
+pub type TypedBlock<'a> = Block<'a, Type>;
+pub type TypedParameters<'a> = Parameters<'a, Type>;
+pub type TypedParameter<'a> = Parameter<'a, Type>;
+pub type TypedFunctionDefinition<'a> = FunctionDefinition<'a, Type>;
+pub type TypedProgram<'a> = Program<'a, Type>;

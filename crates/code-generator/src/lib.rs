@@ -1,4 +1,5 @@
 use anyhow::Result;
+use ast::{TypedProgram, TypedFunctionDefinition, TypedBlock, TypedParameters, TypedExpression};
 use wast::{
     component,
     core::{self},
@@ -27,13 +28,13 @@ type CoreParameters<'a> = Box<
 >;
 
 pub struct CodeGenerator<'a> {
-    ast: ast::Program<'a>,
+    ast: TypedProgram<'a>,
     buffer: ParseBuffer<'a>,
     span: Span,
 }
 
 impl<'a> CodeGenerator<'a> {
-    pub fn new(ast: ast::Program<'a>) -> Result<Self> {
+    pub fn new(ast: TypedProgram<'a>) -> Result<Self> {
         let buffer = ParseBuffer::new(TEMPLATE)?;
         Ok(Self {
             ast,
@@ -90,7 +91,7 @@ impl<'a> CodeGenerator<'a> {
             .collect()
     }
 
-    fn generate_function(&self, function: &'a ast::FunctionDefinition) -> core::Func<'a> {
+    fn generate_function(&self, function: &'a TypedFunctionDefinition) -> core::Func<'a> {
         core::Func {
             span: self.span,
             id: Some(self.generate_identifier(&function.name)),
@@ -106,14 +107,14 @@ impl<'a> CodeGenerator<'a> {
                 index: None,
                 inline: Some(core::FunctionType {
                     params: self.generate_parameters(&function.parameters),
-                    // TODO: Replace unwrap() with proper type inference implementation
-                    results: Box::new([self.generate_type(function.return_type.as_ref().unwrap())]),
+                    // No unwrap needed - typed AST guarantees type is present
+                    results: Box::new([self.generate_type(&function.return_type)]),
                 }),
             },
         }
     }
 
-    fn generate_locals(&self, body: &'a ast::Block) -> Box<[wast::core::Local<'a>]> {
+    fn generate_locals(&self, body: &'a TypedBlock) -> Box<[wast::core::Local<'a>]> {
         body.statements
             .statements
             .iter()
@@ -122,8 +123,8 @@ impl<'a> CodeGenerator<'a> {
                     Some(core::Local {
                         id: Some(self.generate_identifier(&variable.name)),
                         name: None,
-                        // TODO: Replace unwrap() with proper type inference implementation
-                        ty: self.generate_type(variable.variable_type.as_ref().unwrap()),
+                        // No unwrap needed - typed AST guarantees type is present
+                        ty: self.generate_type(&variable.variable_type),
                     })
                 } else {
                     None
@@ -132,7 +133,7 @@ impl<'a> CodeGenerator<'a> {
             .collect()
     }
 
-    fn generate_body(&self, body: &'a ast::Block) -> core::Expression<'a> {
+    fn generate_body(&self, body: &'a TypedBlock) -> core::Expression<'a> {
         core::Expression {
             branch_hints: Box::new([]),
             instr_spans: None,
@@ -140,7 +141,7 @@ impl<'a> CodeGenerator<'a> {
         }
     }
 
-    fn generate_instructions(&self, body: &'a ast::Block) -> Box<[core::Instruction<'a>]> {
+    fn generate_instructions(&self, body: &'a TypedBlock) -> Box<[core::Instruction<'a>]> {
         body.statements
             .statements
             .iter()
@@ -200,7 +201,7 @@ impl<'a> CodeGenerator<'a> {
             .collect()
     }
 
-    fn generate_expression(&self, expression: &'a ast::Expression) -> Vec<core::Instruction<'a>> {
+    fn generate_expression(&self, expression: &'a TypedExpression) -> Vec<core::Instruction<'a>> {
         match expression {
             ast::Expression::BinaryExpression(expr) => {
                 let lhs = self.generate_expression(&expr.left);
@@ -331,7 +332,7 @@ impl<'a> CodeGenerator<'a> {
         }
     }
 
-    fn generate_parameters(&self, parameters: &'a ast::Parameters) -> CoreParameters<'a> {
+    fn generate_parameters(&self, parameters: &'a TypedParameters) -> CoreParameters<'a> {
         parameters
             .parameters
             .iter()
@@ -339,8 +340,8 @@ impl<'a> CodeGenerator<'a> {
                 (
                     Some(self.generate_identifier(&param.name)),
                     None,
-                    // TODO: Replace unwrap() with proper type inference implementation
-                    self.generate_type(param.parameter_type.as_ref().unwrap()),
+                    // No unwrap needed - typed AST guarantees type is present
+                    self.generate_type(&param.parameter_type),
                 )
             })
             .collect()
@@ -393,10 +394,18 @@ mod tests {
     }
 
     fn compile(source: &str) -> Result<Vec<u8>> {
+        // Parse source code into AST
         let ast = parser::parse(source)
             .into_result()
-            .expect("Failed to parse source code into AST"); // TODO: Implement error handling
-        let mut generator = CodeGenerator::new(ast)?;
+            .expect("Failed to parse source code into AST");
+        
+        // Type check the AST to get typed AST
+        let mut type_checker = type_checker::TypeChecker::new();
+        let typed_ast = type_checker.check_program(&ast)
+            .expect("Failed to type check program");
+        
+        // Generate code from typed AST
+        let mut generator = CodeGenerator::new(typed_ast)?;
         let mut wat = generator.generate()?;
         let wasm = wat.encode()?;
         Ok(wasm)

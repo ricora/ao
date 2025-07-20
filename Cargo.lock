@@ -366,6 +366,7 @@ dependencies = [
  "parser",
  "pretty_assertions",
  "thiserror 2.0.12",
+ "type-checker",
  "wasmtime",
  "wasmtime-wasi",
  "wast 235.0.0",
