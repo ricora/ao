@@ -1,5 +1,5 @@
 use anyhow::Result;
-use ast::{TypedProgram, TypedFunctionDefinition, TypedBlock, TypedParameters, TypedExpression};
+use ast::{TypedBlock, TypedExpression, TypedFunctionDefinition, TypedParameters, TypedProgram};
 use wast::{
     component,
     core::{self},
@@ -107,7 +107,6 @@ impl<'a> CodeGenerator<'a> {
                 index: None,
                 inline: Some(core::FunctionType {
                     params: self.generate_parameters(&function.parameters),
-                    // No unwrap needed - typed AST guarantees type is present
                     results: Box::new([self.generate_type(&function.return_type)]),
                 }),
             },
@@ -123,7 +122,6 @@ impl<'a> CodeGenerator<'a> {
                     Some(core::Local {
                         id: Some(self.generate_identifier(&variable.name)),
                         name: None,
-                        // No unwrap needed - typed AST guarantees type is present
                         ty: self.generate_type(&variable.variable_type),
                     })
                 } else {
@@ -340,7 +338,6 @@ impl<'a> CodeGenerator<'a> {
                 (
                     Some(self.generate_identifier(&param.name)),
                     None,
-                    // No unwrap needed - typed AST guarantees type is present
                     self.generate_type(&param.parameter_type),
                 )
             })
@@ -398,12 +395,13 @@ mod tests {
         let ast = parser::parse(source)
             .into_result()
             .expect("Failed to parse source code into AST");
-        
+
         // Type check the AST to get typed AST
         let mut type_checker = type_checker::TypeChecker::new();
-        let typed_ast = type_checker.check_program(&ast)
+        let typed_ast = type_checker
+            .check_program(&ast)
             .expect("Failed to type check program");
-        
+
         // Generate code from typed AST
         let mut generator = CodeGenerator::new(typed_ast)?;
         let mut wat = generator.generate()?;
@@ -556,13 +554,13 @@ mod tests {
     fn if_statement() {
         let source = indoc! {"
             fn main() -> i32 {
-                if 1 {
-                    if 0 {
+                if true {
+                    if false {
                         print_int(1);
                     } else {
-                        if 0 {
+                        if false {
                             print_int(2);
-                        } else if 1 {
+                        } else if true {
                             print_int(3);
                         } else {
                             print_int(4);
@@ -581,18 +579,27 @@ mod tests {
     #[test]
     fn comparison_expression() {
         let source = indoc! {"
+            fn print_bool(value: bool) -> i32 {
+                if value {
+                    print_int(1);
+                } else {
+                    print_int(0);
+                }
+                0
+            }
+
             fn main() -> i32 {
-                print_int(1 == 1);
+                print_bool(1 == 1);
                 print_char(32); // ' '
-                print_int(1 != 1);
+                print_bool(1 != 1);
                 print_char(32); // ' '
-                print_int(1 < 1);
+                print_bool(1 < 1);
                 print_char(32); // ' '
-                print_int(1 <= 1);
+                print_bool(1 <= 1);
                 print_char(32); // ' '
-                print_int(1 > 1);
+                print_bool(1 > 1);
                 print_char(32); // ' '
-                print_int(1 >= 1);
+                print_bool(1 >= 1);
                 0
             }
         "};
@@ -603,65 +610,40 @@ mod tests {
     #[test]
     fn logical_expression_with_boolean() {
         let source = indoc! {"
+            fn print_bool(value: bool) -> i32 {
+                if value {
+                    print_int(1);
+                } else {
+                    print_int(0);
+                }
+                0
+            }
+
             fn main() -> i32 {
-                print_int(1 && 1);
+                print_bool(true && true);
                 print_char(32); // ' '
-                print_int(1 && 0);
+                print_bool(true && false);
                 print_char(32); // ' '
-                print_int(0 && 1);
+                print_bool(false && true);
                 print_char(32); // ' '
-                print_int(0 && 0);
+                print_bool(false && false);
                 print_char(32); // ' '
-                print_int(1 || 1);
+                print_bool(true || true);
                 print_char(32); // ' '
-                print_int(1 || 0);
+                print_bool(true || false);
                 print_char(32); // ' '
-                print_int(0 || 1);
+                print_bool(false || true);
                 print_char(32); // ' '
-                print_int(0 || 0);
+                print_bool(false || false);
                 print_char(32); // ' '
-                print_int(!1);
+                print_bool(!true);
                 print_char(32); // ' '
-                print_int(!0);
+                print_bool(!false);
                 0
             }
         "};
         let stdout = run(source).unwrap().stdout;
         assert_eq!(stdout, "1 0 0 0 1 1 1 0 0 1");
-    }
-
-    #[test]
-    fn logical_expression_with_i32() {
-        let source = indoc! {"
-            fn main() -> i32 {
-                print_int(2 && -3);
-                print_char(32); // ' '
-                print_int(2 && 0);
-                print_char(32); // ' '
-                print_int(0 && -3);
-                print_char(32); // ' '
-                print_int(0 && 0);
-                print_char(32); // ' '
-                print_int(2 || -3);
-                print_char(32); // ' '
-                print_int(2 || 0);
-                print_char(32); // ' '
-                print_int(0 || -3);
-                print_char(32); // ' '
-                print_int(0 || 0);
-                print_char(32); // ' '
-                print_int(!2);
-                print_char(32); // ' '
-                print_int(!-3);
-                print_char(32); // ' '
-                print_int(!!--3);
-                print_char(32); // ' '
-                print_int(!0);
-                0
-            }
-        "};
-        let stdout = run(source).unwrap().stdout;
-        assert_eq!(stdout, "1 0 0 0 1 1 1 0 0 0 1 1");
     }
 
     #[test]

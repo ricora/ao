@@ -1,7 +1,6 @@
 use crate::env::{FunctionInfo, TypeEnvironment, VariableInfo};
 use crate::error::TypeCheckError;
-use ast::{Type, TypeKind, TypedExpression, TypedBlock, TypedFunctionDefinition, TypedProgram};
-
+use ast::{Type, TypeKind, TypedBlock, TypedExpression, TypedFunctionDefinition, TypedProgram};
 
 pub struct TypeChecker {
     pub environment: TypeEnvironment,
@@ -272,6 +271,15 @@ impl TypeChecker {
             });
         }
 
+        // Set the variable as initialized
+        self.environment.add_variable(
+            assignment.name.name.to_string(),
+            VariableInfo {
+                initialized: true,
+                ..var_info
+            },
+        );
+
         // Assignment expression returns the type of the assigned value
         let typed_assignment = ast::Expression::AssignmentExpression(ast::AssignmentExpression {
             name: assignment.name.clone(),
@@ -456,7 +464,10 @@ impl TypeChecker {
 
     /// Simplified implementation that creates a basic typed block
     /// In a full implementation, this would need to also type-check statements and return typed statements
-    pub fn check_block<'a>(&mut self, block: &ast::Block<'a>) -> Result<(TypeKind, TypedBlock<'a>), TypeCheckError> {
+    pub fn check_block<'a>(
+        &mut self,
+        block: &ast::Block<'a>,
+    ) -> Result<(TypeKind, TypedBlock<'a>), TypeCheckError> {
         let statements = &block.statements.statements;
 
         if statements.is_empty() {
@@ -487,35 +498,35 @@ impl TypeChecker {
 
         // The type of the block is the type of the last statement
         let result = self.check_statement(statements.last().unwrap());
-        
+
         // Exit scope
         self.environment.pop_scope();
-        
+
         match result {
             Ok(stmt_type) => {
                 block_type = stmt_type;
-                
+
                 // TEMPORARY FIX: Create a typed block that mimics the original structure
                 // This preserves the statements so that code generation works
                 // This is a hack for now - a proper implementation would do deep type conversion
                 let typed_block = unsafe {
                     std::mem::transmute::<ast::Block<'a>, ast::Block<'a, Type>>(block.clone())
                 };
-                
+
                 Ok((block_type, typed_block))
             }
-            Err(e) => Err(e)
+            Err(e) => Err(e),
         }
     }
 
     /// Type checks a function definition and returns a typed function definition.
-    /// 
+    ///
     /// This function validates:
     /// - Function parameters have type annotations
     /// - Return type is specified
     /// - Function body type matches return type
     /// - No duplicate function definitions
-    /// 
+    ///
     /// Returns a TypedFunctionDefinition with all type information filled in.
     pub fn check_function_definition<'a>(
         &mut self,
@@ -593,13 +604,18 @@ impl TypeChecker {
 
         // Create typed function definition
         let typed_parameters = ast::Parameters {
-            parameters: func_def.parameters.parameters.iter().map(|param| {
-                ast::Parameter {
-                    name: param.name.clone(),
-                    parameter_type: param.parameter_type.clone().unwrap(), // We know this exists from validation
-                    location: param.location.clone(),
-                }
-            }).collect(),
+            parameters: func_def
+                .parameters
+                .parameters
+                .iter()
+                .map(|param| {
+                    ast::Parameter {
+                        name: param.name.clone(),
+                        parameter_type: param.parameter_type.clone().unwrap(), // We know this exists from validation
+                        location: param.location.clone(),
+                    }
+                })
+                .collect(),
             location: func_def.parameters.location.clone(),
         };
 
@@ -615,14 +631,17 @@ impl TypeChecker {
     }
 
     /// Type checks an entire program and returns a typed program.
-    /// 
+    ///
     /// This function processes all function definitions in the program,
     /// ensuring they are well-typed and returning a TypedProgram where
     /// all type information has been resolved.
-    pub fn check_program<'a>(&mut self, program: &ast::Program<'a>) -> Result<TypedProgram<'a>, TypeCheckError> {
+    pub fn check_program<'a>(
+        &mut self,
+        program: &ast::Program<'a>,
+    ) -> Result<TypedProgram<'a>, TypeCheckError> {
         // Check each function definition and collect typed versions
         let mut typed_functions = Vec::with_capacity(program.functions.len());
-        
+
         for func_def in &program.functions {
             let typed_func = self.check_function_definition(func_def)?;
             typed_functions.push(typed_func);
@@ -1669,7 +1688,7 @@ mod tests {
 
         // This should fail to compile because check_function_definition now returns TypedFunctionDefinition
         let result: TypedFunctionDefinition = checker.check_function_definition(func_def).unwrap();
-        
+
         // The typed function should have all type information filled in
         assert_eq!(result.return_type.kind, TypeKind::I32);
     }
@@ -1690,8 +1709,8 @@ mod tests {
         let program = parse_result.output().unwrap();
 
         // This should fail to compile because check_program now returns TypedProgram
-        let result: TypedProgram = checker.check_program(&program).unwrap();
-        
+        let result: TypedProgram = checker.check_program(program).unwrap();
+
         // The typed program should have all functions with type information
         assert_eq!(result.functions.len(), 2);
         for func in &result.functions {
