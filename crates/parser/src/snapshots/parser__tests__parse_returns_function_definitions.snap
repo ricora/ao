@@ -16,7 +16,7 @@ functions:
         end: 7
         context: ~
     return_type:
-      name: I64
+      kind: I64
       location:
         start: 12
         end: 15
@@ -27,6 +27,7 @@ functions:
           - Expression:
               IntegerLiteral:
                 value: "0"
+                type: ~
                 location:
                   start: 18
                   end: 19
@@ -56,7 +57,7 @@ functions:
         end: 29
         context: ~
     return_type:
-      name: I32
+      kind: I32
       location:
         start: 34
         end: 37
@@ -67,6 +68,7 @@ functions:
           - Expression:
               IntegerLiteral:
                 value: "1"
+                type: ~
                 location:
                   start: 40
                   end: 41

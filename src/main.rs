@@ -71,14 +71,16 @@ fn main() {
             let ast = parse(&source).unwrap(); // TODO: handle errors properly
 
             let mut typechecker = TypeChecker::new();
-            let typecheck_result = typechecker.check_program(&ast);
-            if let Err(e) = typecheck_result {
-                let error_msg = typechecker.format_error(&e, &source_id, &source);
-                eprintln!("{error_msg}");
-                return;
-            }
+            let typed_ast = match typechecker.check_program(&ast) {
+                Ok(typed_program) => typed_program,
+                Err(e) => {
+                    let error_msg = typechecker.format_error(&e, &source_id, &source);
+                    eprintln!("{error_msg}");
+                    return;
+                }
+            };
 
-            let mut generator = CodeGenerator::new(ast).unwrap();
+            let mut generator = CodeGenerator::new(typed_ast).unwrap();
             let mut wat = generator.generate().unwrap();
             let wasm = wat.encode().unwrap();
             if let Some(output) = args.output {

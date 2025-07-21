@@ -4,7 +4,7 @@ expression: ast
 ---
 functions:
   - name:
-      name: test
+      name: main
       location:
         start: 3
         end: 7
@@ -31,72 +31,68 @@ functions:
                   start: 27
                   end: 28
                   context: ~
-              mutable: true
+              mutable: false
               variable_type:
-                kind: I32
+                kind: Bool
                 location:
                   start: 30
-                  end: 33
+                  end: 34
                   context: ~
               value:
-                IntegerLiteral:
-                  value: "0"
+                BooleanLiteral:
+                  value: true
                   type: ~
                   location:
-                    start: 36
-                    end: 37
+                    start: 37
+                    end: 41
                     context: ~
               location:
                 start: 23
-                end: 38
+                end: 42
                 context: ~
-          - ExpressionStatement:
-              expression:
-                AssignmentExpression:
-                  name:
-                    name: x
-                    location:
-                      start: 43
-                      end: 44
-                      context: ~
-                  value:
-                    IntegerLiteral:
-                      value: "1"
-                      type: ~
-                      location:
-                        start: 47
-                        end: 48
-                        context: ~
-                  location:
-                    start: 43
-                    end: 48
-                    context: ~
-              location:
-                start: 43
-                end: 49
-                context: ~
-          - Expression:
-              IdentifierExpression:
-                identifier:
-                  name: x
-                  location:
-                    start: 54
-                    end: 55
-                    context: ~
-                type: ~
+          - VariableDefinition:
+              name:
+                name: y
+                location:
+                  start: 51
+                  end: 52
+                  context: ~
+              mutable: false
+              variable_type:
+                kind: Bool
                 location:
                   start: 54
-                  end: 55
+                  end: 58
+                  context: ~
+              value:
+                BooleanLiteral:
+                  value: false
+                  type: ~
+                  location:
+                    start: 61
+                    end: 66
+                    context: ~
+              location:
+                start: 47
+                end: 67
+                context: ~
+          - Expression:
+              IntegerLiteral:
+                value: "0"
+                type: ~
+                location:
+                  start: 72
+                  end: 73
                   context: ~
         location:
           start: 23
-          end: 55
+          end: 73
           context: ~
       location:
         start: 23
-        end: 55
+        end: 73
         context: ~
     location:
       start: 0
-      end: 57
+      end: 75
       context: ~

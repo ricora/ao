@@ -1,4 +1,5 @@
 use anyhow::Result;
+use ast::{TypedBlock, TypedExpression, TypedFunctionDefinition, TypedParameters, TypedProgram};
 use wast::{
     component,
     core::{self},
@@ -27,13 +28,13 @@ type CoreParameters<'a> = Box<
 >;
 
 pub struct CodeGenerator<'a> {
-    ast: ast::Program<'a>,
+    ast: TypedProgram<'a>,
     buffer: ParseBuffer<'a>,
     span: Span,
 }
 
 impl<'a> CodeGenerator<'a> {
-    pub fn new(ast: ast::Program<'a>) -> Result<Self> {
+    pub fn new(ast: TypedProgram<'a>) -> Result<Self> {
         let buffer = ParseBuffer::new(TEMPLATE)?;
         Ok(Self {
             ast,
@@ -90,7 +91,7 @@ impl<'a> CodeGenerator<'a> {
             .collect()
     }
 
-    fn generate_function(&self, function: &'a ast::FunctionDefinition) -> core::Func<'a> {
+    fn generate_function(&self, function: &'a TypedFunctionDefinition) -> core::Func<'a> {
         core::Func {
             span: self.span,
             id: Some(self.generate_identifier(&function.name)),
@@ -112,7 +113,7 @@ impl<'a> CodeGenerator<'a> {
         }
     }
 
-    fn generate_locals(&self, body: &'a ast::Block) -> Box<[wast::core::Local<'a>]> {
+    fn generate_locals(&self, body: &'a TypedBlock) -> Box<[wast::core::Local<'a>]> {
         body.statements
             .statements
             .iter()
@@ -130,7 +131,7 @@ impl<'a> CodeGenerator<'a> {
             .collect()
     }
 
-    fn generate_body(&self, body: &'a ast::Block) -> core::Expression<'a> {
+    fn generate_body(&self, body: &'a TypedBlock) -> core::Expression<'a> {
         core::Expression {
             branch_hints: Box::new([]),
             instr_spans: None,
@@ -138,7 +139,7 @@ impl<'a> CodeGenerator<'a> {
         }
     }
 
-    fn generate_instructions(&self, body: &'a ast::Block) -> Box<[core::Instruction<'a>]> {
+    fn generate_instructions(&self, body: &'a TypedBlock) -> Box<[core::Instruction<'a>]> {
         body.statements
             .statements
             .iter()
@@ -198,7 +199,7 @@ impl<'a> CodeGenerator<'a> {
             .collect()
     }
 
-    fn generate_expression(&self, expression: &'a ast::Expression) -> Vec<core::Instruction<'a>> {
+    fn generate_expression(&self, expression: &'a TypedExpression) -> Vec<core::Instruction<'a>> {
         match expression {
             ast::Expression::BinaryExpression(expr) => {
                 let lhs = self.generate_expression(&expr.left);
@@ -207,8 +208,8 @@ impl<'a> CodeGenerator<'a> {
                 let mut instructions = Vec::with_capacity(
                     lhs.len()
                         + rhs.len()
-                        + if expr.operator.operator == ast::OperatorKind::LogicalAnd
-                            || expr.operator.operator == ast::OperatorKind::LogicalOr
+                        + if expr.operator.operator == ast::BinaryOperatorKind::LogicalAnd
+                            || expr.operator.operator == ast::BinaryOperatorKind::LogicalOr
                         {
                             5
                         } else {
@@ -217,8 +218,8 @@ impl<'a> CodeGenerator<'a> {
                 );
 
                 // calculate lhs and rhs
-                if expr.operator.operator == ast::OperatorKind::LogicalAnd
-                    || expr.operator.operator == ast::OperatorKind::LogicalOr
+                if expr.operator.operator == ast::BinaryOperatorKind::LogicalAnd
+                    || expr.operator.operator == ast::BinaryOperatorKind::LogicalOr
                 {
                     // convert lhs and rhs to boolean
                     instructions.extend(lhs);
@@ -234,43 +235,60 @@ impl<'a> CodeGenerator<'a> {
 
                 // apply operator
                 match expr.operator.operator {
-                    ast::OperatorKind::Add => instructions.push(core::Instruction::I32Add),
-                    ast::OperatorKind::Subtract => instructions.push(core::Instruction::I32Sub),
-                    ast::OperatorKind::Multiply => instructions.push(core::Instruction::I32Mul),
-                    ast::OperatorKind::Divide => instructions.push(core::Instruction::I32DivS),
-                    ast::OperatorKind::Equal => instructions.push(core::Instruction::I32Eq),
-                    ast::OperatorKind::NotEqual => instructions.push(core::Instruction::I32Ne),
-                    ast::OperatorKind::LessThan => instructions.push(core::Instruction::I32LtS),
-                    ast::OperatorKind::LessThanOrEqual => {
+                    ast::BinaryOperatorKind::Add => instructions.push(core::Instruction::I32Add),
+                    ast::BinaryOperatorKind::Subtract => {
+                        instructions.push(core::Instruction::I32Sub)
+                    }
+                    ast::BinaryOperatorKind::Multiply => {
+                        instructions.push(core::Instruction::I32Mul)
+                    }
+                    ast::BinaryOperatorKind::Divide => {
+                        instructions.push(core::Instruction::I32DivS)
+                    }
+                    ast::BinaryOperatorKind::Equal => instructions.push(core::Instruction::I32Eq),
+                    ast::BinaryOperatorKind::NotEqual => {
+                        instructions.push(core::Instruction::I32Ne)
+                    }
+                    ast::BinaryOperatorKind::LessThan => {
+                        instructions.push(core::Instruction::I32LtS)
+                    }
+                    ast::BinaryOperatorKind::LessThanOrEqual => {
                         instructions.push(core::Instruction::I32LeS)
                     }
-                    ast::OperatorKind::GreaterThan => instructions.push(core::Instruction::I32GtS),
-                    ast::OperatorKind::GreaterThanOrEqual => {
+                    ast::BinaryOperatorKind::GreaterThan => {
+                        instructions.push(core::Instruction::I32GtS)
+                    }
+                    ast::BinaryOperatorKind::GreaterThanOrEqual => {
                         instructions.push(core::Instruction::I32GeS)
                     }
-                    ast::OperatorKind::LogicalAnd => instructions.push(core::Instruction::I32And),
-                    ast::OperatorKind::LogicalOr => instructions.push(core::Instruction::I32Or),
-                    _ => {}
+                    ast::BinaryOperatorKind::LogicalAnd => {
+                        instructions.push(core::Instruction::I32And)
+                    }
+                    ast::BinaryOperatorKind::LogicalOr => {
+                        instructions.push(core::Instruction::I32Or)
+                    }
                 };
                 instructions
             }
             ast::Expression::UnaryExpression(expr) => {
                 let operand = self.generate_expression(&expr.operand);
-                let mut instructions = Vec::with_capacity(operand.len() + 1);
-
-                // calculate operand
-                if expr.operator.operator == ast::OperatorKind::LogicalNot {
-                    // convert operand to boolean
-                    instructions.extend(operand);
-                    instructions.push(core::Instruction::I32Const(0));
-                    instructions.push(core::Instruction::I32Ne);
-                } else {
-                    instructions.extend(operand);
-                }
+                let mut instructions = Vec::with_capacity(operand.len() + 3);
 
                 // apply operator
-                if expr.operator.operator == ast::OperatorKind::LogicalNot {
-                    instructions.push(core::Instruction::I32Eqz)
+                match expr.operator.operator {
+                    ast::UnaryOperatorKind::Not => {
+                        // convert operand to boolean, then negate
+                        instructions.extend(operand);
+                        instructions.push(core::Instruction::I32Const(0));
+                        instructions.push(core::Instruction::I32Ne);
+                        instructions.push(core::Instruction::I32Eqz);
+                    }
+                    ast::UnaryOperatorKind::Negate => {
+                        // For negation, we can use i32.const 0 followed by operand then i32.sub
+                        instructions.push(core::Instruction::I32Const(0));
+                        instructions.extend(operand);
+                        instructions.push(core::Instruction::I32Sub);
+                    }
                 };
                 instructions
             }
@@ -296,19 +314,23 @@ impl<'a> CodeGenerator<'a> {
                 )));
                 instructions
             }
-            ast::Expression::Identifier(identifier) => {
+            ast::Expression::IdentifierExpression(identifier) => {
                 vec![core::Instruction::LocalGet(wast::token::Index::Id(
-                    self.generate_identifier(identifier),
+                    self.generate_identifier(&identifier.identifier),
                 ))]
             }
             ast::Expression::IntegerLiteral(literal) => {
                 let value: i32 = literal.value.parse().unwrap();
                 vec![core::Instruction::I32Const(value)]
             }
+            ast::Expression::BooleanLiteral(boolean_literal) => {
+                let value = if boolean_literal.value { 1 } else { 0 };
+                vec![core::Instruction::I32Const(value)]
+            }
         }
     }
 
-    fn generate_parameters(&self, parameters: &'a ast::Parameters) -> CoreParameters<'a> {
+    fn generate_parameters(&self, parameters: &'a TypedParameters) -> CoreParameters<'a> {
         parameters
             .parameters
             .iter()
@@ -327,9 +349,11 @@ impl<'a> CodeGenerator<'a> {
     }
 
     fn generate_type(&self, ast_type: &'a ast::Type) -> core::ValType<'a> {
-        match ast_type.name {
+        match ast_type.kind {
             ast::TypeKind::I32 => core::ValType::I32,
             ast::TypeKind::I64 => core::ValType::I64,
+            ast::TypeKind::Bool => core::ValType::I32, // Boolean can be represented as i32
+            ast::TypeKind::Unit => core::ValType::I32, // Unit can also be represented as i32 (= 0)
         }
     }
 }
@@ -367,10 +391,19 @@ mod tests {
     }
 
     fn compile(source: &str) -> Result<Vec<u8>> {
+        // Parse source code into AST
         let ast = parser::parse(source)
             .into_result()
-            .expect("Failed to parse source code into AST"); // TODO: Implement error handling
-        let mut generator = CodeGenerator::new(ast)?;
+            .expect("Failed to parse source code into AST");
+
+        // Type check the AST to get typed AST
+        let mut type_checker = type_checker::TypeChecker::new();
+        let typed_ast = type_checker
+            .check_program(&ast)
+            .expect("Failed to type check program");
+
+        // Generate code from typed AST
+        let mut generator = CodeGenerator::new(typed_ast)?;
         let mut wat = generator.generate()?;
         let wasm = wat.encode()?;
         Ok(wasm)
@@ -521,13 +554,13 @@ mod tests {
     fn if_statement() {
         let source = indoc! {"
             fn main() -> i32 {
-                if 1 {
-                    if 0 {
+                if true {
+                    if false {
                         print_int(1);
                     } else {
-                        if 0 {
+                        if false {
                             print_int(2);
-                        } else if 1 {
+                        } else if true {
                             print_int(3);
                         } else {
                             print_int(4);
@@ -546,18 +579,27 @@ mod tests {
     #[test]
     fn comparison_expression() {
         let source = indoc! {"
+            fn print_bool(value: bool) -> i32 {
+                if value {
+                    print_int(1);
+                } else {
+                    print_int(0);
+                }
+                0
+            }
+
             fn main() -> i32 {
-                print_int(1 == 1);
+                print_bool(1 == 1);
                 print_char(32); // ' '
-                print_int(1 != 1);
+                print_bool(1 != 1);
                 print_char(32); // ' '
-                print_int(1 < 1);
+                print_bool(1 < 1);
                 print_char(32); // ' '
-                print_int(1 <= 1);
+                print_bool(1 <= 1);
                 print_char(32); // ' '
-                print_int(1 > 1);
+                print_bool(1 > 1);
                 print_char(32); // ' '
-                print_int(1 >= 1);
+                print_bool(1 >= 1);
                 0
             }
         "};
@@ -568,65 +610,40 @@ mod tests {
     #[test]
     fn logical_expression_with_boolean() {
         let source = indoc! {"
+            fn print_bool(value: bool) -> i32 {
+                if value {
+                    print_int(1);
+                } else {
+                    print_int(0);
+                }
+                0
+            }
+
             fn main() -> i32 {
-                print_int(1 && 1);
+                print_bool(true && true);
                 print_char(32); // ' '
-                print_int(1 && 0);
+                print_bool(true && false);
                 print_char(32); // ' '
-                print_int(0 && 1);
+                print_bool(false && true);
                 print_char(32); // ' '
-                print_int(0 && 0);
+                print_bool(false && false);
                 print_char(32); // ' '
-                print_int(1 || 1);
+                print_bool(true || true);
                 print_char(32); // ' '
-                print_int(1 || 0);
+                print_bool(true || false);
                 print_char(32); // ' '
-                print_int(0 || 1);
+                print_bool(false || true);
                 print_char(32); // ' '
-                print_int(0 || 0);
+                print_bool(false || false);
                 print_char(32); // ' '
-                print_int(!1);
+                print_bool(!true);
                 print_char(32); // ' '
-                print_int(!0);
+                print_bool(!false);
                 0
             }
         "};
         let stdout = run(source).unwrap().stdout;
         assert_eq!(stdout, "1 0 0 0 1 1 1 0 0 1");
-    }
-
-    #[test]
-    fn logical_expression_with_i32() {
-        let source = indoc! {"
-            fn main() -> i32 {
-                print_int(2 && -3);
-                print_char(32); // ' '
-                print_int(2 && 0);
-                print_char(32); // ' '
-                print_int(0 && -3);
-                print_char(32); // ' '
-                print_int(0 && 0);
-                print_char(32); // ' '
-                print_int(2 || -3);
-                print_char(32); // ' '
-                print_int(2 || 0);
-                print_char(32); // ' '
-                print_int(0 || -3);
-                print_char(32); // ' '
-                print_int(0 || 0);
-                print_char(32); // ' '
-                print_int(!2);
-                print_char(32); // ' '
-                print_int(!-3);
-                print_char(32); // ' '
-                print_int(!!--3);
-                print_char(32); // ' '
-                print_int(!0);
-                0
-            }
-        "};
-        let stdout = run(source).unwrap().stdout;
-        assert_eq!(stdout, "1 0 0 0 1 1 1 0 0 0 1 1");
     }
 
     #[test]
