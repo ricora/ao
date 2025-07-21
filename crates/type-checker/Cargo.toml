@@ -6,7 +6,7 @@ edition = "2021"
 [dependencies]
 ast = { workspace = true }
 thiserror = "2.0"
-ariadne = "0.4"
+ariadne = "0.5"
 
 [dev-dependencies]
 parser = { workspace = true }
