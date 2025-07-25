@@ -20,8 +20,8 @@ importers:
         specifier: ^4.0.1
         version: 4.0.1(@astrojs/starlight@0.35.1(astro@5.12.3(@types/node@24.1.0)(jiti@2.4.2)(lightningcss@1.30.1)(rollup@4.45.1)(terser@5.37.0)(typescript@5.8.3)(yaml@2.7.0)))(tailwindcss@4.1.11)
       '@bytecodealliance/jco':
-        specifier: 1.12.0
-        version: 1.12.0
+        specifier: 1.13.0
+        version: 1.13.0
       '@bytecodealliance/preview2-shim':
         specifier: ^0.17.1
         version: 0.17.1
@@ -285,12 +285,12 @@ packages:
     resolution: {integrity: sha512-x0LvFTekgSX+83TI28Y9wYPUfzrnl2aT5+5QLnO6v7mSJYtEEevuDRN0F0uSHRk1G1IWZC43o00Y0xDDrpBGPQ==}
     engines: {node: '>=6.9.0'}
 
-  '@bytecodealliance/componentize-js@0.18.3':
-    resolution: {integrity: sha512-eHYAdtTWqN7hR7O/seewXAAluY83eYL36he6rZIgXOgLYbMKNfFaGZVE9J5yWc78kKHyf221icQuYDTh6SQLyA==}
+  '@bytecodealliance/componentize-js@0.18.4':
+    resolution: {integrity: sha512-j007E7t+Ww2lw3Ao1nrtqzgpEcrZD9+cpov8knf2NojJ3PGI8CkZBBZvjNgP05jnUP7EJ7jAyD8+HTzUxaJUSw==}
     hasBin: true
 
-  '@bytecodealliance/jco@1.12.0':
-    resolution: {integrity: sha512-Xjl26a9e6wqKXS6VPuksyfg0k2ZWmVfYVOInn9fhtqi4DpmRebEZl13dkzBS5hVQfO1c3Qr7h2ZKDneHUUhalg==}
+  '@bytecodealliance/jco@1.13.0':
+    resolution: {integrity: sha512-pNMZIGLufXkqM5QZSR0l8LsAShnqYVHrNevWu0q2qog2ldczRkKs/nnESCQPvGz/D3Usu1pCqhHH8qlsGOUXpg==}
     hasBin: true
 
   '@bytecodealliance/preview2-shim@0.17.1':
@@ -299,8 +299,8 @@ packages:
   '@bytecodealliance/preview2-shim@0.17.2':
     resolution: {integrity: sha512-mNm/lblgES8UkVle8rGImXOz4TtL3eU3inHay/7TVchkKrb/lgcVvTK0+VAw8p5zQ0rgQsXm1j5dOlAAd+MeoA==}
 
-  '@bytecodealliance/weval@0.3.3':
-    resolution: {integrity: sha512-hrQI47O1l3ilFscixu0uuSJTj5tbQW0QmCATQWWNW0E8wJxbKH4yo8y57O5gqpRSKk/T+da1sH/GJNrnGHTFNA==}
+  '@bytecodealliance/weval@0.3.4':
+    resolution: {integrity: sha512-+GCKtZXhPj7qyDl5pR0F3PTEk8tWINV8dv1tUbKMjMXvqjHIkvzalkWo5ZL2kCKwh8Bwn8rWpSmyvRC/Nlu9nQ==}
     engines: {node: '>=16'}
 
   '@bytecodealliance/wizer-darwin-arm64@7.0.5':
@@ -351,9 +351,6 @@ packages:
     resolution: {integrity: sha512-WyOx8cJQ+FQus4Mm4uPIZA64gbk3Wxh0so5Lcii0aJifqwoVOlfFtorjLE0Hen4OYyHZMXDWqMmaQemBhgxFRQ==}
     engines: {node: '>=14'}
 
-  '@emnapi/core@1.3.1':
-    resolution: {integrity: sha512-pVGjBIt1Y6gg3EJN8jTcfpP/+uuRksIo055oE/OBkDNcjZqVbfkWCksG1Jp4yZnj3iKWyWX8fdG/j6UDYPbFog==}
-
   '@emnapi/core@1.4.5':
     resolution: {integrity: sha512-XsLw1dEOpkSX/WucdqUhPWP7hDxSvZiY+fsUC14h+FtQ2Ifni4znbBt8punRX+Uj2JG/uDb8nEHVKvrVlvdZ5Q==}
 
@@ -362,9 +359,6 @@ packages:
 
   '@emnapi/runtime@1.4.5':
     resolution: {integrity: sha512-++LApOtY0pEEz1zrd9vy1/zXVaVJJ/EbAF3u0fXIzPJEDtnITsBGbbK0EkM72amhl/R5b+5xx0Y/QhcVOpuulg==}
-
-  '@emnapi/wasi-threads@1.0.1':
-    resolution: {integrity: sha512-iIBu7mwkq4UQGeMEM8bLwNK962nXdhodeScX4slfQnRhEMMzvYivHhutCIk8uojvmASXXPC2WNEjwxFWk72Oqw==}
 
   '@emnapi/wasi-threads@1.0.4':
     resolution: {integrity: sha512-PJR+bOmMOPH8AtcTGAyYNiuJ3/Fcoj2XN/gBEWzDIKh254XO+mM9XoXHk5GNEhodxeMznbg7BlRojVbKN+gC6g==}
@@ -888,9 +882,6 @@ packages:
 
   '@napi-rs/wasm-runtime@0.2.12':
     resolution: {integrity: sha512-ZVWUcfwY4E/yPitQJl481FjFo3K22D6qF0DuFH6Y/nbnE11GY5uguDxZMGXPQ8WQ0128MXQD7TnfHyK4oWoIJQ==}
-
-  '@napi-rs/wasm-runtime@0.2.6':
-    resolution: {integrity: sha512-z8YVS3XszxFTO73iwvFDNpQIzdMmSDTP/mB3E/ucR37V3Sx57hSExcXyMoNwaucWxnsWf4xfbZv0iZ30jr0M4Q==}
 
   '@nodelib/fs.scandir@2.1.5':
     resolution: {integrity: sha512-vq24Bq3ym5HEQm2NKCr3yXDwjc7vTsEThRDnkp2DK9p1uqLR+DHurm/NOTo0KG7HYHU7eppKZj3MyqYuMBf62g==}
@@ -1848,9 +1839,6 @@ packages:
   '@tybys/wasm-util@0.10.0':
     resolution: {integrity: sha512-VyyPYFlOMNylG45GoAe0xDoLwWuowvf92F9kySqzYh8vmYm7D2u4iUJKa1tOUpS70Ku13ASrOkS4ScXFsTaCNQ==}
 
-  '@tybys/wasm-util@0.9.0':
-    resolution: {integrity: sha512-6+7nlbMVX/PVDCwaIQ8nTOPveOcFLSt8GcXdx8hD0bt39uWxYT88uXzqTd4fTvqta7oeUJqudepapKNt2DYJFw==}
-
   '@types/acorn@4.0.6':
     resolution: {integrity: sha512-veQTnWP+1D/xbxVrPC3zHnCZRjSrKfhbMUlEA43iMZLu7EsnTtkJklIuwrCPbOi8YkvDQAiW05VQQFvvz9oieQ==}
 
@@ -2352,9 +2340,9 @@ packages:
   comma-separated-tokens@2.0.3:
     resolution: {integrity: sha512-Fu4hJdvzeylCfQPp9SGWidpzrMs7tTrlu6Vb8XGaRGck8QSNZJJp538Wrb60Lax4fPwR64ViY468OIUTbRlGZg==}
 
-  commander@12.1.0:
-    resolution: {integrity: sha512-Vw8qHK3bZM9y/P10u3Vib8o/DdkvA2OtPtZvD871QKjy74Wj1WSKFILMPRPSdUSx5RFK1arlJzEtA4PkFgnbuA==}
-    engines: {node: '>=18'}
+  commander@14.0.0:
+    resolution: {integrity: sha512-2uM9rYjPvyq39NwLRqaiLtWHyDC1FvryJDa2ATTVims5YAS4PupsEQsDvP14FqhFr0P49CYDugi59xaxJlTXRA==}
+    engines: {node: '>=20'}
 
   commander@2.20.3:
     resolution: {integrity: sha512-GpVkmM8vF2vQUkj2LvZmD35JxeJOLCwJ9cUkugyk2nuhbv3+mJvpLYYt+0+USMxE+oj+ey/lJEnhZw75x/OMcQ==}
@@ -5086,21 +5074,21 @@ snapshots:
       '@babel/helper-string-parser': 7.27.1
       '@babel/helper-validator-identifier': 7.27.1
 
-  '@bytecodealliance/componentize-js@0.18.3':
+  '@bytecodealliance/componentize-js@0.18.4':
     dependencies:
-      '@bytecodealliance/jco': 1.12.0
-      '@bytecodealliance/weval': 0.3.3
+      '@bytecodealliance/jco': 1.13.0
+      '@bytecodealliance/weval': 0.3.4
       '@bytecodealliance/wizer': 7.0.5
       es-module-lexer: 1.7.0
       oxc-parser: 0.76.0
 
-  '@bytecodealliance/jco@1.12.0':
+  '@bytecodealliance/jco@1.13.0':
     dependencies:
-      '@bytecodealliance/componentize-js': 0.18.3
+      '@bytecodealliance/componentize-js': 0.18.4
       '@bytecodealliance/preview2-shim': 0.17.2
       binaryen: 123.0.0
       chalk-template: 1.1.0
-      commander: 12.1.0
+      commander: 14.0.0
       mkdirp: 3.0.1
       ora: 8.1.1
       terser: 5.37.0
@@ -5109,7 +5097,7 @@ snapshots:
 
   '@bytecodealliance/preview2-shim@0.17.2': {}
 
-  '@bytecodealliance/weval@0.3.3':
+  '@bytecodealliance/weval@0.3.4':
     dependencies:
       '@napi-rs/lzma': 1.4.1
       decompress: 4.2.1
@@ -5153,12 +5141,6 @@ snapshots:
 
   '@ctrl/tinycolor@4.1.0': {}
 
-  '@emnapi/core@1.3.1':
-    dependencies:
-      '@emnapi/wasi-threads': 1.0.1
-      tslib: 2.8.1
-    optional: true
-
   '@emnapi/core@1.4.5':
     dependencies:
       '@emnapi/wasi-threads': 1.0.4
@@ -5171,11 +5153,6 @@ snapshots:
     optional: true
 
   '@emnapi/runtime@1.4.5':
-    dependencies:
-      tslib: 2.8.1
-    optional: true
-
-  '@emnapi/wasi-threads@1.0.1':
     dependencies:
       tslib: 2.8.1
     optional: true
@@ -5583,7 +5560,7 @@ snapshots:
 
   '@napi-rs/lzma-wasm32-wasi@1.4.1':
     dependencies:
-      '@napi-rs/wasm-runtime': 0.2.6
+      '@napi-rs/wasm-runtime': 0.2.12
     optional: true
 
   '@napi-rs/lzma-win32-arm64-msvc@1.4.1':
@@ -5620,13 +5597,6 @@ snapshots:
       '@emnapi/core': 1.4.5
       '@emnapi/runtime': 1.4.5
       '@tybys/wasm-util': 0.10.0
-    optional: true
-
-  '@napi-rs/wasm-runtime@0.2.6':
-    dependencies:
-      '@emnapi/core': 1.3.1
-      '@emnapi/runtime': 1.3.1
-      '@tybys/wasm-util': 0.9.0
     optional: true
 
   '@nodelib/fs.scandir@2.1.5':
@@ -6943,11 +6913,6 @@ snapshots:
       tslib: 2.8.1
     optional: true
 
-  '@tybys/wasm-util@0.9.0':
-    dependencies:
-      tslib: 2.8.1
-    optional: true
-
   '@types/acorn@4.0.6':
     dependencies:
       '@types/estree': 1.0.8
@@ -7607,7 +7572,7 @@ snapshots:
 
   comma-separated-tokens@2.0.3: {}
 
-  commander@12.1.0: {}
+  commander@14.0.0: {}
 
   commander@2.20.3: {}
 
