@@ -21,7 +21,7 @@
     "@astrojs/react": "^4.3.0",
     "@astrojs/starlight": "^0.35.1",
     "@astrojs/starlight-tailwind": "^4.0.1",
-    "@bytecodealliance/jco": "1.12.0",
+    "@bytecodealliance/jco": "1.13.0",
     "@bytecodealliance/preview2-shim": "^0.17.1",
     "@intentui/icons": "^1.11.0",
     "@monaco-editor/react": "^4.6.0",
