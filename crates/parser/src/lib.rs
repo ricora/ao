@@ -15,11 +15,15 @@ where
 
     let r#type = select! {
         Token::Identifier(ident) if ident == "i32" => ast::TypeKind::I32,
-        Token::Identifier(ident) if ident == "i64" => ast::TypeKind::I64
+        Token::Identifier(ident) if ident == "i64" => ast::TypeKind::I64,
+        Token::Identifier(ident) if ident == "bool" => ast::TypeKind::Bool,
+        Token::Identifier(ident) if ident == "()" => ast::TypeKind::Unit
     }
-    .map_with(|kind, e: &mut MapExtra<'_, '_, I, E<'_>>| ast::Type {
-        name: kind,
-        location: ast::Location::from(e.span()),
+    .map_with(|kind, e: &mut MapExtra<'_, '_, I, E<'_>>| {
+        Some(ast::Type {
+            kind,
+            location: ast::Location::from(e.span()),
+        })
     })
     .boxed();
 
@@ -35,14 +39,22 @@ where
     .boxed();
 
     let literal = select! {
-        Token::Integer(lit) => lit,
-    }
-    .map_with(
-        |lit, e: &mut MapExtra<'_, '_, I, E<'_>>| ast::IntegerLiteral {
-            value: lit,
+        Token::Integer(value) = e => ast::Expression::IntegerLiteral(ast::IntegerLiteral {
+            value,
+            r#type: None,
             location: ast::Location::from(e.span()),
-        },
-    )
+        }),
+        Token::True = e => ast::Expression::BooleanLiteral(ast::BooleanLiteral {
+            value: true,
+            r#type: None,
+            location: ast::Location::from(e.span()),
+        }),
+        Token::False = e => ast::Expression::BooleanLiteral(ast::BooleanLiteral {
+            value: false,
+            r#type: None,
+            location: ast::Location::from(e.span()),
+        }),
+    }
     .boxed();
 
     let expression = recursive(|expression| {
@@ -59,6 +71,7 @@ where
                 ast::Expression::FunctionCall(ast::FunctionCall {
                     name,
                     arguments: args,
+                    r#type: None,
                     location: ast::Location::from(e.span()),
                 })
             })
@@ -79,8 +92,14 @@ where
 
         let atom = assignment
             .or(function_call)
-            .or(literal.map(ast::Expression::IntegerLiteral))
-            .or(identifier.clone().map(ast::Expression::Identifier))
+            .or(literal)
+            .or(identifier.clone().map(|id| {
+                ast::Expression::IdentifierExpression(ast::IdentifierExpression {
+                    identifier: id.clone(),
+                    r#type: None,
+                    location: id.location.clone(),
+                })
+            }))
             .or(expression
                 .clone()
                 .delimited_by(just(Token::LParen), just(Token::RParen)))
@@ -91,12 +110,12 @@ where
             .repeated()
             .foldr(atom, |op, expr| {
                 let op_kind = match op {
-                    Token::Sub => ast::OperatorKind::Subtract,
-                    Token::Not => ast::OperatorKind::LogicalNot,
+                    Token::Sub => ast::UnaryOperatorKind::Negate,
+                    Token::Not => ast::UnaryOperatorKind::Not,
                     _ => unreachable!(),
                 };
                 ast::Expression::UnaryExpression(ast::UnaryExpression {
-                    operator: ast::Operator {
+                    operator: ast::UnaryOperator {
                         operator: op_kind,
                         location: ast::Location {
                             start: 0,
@@ -105,6 +124,7 @@ where
                         },
                     },
                     operand: Box::new(expr),
+                    r#type: None,
                     location: ast::Location {
                         start: 0,
                         end: 0,
@@ -120,13 +140,13 @@ where
                 just(Token::Mul).or(just(Token::Div)).then(unary).repeated(),
                 |left, (op, right)| {
                     let op_kind = match op {
-                        Token::Mul => ast::OperatorKind::Multiply,
-                        Token::Div => ast::OperatorKind::Divide,
+                        Token::Mul => ast::BinaryOperatorKind::Multiply,
+                        Token::Div => ast::BinaryOperatorKind::Divide,
                         _ => unreachable!(),
                     };
                     ast::Expression::BinaryExpression(ast::BinaryExpression {
                         left: Box::new(left),
-                        operator: ast::Operator {
+                        operator: ast::BinaryOperator {
                             operator: op_kind,
                             location: ast::Location {
                                 start: 0,
@@ -135,6 +155,7 @@ where
                             },
                         },
                         right: Box::new(right),
+                        r#type: None,
                         location: ast::Location {
                             start: 0,
                             end: 0,
@@ -151,13 +172,13 @@ where
                 just(Token::Add).or(just(Token::Sub)).then(mul).repeated(),
                 |left, (op, right)| {
                     let op_kind = match op {
-                        Token::Add => ast::OperatorKind::Add,
-                        Token::Sub => ast::OperatorKind::Subtract,
+                        Token::Add => ast::BinaryOperatorKind::Add,
+                        Token::Sub => ast::BinaryOperatorKind::Subtract,
                         _ => unreachable!(),
                     };
                     ast::Expression::BinaryExpression(ast::BinaryExpression {
                         left: Box::new(left),
-                        operator: ast::Operator {
+                        operator: ast::BinaryOperator {
                             operator: op_kind,
                             location: ast::Location {
                                 start: 0,
@@ -166,6 +187,7 @@ where
                             },
                         },
                         right: Box::new(right),
+                        r#type: None,
                         location: ast::Location {
                             start: 0,
                             end: 0,
@@ -189,17 +211,17 @@ where
                     .repeated(),
                 |left, (op, right)| {
                     let op_kind = match op {
-                        Token::LessThan => ast::OperatorKind::LessThan,
-                        Token::LessThanOrEqual => ast::OperatorKind::LessThanOrEqual,
-                        Token::GreaterThan => ast::OperatorKind::GreaterThan,
-                        Token::GreaterThanOrEqual => ast::OperatorKind::GreaterThanOrEqual,
-                        Token::Equal => ast::OperatorKind::Equal,
-                        Token::NotEqual => ast::OperatorKind::NotEqual,
+                        Token::LessThan => ast::BinaryOperatorKind::LessThan,
+                        Token::LessThanOrEqual => ast::BinaryOperatorKind::LessThanOrEqual,
+                        Token::GreaterThan => ast::BinaryOperatorKind::GreaterThan,
+                        Token::GreaterThanOrEqual => ast::BinaryOperatorKind::GreaterThanOrEqual,
+                        Token::Equal => ast::BinaryOperatorKind::Equal,
+                        Token::NotEqual => ast::BinaryOperatorKind::NotEqual,
                         _ => unreachable!(),
                     };
                     ast::Expression::BinaryExpression(ast::BinaryExpression {
                         left: Box::new(left),
-                        operator: ast::Operator {
+                        operator: ast::BinaryOperator {
                             operator: op_kind,
                             location: ast::Location {
                                 start: 0,
@@ -208,6 +230,7 @@ where
                             },
                         },
                         right: Box::new(right),
+                        r#type: None,
                         location: ast::Location {
                             start: 0,
                             end: 0,
@@ -227,13 +250,13 @@ where
                     .repeated(),
                 |left, (op, right)| {
                     let op_kind = match op {
-                        Token::And => ast::OperatorKind::LogicalAnd,
-                        Token::Or => ast::OperatorKind::LogicalOr,
+                        Token::And => ast::BinaryOperatorKind::LogicalAnd,
+                        Token::Or => ast::BinaryOperatorKind::LogicalOr,
                         _ => unreachable!(),
                     };
                     ast::Expression::BinaryExpression(ast::BinaryExpression {
                         left: Box::new(left),
-                        operator: ast::Operator {
+                        operator: ast::BinaryOperator {
                             operator: op_kind,
                             location: ast::Location {
                                 start: 0,
@@ -242,6 +265,7 @@ where
                             },
                         },
                         right: Box::new(right),
+                        r#type: None,
                         location: ast::Location {
                             start: 0,
                             end: 0,
@@ -437,6 +461,22 @@ mod tests {
     use super::parse;
     use indoc::indoc;
     use insta::assert_yaml_snapshot;
+
+    #[test]
+    fn parse_bool_literal() {
+        let source = indoc! {"
+            fn main() -> i32 {
+                let x: bool = true;
+                let y: bool = false;
+                0
+            }
+        "};
+        let result = parse(source);
+        assert!(result.errors().len() == 0);
+
+        let ast = result.into_result().unwrap();
+        assert_yaml_snapshot!(ast);
+    }
 
     #[test]
     fn block_returns_none_when_multiple_expressions() {

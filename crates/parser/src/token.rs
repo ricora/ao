@@ -34,6 +34,11 @@ pub enum Token<'a> {
     #[regex(r"[0-9]+")]
     Integer(&'a str),
 
+    #[token("true")]
+    True,
+    #[token("false")]
+    False,
+
     #[token("+")]
     Add,
 
@@ -128,6 +133,8 @@ impl std::fmt::Display for Token<'_> {
             Self::Return => write!(f, "return"),
             Self::Identifier(value) => write!(f, "{value}"),
             Self::Integer(value) => write!(f, "{value}"),
+            Self::True => write!(f, "true"),
+            Self::False => write!(f, "false"),
             Self::Add => write!(f, "+"),
             Self::Sub => write!(f, "-"),
             Self::Mul => write!(f, "*"),

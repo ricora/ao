@@ -27,6 +27,8 @@ pub enum TypeCheckError {
         operator: String,
         location: Location,
     },
+    #[error("Missing type annotation")]
+    MissingTypeAnnotation { location: Location },
 }
 
 impl TypeCheckError {
@@ -113,6 +115,13 @@ impl TypeCheckError {
                             ))
                             .with_color(Color::Red),
                     );
+            }
+            TypeCheckError::MissingTypeAnnotation { location } => {
+                report = report.with_message("Missing type annotation").with_label(
+                    Label::new((source_id, location.to_range()))
+                        .with_message("Type annotation is required here")
+                        .with_color(Color::Red),
+                );
             }
         }
 

@@ -5,6 +5,7 @@ use anyhow::Context;
 use bindings::Guest;
 use code_generator::CodeGenerator;
 use parser::parse;
+use type_checker::TypeChecker;
 
 #[derive(Debug, thiserror::Error)]
 enum Error {
@@ -25,8 +26,14 @@ struct Component;
 impl Guest for Component {
     fn compile(source: String) -> Result<bindings::Output, bindings::Error> {
         let ast = parse(&source).unwrap();
-        let mut generator =
-            CodeGenerator::new(ast.clone()).with_context(|| "Failed to create code generator")?;
+
+        let mut type_checker = TypeChecker::new();
+        let typed_ast = type_checker
+            .check_program(&ast)
+            .with_context(|| "Failed to type check the program")?;
+
+        let mut generator = CodeGenerator::new(typed_ast.clone())
+            .with_context(|| "Failed to create code generator")?;
         let mut wat = generator
             .generate()
             .with_context(|| "Failed to generate WAT")?;

@@ -33,6 +33,9 @@ primary_expression =
 assignment_expression = identifier "=" expression
 function_call = identifier "(" expression* ")"
 
-literal = INTEGER
+literal =
+    INTEGER
+  | "true"
+  | "false"
 identifier = IDENTIFIER
 type = "i32" | "i64"

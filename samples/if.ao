@@ -1,16 +1,22 @@
-fn is_gt_0(x: i32) -> i32 {
-  var result: i32 = 0;
+fn is_gt_0(x: i32) -> bool {
+  var result: bool = false;
   if x > 0 {
-    result = 1;
+    result = true;
   } else {
-    result = 0;
+    result = false;
   }
   result
 }
 
 fn main() -> i32 {
-  let x: i32 = 1;
-  let result: i32 = is_gt_0(x);
-  print_int(result);
+  let x: i32 = 100;
+
+  let result: bool = is_gt_0(x);
+  if result {
+    print_int(1);
+  } else {
+    print_int(0);
+  }
+
   0
 }
